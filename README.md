@@ -1,20 +1,20 @@
-# zod-faker
+# zod-schema-faker
 
-> Zod-faker will generate you a fake data based on your zod schema.
+> Zod-schema-faker will generate you a fake data based on your zod schema.
 
-[![License - MIT](https://img.shields.io/github/license/iendeavor/zod-faker?color=blue&label=License)](https://github.com/iendeavor/zod-faker/blob/main/LICENSE)
+[![License - MIT](https://img.shields.io/github/license/iendeavor/zod-schema-faker?color=blue&label=License)](https://github.com/iendeavor/zod-schema-faker/blob/main/LICENSE)
 <span>&nbsp;</span> [![SemVer version](https://img.shields.io/badge/Sem%20Ver-2.0.0-black.svg)](https://semver.org/)
 <span>&nbsp;</span>
-[![CI](https://github.com/iendeavor/zod-faker/actions/workflows/ci.yml/badge.svg)](https://github.com/iendeavor/zod-faker/actions/workflows/ci.yml)
+[![CI](https://github.com/iendeavor/zod-schema-faker/actions/workflows/ci.yml/badge.svg)](https://github.com/iendeavor/zod-schema-faker/actions/workflows/ci.yml)
 <span>&nbsp;</span>
-[![zod-faker version](https://img.shields.io/npm/v/zod-faker.svg?label=zod-faker)](https://www.npmjs.com/package/zod-faker)
+[![zod-schema-faker version](https://img.shields.io/npm/v/zod-schema-faker.svg?label=zod-schema-faker)](https://www.npmjs.com/package/zod-schema-faker)
 
 ## Installation
 
 ```sh
 npm install zod
 # faker
-npm install --save-dev zod-faker
+npm install --save-dev zod-schema-faker
 # peer dependencies
 npm install --save-dev @faker-js/faker
 npm install --save-dev randexp
@@ -24,7 +24,7 @@ npm install --save-dev randexp
 
 ```ts
 import * as z from 'zod'
-import { install, fake } from 'zod-faker'
+import { install, fake } from 'zod-schema-faker'
 
 const schema = z.number()
 
