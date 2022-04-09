@@ -36,6 +36,7 @@ test('ZodAnyFaker.fake should return any type', () => {
 test('ZodAnyFaker.fake should return a valid data', () => {
   install()
   const schema = z.any()
-  const data = zodAnyFaker(schema).fake()
+  const faker = zodAnyFaker(schema)
+  const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
