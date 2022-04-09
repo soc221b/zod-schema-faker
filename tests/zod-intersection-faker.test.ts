@@ -40,11 +40,40 @@ test('ZodIntersectionFaker.fake should return intersection type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
 })
 
-test('ZodIntersectionFaker.fake should return a valid data', () => {
+test('ZodIntersectionFaker.fake should return a valid data (literal)', () => {
+  install()
+
+  const schema = z.intersection(z.literal('foo'), z.literal('foo'))
+  const faker = zodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('ZodIntersectionFaker.fake should return a valid data (object)', () => {
   install()
 
   const schema = z.intersection(Person, Employee)
   const faker = zodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('ZodIntersectionFaker.fake should return a valid data (array)', () => {
+  install()
+
+  const schema = z.intersection(z.array(Person).length(1), z.array(Employee).length(1))
+  const faker = zodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+// not sure how to test this one
+test.skip('ZodIntersectionFaker.fake should return a valid data (date)', () => {})
+
+test('ZodIntersectionFaker.fake should return a valid data (no intersection)', () => {
+  install()
+
+  const schema = z.intersection(z.literal('foo'), z.literal('bar'))
+  const faker = zodIntersectionFaker(schema)
+  expect(() => faker.fake()).toThrow()
 })
