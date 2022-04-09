@@ -35,11 +35,38 @@ test('ZodDefaultFaker.fake should return object type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, {}>>(true)
 })
 
-test('ZodDefaultFaker.fake should return a valid data', () => {
+test('ZodDefaultFaker.fake should sometimes return defaultData', () => {
   install()
 
   const schema = z.object({}).default(defaultData)
   const faker = zodDefaultFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
+
+  let i = 0
+  while (++i < 1e3) {
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    if (data === defaultData) {
+      return
+    }
+  }
+
+  throw Error('should not reach here')
+})
+
+test('ZodDefaultFaker.fake should sometimes return non-defaultData', () => {
+  install()
+
+  const schema = z.object({}).default(defaultData)
+  const faker = zodDefaultFaker(schema)
+
+  let i = 0
+  while (++i < 1e3) {
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    if (data !== defaultData) {
+      return
+    }
+  }
+
+  throw Error('should not reach here')
 })
