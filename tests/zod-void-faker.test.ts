@@ -1,6 +1,7 @@
 import * as z from 'zod'
 import { zodVoidFaker, ZodVoidFaker } from '../src/zod-void-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { install } from '../src'
 
 test('ZodVoidFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -32,9 +33,9 @@ test('ZodVoidFaker.fake should return void type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, void>>(true)
 })
 
-test('ZodVoidFaker.fake should return a valid data', () => {
+test('ZodVoidFaker.fake should return a data (but should not be used)', () => {
+  install()
   const schema = z.void()
   const faker = zodVoidFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
+  expect(() => faker.fake()).not.toThrow()
 })

@@ -36,7 +36,7 @@ testMultipleTimes('e2e', () => {
     emptyValues: z.object({
       undefined: z.undefined(),
       null: z.null(),
-      void: z.void(),
+      // void: z.void(), // should not use its return value
     }),
     any: z.any(),
     unknown: z.unknown(),

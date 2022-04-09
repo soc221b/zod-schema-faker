@@ -96,7 +96,7 @@ const schema = z.object({
   emptyValues: z.object({
     undefined: z.undefined(),
     null: z.null(),
-    void: z.void(),
+    // void: z.void(), // should not use its return value
   }),
   any: z.any(),
   unknown: z.unknown(),
@@ -177,7 +177,7 @@ const data = {
     boolean: true,
     date: 2022-04-08T08:31:40.690Z,
   },
-  emptyValues: { undefined: undefined, null: null, void: undefined },
+  emptyValues: { undefined: undefined, null: null },
   any: undefined,
   unknown: undefined,
   literal: 'tuna',
