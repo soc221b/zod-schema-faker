@@ -40,7 +40,7 @@ testMultipleTimes('e2e', () => {
     }),
     any: z.any(),
     unknown: z.unknown(),
-    // never: z.never(), // will throw an Error
+    // never: z.never(), // should not use its return value
     literal: z.literal('tuna'),
     strings: z.object({
       max: z.string().max(5),

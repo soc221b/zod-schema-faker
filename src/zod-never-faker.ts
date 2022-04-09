@@ -3,7 +3,7 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodNeverFaker extends ZodTypeFaker<z.ZodNever> {
   fake(): z.infer<z.ZodNever> {
-    throw new Error()
+    return void 0 as never
   }
 
   static create(schema: z.ZodNever): ZodNeverFaker {

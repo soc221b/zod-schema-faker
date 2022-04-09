@@ -30,3 +30,9 @@ test('ZodNeverFaker.fake should return never type', () => {
   const faker = zodNeverFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, never>>(true)
 })
+
+test('ZodNullFaker.fake should return a data (but should not be used)', () => {
+  const schema = z.never()
+  const faker = zodNeverFaker(schema)
+  expect(() => faker.fake()).not.toThrow()
+})
