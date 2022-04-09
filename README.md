@@ -38,6 +38,27 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
+## API
+
+- `install(): void`: register fakers, must be called before using `fake()`
+- `fake<T extends z.ZodType>(schema: T): z.infer<T>`: generate fake data based on schema
+- `seed(seed?: number | number[]): void`: Sets the seed to use.
+
+  ```ts
+  import * as z from 'zod'
+  import { install, fake, seed } from 'zod-schema-faker'
+
+  install()
+
+  const schema = z.number()
+
+  seed(1)
+  console.log(fake(schema)) // => 8399729968525060
+  seed(1)
+  console.log(fake(schema)) // => 8399729968525060
+  console.log(fake(schema)) // => 62.93956000000001
+  ```
+
 ## Example
 
 <details>
