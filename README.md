@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'development') {
 
 - `install(): void`: register fakers, must be called before using `fake()`
 - `fake<T extends z.ZodType>(schema: T): z.infer<T>`: generate fake data based on schema
-- `seed(seed?: number | number[]): void`: Sets the seed to use.
+- `seed(seed?: number | number[]): void`: sets the seed to use.
 
   ```ts
   import * as z from 'zod'
