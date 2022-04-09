@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { ZodSchemaFakerError } from './error'
 import { assertZodSchema } from './utils'
 
 export const zodTypeKindToZodTypeFaker: Map<z.ZodFirstPartyTypeKind, any /* TODO: should not use any */> = new Map()
@@ -12,7 +13,7 @@ export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
   const typeName = (schema._def as any).typeName
   const faker = zodTypeKindToZodTypeFaker.get(typeName)
   if (faker === undefined) {
-    throw ReferenceError(`Unsupported schema: ${typeName}`)
+    throw new ZodSchemaFakerError(`Unsupported schema: ${typeName}`)
   }
 
   return faker.create(schema).fake()

@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { ZodSchemaFakerError } from './error'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 
@@ -16,7 +17,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     } while (++count < safeCount)
 
-    throw new Error('can not fake a valid data')
+    throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
   }
 
   static create<T extends z.ZodIntersection<any, any>>(schema: T): ZodIntersectionFaker<T> {

@@ -42,6 +42,10 @@ if (process.env.NODE_ENV === 'development') {
 
 - `install(): void`: register fakers, must be called before using `fake()`
 - `fake<T extends z.ZodType>(schema: T): z.infer<T>`: generate fake data based on schema
+
+  > This function may throw `ZodSchemaFakerError` if a valid value cannot be generated for the Zod schema, or if the
+  > schema is not supported.
+
 - `seed(seed?: number | number[]): void`: sets the seed to use.
 
   ```ts
@@ -58,6 +62,8 @@ if (process.env.NODE_ENV === 'development') {
   console.log(fake(schema)) // => 8399729968525060
   console.log(fake(schema)) // => 62.93956000000001
   ```
+
+- `ZodSchemaFakerError`
 
 ## Example
 

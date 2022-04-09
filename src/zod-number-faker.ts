@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { ZodSchemaFakerError } from './error'
 import { runFake } from './faker'
 import { ZodTypeFaker } from './zod-type-faker'
 
@@ -36,7 +37,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
       }
     } while (++count < safeCount)
 
-    throw new Error('can not fake a valid data')
+    throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
   }
 
   private resolveCheck() {

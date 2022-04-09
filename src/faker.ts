@@ -15,7 +15,7 @@ export const runFake = <Runner extends (faker: Faker) => any>(runner: Runner): R
 
   const result = runner(_faker)
   if (result instanceof Promise) {
-    throw new Error('runFake cannot be used with async functions')
+    throw new SyntaxError('InternalError: runFake cannot be used with async functions')
   }
 
   if (_shouldSeed) {
