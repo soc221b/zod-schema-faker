@@ -2,12 +2,13 @@
 
 > Zod-schema-faker will generate you a fake data based on your zod schema.
 
-[![License - MIT](https://img.shields.io/github/license/iendeavor/zod-schema-faker?color=blue&label=License)](https://github.com/iendeavor/zod-schema-faker/blob/main/LICENSE)
-<span>&nbsp;</span> [![SemVer version](https://img.shields.io/badge/Sem%20Ver-2.0.0-black.svg)](https://semver.org/)
+[![License - MIT](https://img.shields.io/github/license/iendeavor/zod-schema-faker?color=brightgreen&label=License)](https://github.com/iendeavor/zod-schema-faker/blob/main/LICENSE)
+<span>&nbsp;</span>
+[![SemVer version](https://img.shields.io/badge/Sem%20Ver-2.0.0-brightgreen.svg)](https://semver.org/)
 <span>&nbsp;</span>
 [![CI](https://github.com/iendeavor/zod-schema-faker/actions/workflows/ci.yml/badge.svg)](https://github.com/iendeavor/zod-schema-faker/actions/workflows/ci.yml)
 <span>&nbsp;</span>
-[![zod-schema-faker version](https://img.shields.io/npm/v/zod-schema-faker.svg?label=zod-schema-faker)](https://www.npmjs.com/package/zod-schema-faker)
+[![zod-schema-faker version](https://img.shields.io/npm/v/zod-schema-faker.svg?label=zod-schema-faker&color=brightgreen)](https://www.npmjs.com/package/zod-schema-faker)
 
 ## Installation
 
