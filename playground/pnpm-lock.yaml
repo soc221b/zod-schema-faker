@@ -6,7 +6,7 @@ specifiers:
   typescript: ^4.5.4
   vite: ^2.9.0
   zod: ^3.14.4
-  zod-schema-faker: ^0.1.1
+  zod-schema-faker: link:..
 
 dependencies:
   zod: 3.14.4
