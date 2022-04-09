@@ -1,6 +1,7 @@
 import * as z from 'zod'
 import { zodUnknownFaker, ZodUnknownFaker } from '../src/zod-unknown-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { install } from '../src'
 
 {
   const data = zodUnknownFaker(z.unknown()).fake()
@@ -38,6 +39,7 @@ test('ZodUnknownFaker.fake should return unknown type', () => {
 })
 
 test('ZodUnknownFaker.fake should return a valid data', () => {
+  install()
   const schema = z.unknown()
   const faker = zodUnknownFaker(schema)
   const data = faker.fake()

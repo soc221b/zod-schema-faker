@@ -1,9 +1,10 @@
 import * as z from 'zod'
+import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodUnknownFaker extends ZodTypeFaker<z.ZodUnknown> {
   fake(): z.infer<z.ZodUnknown> {
-    return void 0
+    return fake(z.any())
   }
 
   static create(schema: z.ZodUnknown): ZodUnknownFaker {
