@@ -33,6 +33,9 @@ export const randexp = (pattern: string | RegExp, flags?: string) => {
   return randexp.gen()
 }
 
+/**
+ * sets the seed to use.
+ */
 export const seed = (value?: number | number[]): void => {
   _seedValue = value
   _shouldSeed = true

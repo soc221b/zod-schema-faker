@@ -3,6 +3,9 @@ import { assertZodSchema } from './utils'
 
 export const zodTypeKindToZodTypeFaker: Map<z.ZodFirstPartyTypeKind, any /* TODO: should not use any */> = new Map()
 
+/**
+ * generate fake data based on schema
+ */
 export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
   assertZodSchema(schema)
 

@@ -32,6 +32,9 @@ import { ZodUnionFaker } from './zod-union-faker'
 import { ZodUnknownFaker } from './zod-unknown-faker'
 import { ZodVoidFaker } from './zod-void-faker'
 
+/**
+ * register fakers, must be called before using `fake()`
+ */
 export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodAny, ZodAnyFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodArray, ZodArrayFaker)
