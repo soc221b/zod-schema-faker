@@ -236,13 +236,49 @@ const data = {
 
 </details>
 
-## Note:
+## Supported APIs
 
-- ZodFunction: not applicable.
-- ZodEffect:
-  - preprocess: ignored, not applicable.
-  - refine: ignored now.
-  - transform: works as expected.
-- ZodNever: will throw an Error
-- ZodNumber:
-  - multipleOf: not supported.
+- ✅ z.any
+- ✅ z.array
+- ✅ z.bigint
+- ✅ z.boolean
+- ✅ z.date
+- ✅ z.default
+- ✅ z.discriminatedUnion
+- z.effects
+  - ❌ preprocess: not applicable.
+  - ❌ refine: not yet supported.
+  - ✅ transform: works as expected.
+- ✅ z.enum
+- ❌ z.function: not applicable.
+- ✅ z.intersection
+- ✅ z.lazy
+- ✅ z.literal
+- ✅ z.map
+- ✅ z.nan
+- ✅ z.nativeEnum
+- ✅ z.never: return nothing, but should not be used.
+- ✅ z.null
+- ✅ z.nullable
+- z.number
+  - ✅ gt
+  - ✅ gte
+  - ✅ lt
+  - ✅ lte
+  - ✅ int
+  - ✅ positive
+  - ✅ nonnegative
+  - ✅ negative
+  - ✅ nonpositive
+  - ❌ multipleOf: not yet supported.
+- ✅ z.object
+- ✅ z.optional
+- ✅ z.promise
+- ✅ z.record
+- ✅ z.set
+- ✅ z.string
+- ✅ z.tuple
+- ✅ z.undefined
+- ✅ z.union
+- ✅ z.unknown: return `fake(z.any())`, should not be used.
+- ✅ z.void: return `fake(z.any())`, should not be used.
