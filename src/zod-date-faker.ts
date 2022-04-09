@@ -1,9 +1,10 @@
 import * as z from 'zod'
+import { runFake } from './faker'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
   fake(): z.infer<z.ZodDate> {
-    return new Date()
+    return runFake(faker => faker.datatype.datetime())
   }
 
   static create(schema: z.ZodDate): ZodDateFaker {
