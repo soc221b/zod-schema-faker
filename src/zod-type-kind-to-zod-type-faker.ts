@@ -66,6 +66,9 @@ export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodVoid, ZodVoidFaker)
 }
 
+/**
+ * @internal This is a private API, do not use. It is a utility function for testing.
+ */
 export const uninstall = (): void => {
   zodTypeKindToZodTypeFaker.clear()
 }
