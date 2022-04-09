@@ -1,5 +1,6 @@
 import * as z from 'zod'
 import { install, fake, seed } from '../src'
+import { runFake } from '../src/faker'
 
 test('seed', () => {
   install()
@@ -13,4 +14,8 @@ test('seed', () => {
 
   const data3 = fake(schema)
   expect(data1).not.toBe(data3)
+})
+
+test('runFake can not be used with async functions', () => {
+  expect(() => runFake(async () => {})).toThrow()
 })
