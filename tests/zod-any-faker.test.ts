@@ -1,6 +1,7 @@
 import * as z from 'zod'
 import { zodAnyFaker, ZodAnyFaker } from '../src/zod-any-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { install } from '../src'
 
 test('ZodAnyFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -33,6 +34,7 @@ test('ZodAnyFaker.fake should return any type', () => {
 })
 
 test('ZodAnyFaker.fake should return a valid data', () => {
+  install()
   const schema = z.any()
   const data = zodAnyFaker(schema).fake()
   expect(schema.safeParse(data).success).toBe(true)
