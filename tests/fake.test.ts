@@ -14,4 +14,8 @@ describe('fake', () => {
     install()
     expect(() => fake(z.number())).not.toThrow()
   })
+
+  test('fake should throw an error if not installed', () => {
+    expect(() => fake(z.number())).toThrow()
+  })
 })
