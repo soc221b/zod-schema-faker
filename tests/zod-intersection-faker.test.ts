@@ -2,6 +2,7 @@ import * as z from 'zod'
 import { zodIntersectionFaker, ZodIntersectionFaker } from '../src/zod-intersection-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
+import { testMultipleTimes } from './util'
 
 const Person = z.object({
   name: z.string(),
@@ -40,7 +41,7 @@ test('ZodIntersectionFaker.fake should return intersection type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
 })
 
-test('ZodIntersectionFaker.fake should return a valid data (literal)', () => {
+test('ZodIntersectionFaker.fake should return a valid data (primitive)', () => {
   install()
 
   const schema = z.intersection(z.literal('foo'), z.literal('foo'))
@@ -52,19 +53,35 @@ test('ZodIntersectionFaker.fake should return a valid data (literal)', () => {
 test('ZodIntersectionFaker.fake should return a valid data (object)', () => {
   install()
 
-  const schema = z.intersection(Person, Employee)
+  const schema = z.intersection(z.object({ foo: z.literal('foo') }), z.object({ foo: z.literal('foo') }))
   const faker = zodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-test('ZodIntersectionFaker.fake should return a valid data (array)', () => {
+test('ZodIntersectionFaker.fake should return a valid data (object, no intersection)', () => {
   install()
 
-  const schema = z.intersection(z.array(Person).length(1), z.array(Employee).length(1))
+  const schema = z.intersection(z.object({ foo: z.literal('foo') }), z.object({ foo: z.literal('bar') }))
+  const faker = zodIntersectionFaker(schema)
+  expect(() => faker.fake()).toThrow()
+})
+
+testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array)', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.literal('foo')), z.array(z.literal('foo')))
   const faker = zodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array, no intersection)', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.literal('foo')).length(1), z.array(z.literal('bar')).length(1))
+  const faker = zodIntersectionFaker(schema)
+  expect(() => faker.fake()).toThrow()
 })
 
 // not sure how to test this one
