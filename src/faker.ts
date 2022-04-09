@@ -2,17 +2,28 @@ import { Faker, faker as _faker } from '@faker-js/faker'
 import RandExp from 'randexp'
 
 let _seedValue: number | number[] | undefined
+let _shouldSeed: boolean = false
 
 // https://github.com/faker-js/faker/issues/448
 // TODO: create standalone faker instead of use following workaround
 export const runFake = <Runner extends (faker: Faker) => any>(runner: Runner): ReturnType<Runner> => {
-  const oldSeedValue = _faker.seedValue
-  _faker.seed(_seedValue)
+  let oldSeedValue
+  if (_shouldSeed) {
+    oldSeedValue = _faker.seedValue
+    _faker.seed(_seedValue)
+  }
+
   const result = runner(_faker)
   if (result instanceof Promise) {
     throw new Error('runFake cannot be used with async functions')
   }
-  _faker.seed(oldSeedValue)
+
+  if (_shouldSeed) {
+    _faker.seed(oldSeedValue)
+  }
+
+  _shouldSeed = false
+
   return result
 }
 
@@ -24,4 +35,5 @@ export const randexp = (pattern: string | RegExp, flags?: string) => {
 
 export const seed = (value?: number | number[]): void => {
   _seedValue = value
+  _shouldSeed = true
 }
