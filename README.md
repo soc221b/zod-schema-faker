@@ -257,7 +257,7 @@ const data = {
 - ✅ z.map
 - ✅ z.nan
 - ✅ z.nativeEnum
-- ✅ z.never: return nothing, but should not be used.
+- ✅ z.never: return nothing, should not be used.
 - ✅ z.null
 - ✅ z.nullable
 - z.number
