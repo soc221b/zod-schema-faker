@@ -3,11 +3,6 @@ import { zodUnknownFaker, ZodUnknownFaker } from '../src/zod-unknown-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
 
-{
-  const data = zodUnknownFaker(z.unknown()).fake()
-  expectType<TypeEqual<typeof data, unknown>>(true)
-}
-
 test('ZodUnknownFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
   expect(() => zodUnknownFaker(invalidSchema)).toThrow()
