@@ -10,7 +10,7 @@ specifiers:
   '@rollup/plugin-replace': ^5.0.0
   '@types/jest': ^27.4.1
   '@types/node': ^17.0.24
-  husky: ^5.2.0
+  husky: ^8.0.0
   jest: ^27.5.1
   pinst: ^3.0.0
   prettier: ^2.6.2
@@ -38,7 +38,7 @@ devDependencies:
   '@rollup/plugin-replace': 5.0.1_rollup@2.70.2
   '@types/jest': 27.4.1
   '@types/node': 17.0.24
-  husky: 5.2.0
+  husky: 8.0.2
   jest: 27.5.1_ts-node@9.1.1
   pinst: 3.0.0
   prettier: 2.6.2
@@ -2193,9 +2193,9 @@ packages:
     engines: {node: '>=10.17.0'}
     dev: true
 
-  /husky/5.2.0:
-    resolution: {integrity: sha512-AM8T/auHXRBxlrfPVLKP6jt49GCM2Zz47m8G3FOMsLmTv8Dj/fKVWE0Rh2d4Qrvmy131xEsdQnb3OXRib67PGg==}
-    engines: {node: '>= 10'}
+  /husky/8.0.2:
+    resolution: {integrity: sha512-Tkv80jtvbnkK3mYWxPZePGFpQ/tT3HNSs/sasF9P2YfkMezDl3ON37YN6jUUI4eTg5LcyVynlb6r4eyvOmspvg==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: true
 
