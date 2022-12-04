@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@faker-js/faker': ^6.1.2
+  '@faker-js/faker': ^7.0.0
   randexp: ^0.5.3
   typescript: ^4.5.4
   vite: ^3.0.0
@@ -12,7 +12,7 @@ dependencies:
   zod: 3.14.4
 
 devDependencies:
-  '@faker-js/faker': 6.1.2
+  '@faker-js/faker': 7.6.0
   randexp: 0.5.3
   typescript: 4.6.3
   vite: 3.2.4
@@ -38,8 +38,8 @@ packages:
     dev: true
     optional: true
 
-  /@faker-js/faker/6.1.2:
-    resolution: {integrity: sha512-QSvmexHCxeRUk1/yKmoEDaWB5Hohjvtim5g2JJwy8S/l0L4b3y/GxSpE6vN4SBoVGGahEQW21uqyRr7EofI35A==}
+  /@faker-js/faker/7.6.0:
+    resolution: {integrity: sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
     dev: true
 
