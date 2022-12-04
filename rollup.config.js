@@ -1,6 +1,6 @@
 const path = require('path')
 const ts = require('rollup-plugin-typescript2')
-const { terser } = require('rollup-plugin-terser')
+const terser = require('@rollup/plugin-terser').default
 const nodeResolve = require('@rollup/plugin-node-resolve').default
 const replace = require('@rollup/plugin-replace')
 const commonjs = require('@rollup/plugin-commonjs')
