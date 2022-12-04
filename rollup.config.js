@@ -1,11 +1,11 @@
-import path from 'path'
-import ts from 'rollup-plugin-typescript2'
-import { terser } from 'rollup-plugin-terser'
-import nodeResolve from '@rollup/plugin-node-resolve'
-import replace from '@rollup/plugin-replace'
-import commonjs from '@rollup/plugin-commonjs'
-import autoExternal from 'rollup-plugin-auto-external'
-import json from '@rollup/plugin-json'
+const path = require('path')
+const ts = require('rollup-plugin-typescript2')
+const { terser } = require('rollup-plugin-terser')
+const nodeResolve = require('@rollup/plugin-node-resolve').default
+const replace = require('@rollup/plugin-replace')
+const commonjs = require('@rollup/plugin-commonjs')
+const autoExternal = require('rollup-plugin-auto-external')
+const json = require('@rollup/plugin-json')
 
 const packageDir = path.resolve(__dirname)
 const packageResolve = p => path.resolve(packageDir, p)
@@ -77,4 +77,4 @@ const configs = finalFormats
   )
   .reduce((flattedConfigs, configs) => flattedConfigs.concat(...configs), [])
 
-export default configs
+module.exports = configs
