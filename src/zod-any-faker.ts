@@ -52,7 +52,7 @@ const schemas = (() => {
 
 export class ZodAnyFaker extends ZodTypeFaker<z.ZodAny> {
   fake(): z.infer<z.ZodAny> {
-    const randomSchema = runFake(faker => faker.random.arrayElement(schemas))
+    const randomSchema = runFake(faker => faker.helpers.arrayElement(schemas))
     return fake(randomSchema)
   }
 

@@ -40,7 +40,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.0.0",
     "@commitlint/config-conventional": "^17.0.0",
-    "@faker-js/faker": "^6.1.2",
+    "@faker-js/faker": "^7.0.0",
     "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-json": "^5.0.0",
     "@rollup/plugin-node-resolve": "^15.0.0",
@@ -66,7 +66,7 @@
     "zod": "^3.14.4"
   },
   "peerDependencies": {
-    "@faker-js/faker": "^6.0.0",
+    "@faker-js/faker": "^6.0.0 || ^7.0.0",
     "randexp": "^0.5.3",
     "zod": "^3.14.4"
   },

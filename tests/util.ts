@@ -1,4 +1,4 @@
-const count = 1e3
+const count = 50
 
 export const testMultipleTimes = (name: string, fn: () => void) => {
   test(name, () => {
