@@ -1,6 +1,6 @@
 {
   "name": "zod-schema-faker",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "sideEffects": false,
   "description": "Zod-schema-faker will generate you a fake data based on your zod schema.",
   "keywords": [
