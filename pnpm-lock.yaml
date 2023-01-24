@@ -8,7 +8,7 @@ specifiers:
   '@rollup/plugin-json': ^6.0.0
   '@rollup/plugin-node-resolve': ^15.0.0
   '@rollup/plugin-replace': ^5.0.0
-  '@rollup/plugin-terser': ^0.3.0
+  '@rollup/plugin-terser': ^0.4.0
   '@types/jest': ^29.0.0
   '@types/node': ^18.0.0
   husky: ^8.0.0
@@ -36,7 +36,7 @@ devDependencies:
   '@rollup/plugin-json': 6.0.0_rollup@3.5.1
   '@rollup/plugin-node-resolve': 15.0.1_rollup@3.5.1
   '@rollup/plugin-replace': 5.0.1_rollup@3.5.1
-  '@rollup/plugin-terser': 0.3.0_rollup@3.5.1
+  '@rollup/plugin-terser': 0.4.0_rollup@3.5.1
   '@types/jest': 29.2.3
   '@types/node': 18.11.10
   husky: 8.0.2
@@ -918,8 +918,8 @@ packages:
       rollup: 3.5.1
     dev: true
 
-  /@rollup/plugin-terser/0.3.0_rollup@3.5.1:
-    resolution: {integrity: sha512-mYTkNW9KjOscS/3QWU5LfOKsR3/fAAVDaqcAe2TZ7ng6pN46f+C7FOZbITuIW/neA+PhcjoKl7yMyB3XcmA4gw==}
+  /@rollup/plugin-terser/0.4.0_rollup@3.5.1:
+    resolution: {integrity: sha512-Ipcf3LPNerey1q9ZMjiaWHlNPEHNU/B5/uh9zXLltfEQ1lVSLLeZSgAtTPWGyw8Ip1guOeq+mDtdOlEj/wNxQw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.x || ^3.x
