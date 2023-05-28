@@ -4,7 +4,7 @@ specifiers:
   '@commitlint/cli': ^17.0.0
   '@commitlint/config-conventional': ^17.0.0
   '@faker-js/faker': ^7.0.0
-  '@rollup/plugin-commonjs': ^24.0.0
+  '@rollup/plugin-commonjs': ^25.0.0
   '@rollup/plugin-json': ^6.0.0
   '@rollup/plugin-node-resolve': ^15.0.0
   '@rollup/plugin-replace': ^5.0.0
@@ -32,7 +32,7 @@ devDependencies:
   '@commitlint/cli': 17.3.0
   '@commitlint/config-conventional': 17.3.0
   '@faker-js/faker': 7.6.0
-  '@rollup/plugin-commonjs': 24.0.0_rollup@3.5.1
+  '@rollup/plugin-commonjs': 25.0.0_rollup@3.5.1
   '@rollup/plugin-json': 6.0.0_rollup@3.5.1
   '@rollup/plugin-node-resolve': 15.0.1_rollup@3.5.1
   '@rollup/plugin-replace': 5.0.1_rollup@3.5.1
@@ -855,8 +855,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@rollup/plugin-commonjs/24.0.0_rollup@3.5.1:
-    resolution: {integrity: sha512-0w0wyykzdyRRPHOb0cQt14mIBLujfAv6GgP6g8nvg/iBxEm112t3YPPq+Buqe2+imvElTka+bjNlJ/gB56TD8g==}
+  /@rollup/plugin-commonjs/25.0.0_rollup@3.5.1:
+    resolution: {integrity: sha512-hoho2Kay9TZrLu0bnDsTTCaj4Npa+THk9snajP/XDNb9a9mmjTjh52EQM9sKl3HD1LsnihX7js+eA2sd2uKAhw==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.68.0||^3.0.0
