@@ -29,6 +29,25 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
   }
 
   private resolveCheck() {
+    if (
+      this.schema._def.checks.some(check => check.kind === 'finite') === false &&
+      this.schema._def.checks.some(check => check.kind === 'int') === false &&
+      this.schema._def.checks.some(check => check.kind === 'max') === false &&
+      this.schema._def.checks.some(check => check.kind === 'multipleOf') === false &&
+      runFake(faker => faker.datatype.boolean())
+    ) {
+      return { min: Infinity, max: Infinity, precision: 1 }
+    }
+    if (
+      this.schema._def.checks.some(check => check.kind === 'finite') === false &&
+      this.schema._def.checks.some(check => check.kind === 'int') === false &&
+      this.schema._def.checks.some(check => check.kind === 'min') === false &&
+      this.schema._def.checks.some(check => check.kind === 'multipleOf') === false &&
+      runFake(faker => faker.datatype.boolean())
+    ) {
+      return { min: -Infinity, max: -Infinity, precision: 1 }
+    }
+
     let min =
       -1 * (Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1)
     let max = Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1
@@ -38,16 +57,18 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = check.value
+          min = Math.max(min, check.value)
           break
         case 'max':
-          max = check.value
+          max = Math.min(max, check.value)
           break
         case 'int':
           precision = 1
           break
         case 'multipleOf':
           // step = check.value
+          break
+        case 'finite':
           break
         default:
           const _: never = check

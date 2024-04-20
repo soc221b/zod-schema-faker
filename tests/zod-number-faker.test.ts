@@ -124,3 +124,17 @@ testMultipleTimes.skip('multipleOf', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+testMultipleTimes('finite', () => {
+  const schema = z.number().finite()
+  const faker = zodNumberFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+testMultipleTimes('safe', () => {
+  const schema = z.number().safe()
+  const faker = zodNumberFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
