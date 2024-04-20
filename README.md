@@ -277,7 +277,31 @@ const data = {
 - ✅ z.promise
 - ✅ z.record
 - ✅ z.set
-- ✅ z.string
+- z.string
+  - ✅ max
+  - ✅ min
+  - ✅ length
+  - ✅ email
+  - ✅ url
+  - ❌ emoji: not yet supported.
+  - ✅ uuid
+  - ~~nanoid~~
+  - ✅ cuid
+  - ✅ cuid2
+  - ✅ ulid
+  - ✅ regex
+  - ✅ includes
+  - ✅ startsWith
+  - ✅ endsWith
+  - ✅ datetime
+  - ~~date~~
+  - ~~time~~
+  - ~~duration~~
+  - ✅ ip
+  - ~~base64~~
+  - ✅ trim
+  - ✅ toLowerCase
+  - ✅ toUpperCase
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
