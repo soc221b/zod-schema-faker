@@ -253,8 +253,8 @@ const data = {
   - ❌ multipleOf: not yet supported
 - ✅ z.boolean
 - z.date
-  - ✅ min: not yet supported
-  - ✅ max: not yet supported
+  - ✅ min
+  - ✅ max
 - ✅ z.default
 - ✅ z.discriminatedUnion
 - z.effects
