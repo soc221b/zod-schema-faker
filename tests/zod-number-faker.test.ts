@@ -117,9 +117,8 @@ testMultipleTimes('non-negative', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-// TODO
-testMultipleTimes.skip('multipleOf', () => {
-  const schema = z.number().multipleOf(5)
+testMultipleTimes('multipleOf', () => {
+  const schema = z.number().multipleOf(0.1 + 0.2)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)

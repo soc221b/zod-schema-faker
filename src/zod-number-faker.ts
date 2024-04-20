@@ -66,8 +66,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
           precision = 1
           break
         case 'multipleOf':
-          // step = check.value
-          break
+          return { min: check.value, max: check.value, precision: 0.1 }
         case 'finite':
           break
         default:

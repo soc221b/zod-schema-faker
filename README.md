@@ -285,7 +285,7 @@ const data = {
   - ✅ nonnegative
   - ✅ negative
   - ✅ nonpositive
-  - ❌ multipleOf: not yet supported.
+  - ✅ multipleOf
   - ✅ finite
   - ✅ safe
 - ✅ z.object
