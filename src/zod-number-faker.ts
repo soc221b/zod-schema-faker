@@ -72,7 +72,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
           break
         default:
           const _: never = check
-          break
+          throw Error('unimplemented')
       }
     }
 
@@ -94,6 +94,13 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
             min = Math.min(min, max)
           }
           break
+        case 'finite':
+        case 'int':
+        case 'multipleOf':
+          break
+        default:
+          const _: never = check
+          throw Error('unimplemented')
       }
     }
 
