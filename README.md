@@ -252,7 +252,9 @@ const data = {
   - ❌ nonpositive: not yet supported
   - ❌ multipleOf: not yet supported
 - ✅ z.boolean
-- ✅ z.date
+- z.date
+  - ❌ min: not yet supported
+  - ❌ max: not yet supported
 - ✅ z.default
 - ✅ z.discriminatedUnion
 - z.effects
