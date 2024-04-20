@@ -48,7 +48,7 @@ describe('passthrough', () => {
   test('ZodObjectFaker.fake should return object type', () => {
     const schema = z.object({ foo: z.number(), bar: z.string() }).passthrough()
     const faker = zodObjectFaker(schema)
-    expectType<TypeEqual<ReturnType<typeof faker.fake>, { foo: number; bar: string }>>(true)
+    expectType<TypeEqual<ReturnType<typeof faker.fake>, { foo: number; bar: string } & { [k: string]: unknown }>>(true)
   })
 
   test('ZodObjectFaker.fake should return a valid data', () => {
