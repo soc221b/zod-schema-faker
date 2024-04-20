@@ -268,7 +268,7 @@ const data = {
 - ✅ z.literal
 - ✅ z.map
 - ✅ z.nan
-- ✅ z.nativeEnum
+- z.nativeEnum
   - ✅ numeric enums
   - ✅ string enums
   - ✅ const enums
