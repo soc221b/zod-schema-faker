@@ -290,7 +290,9 @@ const data = {
   - ✅ safe
 - ✅ z.object
 - ✅ z.optional
+- ❌ z.pipe: not yet supported.
 - ✅ z.promise
+- ❌ z.readonly: not yet supported.
 - ✅ z.record
 - ✅ z.set
 - z.string
