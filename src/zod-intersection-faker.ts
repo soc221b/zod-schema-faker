@@ -57,7 +57,7 @@ function mergeValues(a: any, b: any): { valid: true; data: any } | { valid: fals
     }
 
     return { valid: true, data: newArray }
-  } else if (aType === z.ZodParsedType.date && bType === z.ZodParsedType.date && +a === +b) {
+  } else if (aType === z.ZodParsedType.date && bType === z.ZodParsedType.date) {
     return { valid: true, data: a }
   } else {
     return { valid: false }

@@ -50,6 +50,15 @@ test('ZodIntersectionFaker.fake should return a valid data (primitive)', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('ZodIntersectionFaker.fake should return a valid data (date)', () => {
+  install()
+
+  const schema = z.intersection(z.date(), z.date())
+  const faker = zodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('ZodIntersectionFaker.fake should return a valid data (object)', () => {
   install()
 
@@ -83,9 +92,6 @@ testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array, 
   const faker = zodIntersectionFaker(schema)
   expect(() => faker.fake()).toThrow()
 })
-
-// not sure how to test this one
-test.skip('ZodIntersectionFaker.fake should return a valid data (date)', () => {})
 
 test('ZodIntersectionFaker.fake should return a valid data (no intersection)', () => {
   install()
