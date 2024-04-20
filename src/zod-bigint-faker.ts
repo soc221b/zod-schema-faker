@@ -4,7 +4,7 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
   fake(): z.infer<z.ZodBigInt> {
-    return runFake(faker => faker.datatype.bigInt())
+    return runFake(faker => faker.number.bigInt())
   }
 
   static create(schema: z.ZodBigInt): ZodBigIntFaker {

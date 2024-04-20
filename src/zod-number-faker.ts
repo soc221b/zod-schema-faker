@@ -22,11 +22,11 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
     do {
       const result = runFake(faker =>
         precision === 1
-          ? faker.datatype.number({
+          ? faker.number.int({
               min: Math.ceil(min),
               max: Math.floor(max),
             })
-          : faker.datatype.float({
+          : faker.number.float({
               min,
               max,
               precision,
@@ -42,10 +42,10 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
 
   private resolveCheck() {
     let min =
-      -1 * (Math.pow(2, exponents[runFake(faker => faker.datatype.number({ min: 0, max: exponents.length - 1 }))]) - 1)
-    let max = Math.pow(2, exponents[runFake(faker => faker.datatype.number({ min: 0, max: exponents.length - 1 }))]) - 1
+      -1 * (Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1)
+    let max = Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1
     let precision =
-      1 / Math.pow(10, precisions[runFake(faker => faker.datatype.number({ min: 0, max: precisions.length - 1 }))])
+      1 / Math.pow(10, precisions[runFake(faker => faker.number.int({ min: 0, max: precisions.length - 1 }))])
 
     for (const check of this.schema._def.checks) {
       switch (check.kind) {

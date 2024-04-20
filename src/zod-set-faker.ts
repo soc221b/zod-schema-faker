@@ -6,10 +6,10 @@ import { ZodTypeFaker } from './zod-type-faker'
 export class ZodSetFaker<T extends z.ZodSet<any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
     let min = this.schema._def.minSize?.value ?? 0
-    let max = this.schema._def.maxSize?.value ?? runFake(faker => faker.datatype.number({ min, max: min + 10 }))
+    let max = this.schema._def.maxSize?.value ?? runFake(faker => faker.number.int({ min, max: min + 10 }))
 
     return new Set(
-      Array(runFake(faker => faker.datatype.number({ min, max })))
+      Array(runFake(faker => faker.number.int({ min, max })))
         .fill(null)
         .map(() => fake(this.schema._def.valueType)),
     )

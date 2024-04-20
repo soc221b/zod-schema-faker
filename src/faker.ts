@@ -21,7 +21,7 @@ export const runFake = <Runner extends (faker: Faker) => any>(runner: Runner): R
 
 export const randexp = (pattern: string | RegExp, flags?: string) => {
   const randexp = new RandExp(pattern, flags)
-  randexp.randInt = (from, to) => runFake(faker => faker.datatype.number({ min: from, max: to }))
+  randexp.randInt = (from, to) => runFake(faker => faker.number.int({ min: from, max: to }))
   return randexp.gen()
 }
 

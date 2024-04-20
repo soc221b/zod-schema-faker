@@ -48,7 +48,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'url':
           return runFake(faker => faker.internet.url())
         case 'uuid':
-          return runFake(faker => faker.datatype.uuid())
+          return runFake(faker => faker.string.uuid())
       }
     }
 
