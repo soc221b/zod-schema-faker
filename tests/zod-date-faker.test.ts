@@ -38,3 +38,17 @@ test('ZodDateFaker.fake should return a valid data', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('min', () => {
+  const schema = z.date().min(new Date('2000-01-01'))
+  const faker = zodDateFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('max', () => {
+  const schema = z.date().max(new Date('2000-01-01'))
+  const faker = zodDateFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
