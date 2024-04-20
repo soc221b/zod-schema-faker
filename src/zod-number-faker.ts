@@ -1,10 +1,6 @@
 import * as z from 'zod'
-import { ZodSchemaFakerError } from './error'
 import { runFake } from './faker'
 import { ZodTypeFaker } from './zod-type-faker'
-
-/* TODO: this is a bit of a hack, but it works for now */
-const safeCount = 1e3
 
 const exponents = Array(54)
   .fill(null)
@@ -17,27 +13,19 @@ const precisions = Array(16)
 export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
   fake(): z.infer<z.ZodNumber> {
     const { min, max, precision } = this.resolveCheck()
-
-    let count = 0
-    do {
-      const result = runFake(faker =>
-        precision === 1
-          ? faker.number.int({
-              min: Math.ceil(min),
-              max: Math.floor(max),
-            })
-          : faker.number.float({
-              min,
-              max,
-              precision,
-            }),
-      )
-      if (this.schema.safeParse(result).success) {
-        return result
-      }
-    } while (++count < safeCount)
-
-    throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
+    const result = runFake(faker =>
+      precision === 1
+        ? faker.number.int({
+            min: Math.ceil(min),
+            max: Math.floor(max),
+          })
+        : faker.number.float({
+            min,
+            max,
+            precision,
+          }),
+    )
+    return this.schema.parse(result)
   }
 
   private resolveCheck() {
