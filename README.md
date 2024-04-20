@@ -269,6 +269,9 @@ const data = {
 - ✅ z.map
 - ✅ z.nan
 - ✅ z.nativeEnum
+  - ✅ numeric enums
+  - ✅ string enums
+  - ✅ const enums
 - ✅ z.never: return nothing, should not be used.
 - ✅ z.null
 - ✅ z.nullable
