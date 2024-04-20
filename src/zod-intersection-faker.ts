@@ -3,21 +3,16 @@ import { ZodSchemaFakerError } from './error'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 
-/* TODO: this is a bit of a hack, but it works for now */
-const safeCount = 1e3
 export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    let count = 0
-    do {
-      const leftResult = fake(this.schema._def.left)
-      const rightResult = fake(this.schema._def.right)
-      const result = mergeValues(leftResult, rightResult)
-      if (result.valid && this.schema.safeParse(result.data).success) {
-        return result.data
-      }
-    } while (++count < safeCount)
-
-    throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
+    const leftResult = fake(this.schema._def.left)
+    const rightResult = fake(this.schema._def.right)
+    const result = mergeValues(leftResult, rightResult)
+    if (result.valid && this.schema.safeParse(result.data).success) {
+      return result.data
+    } else {
+      throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
+    }
   }
 
   static create<T extends z.ZodIntersection<any, any>>(schema: T): ZodIntersectionFaker<T> {
@@ -48,12 +43,8 @@ function mergeValues(a: any, b: any): { valid: true; data: any } | { valid: fals
 
     return { valid: true, data: newObj }
   } else if (aType === z.ZodParsedType.array && bType === z.ZodParsedType.array) {
-    if (a.length !== b.length) {
-      return { valid: false }
-    }
-
     const newArray = []
-    for (let index = 0; index < a.length; index++) {
+    for (let index = 0; index < Math.min(a.length, b.length); index++) {
       const itemA = a[index]
       const itemB = b[index]
       const sharedValue = mergeValues(itemA, itemB)
