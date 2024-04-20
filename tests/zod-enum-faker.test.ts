@@ -41,3 +41,21 @@ test('ZodEnumFaker.fake should return a valid data', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('ZodEnumFaker.fake.extract should return a valid data', () => {
+  install()
+
+  const schema = z.enum(['foo', 'bar']).extract(['foo'])
+  const faker = zodEnumFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('ZodEnumFaker.fake.exclude should return a valid data', () => {
+  install()
+
+  const schema = z.enum(['foo', 'bar']).exclude(['foo'])
+  const faker = zodEnumFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
