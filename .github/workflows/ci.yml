@@ -104,10 +104,4 @@ jobs:
         run: pnpm install
 
       - name: Test
-        run: pnpm run test -- --no-cache --collect-coverage
-
-      - name: Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          directory: ./coverage/
-          fail_ci_if_error: true
+        run: pnpm run test -- --no-cache
