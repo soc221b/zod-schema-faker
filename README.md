@@ -236,7 +236,16 @@ const data = {
 
 - ✅ z.any
 - ✅ z.array
-- ❌ z.bigint
+- z.bigint
+  - ✅ gt
+  - ✅ gte
+  - ✅ lt
+  - ✅ lte
+  - ✅ positive
+  - ✅ nonnegative
+  - ✅ negative
+  - ✅ nonpositive
+  - ✅ multipleOf
 - ✅ z.boolean
 - z.date
   - ✅ min
