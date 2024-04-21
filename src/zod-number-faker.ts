@@ -22,7 +22,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
         : faker.number.float({
             min,
             max,
-            precision,
+            multipleOf: precision,
           }),
     )
     return this.schema.parse(result)
