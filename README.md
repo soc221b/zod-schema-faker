@@ -7,12 +7,7 @@
 ## Installation
 
 ```sh
-npm install zod
-# faker
 npm install --save-dev zod-schema-faker
-# peer dependencies
-npm install --save-dev @faker-js/faker
-npm install --save-dev randexp
 ```
 
 ## Usage

@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@commitlint/cli': ^19.0.0
   '@commitlint/config-conventional': ^19.0.0
-  '@faker-js/faker': ^8.0.0
+  '@faker-js/faker': ^8.4.1
   '@rollup/plugin-commonjs': ^25.0.0
   '@rollup/plugin-json': ^6.0.0
   '@rollup/plugin-node-resolve': ^15.0.0
@@ -28,10 +28,13 @@ specifiers:
   typescript: ^4.6.3
   zod: ^3.22.5
 
+dependencies:
+  '@faker-js/faker': 8.4.1
+  randexp: 0.5.3
+
 devDependencies:
   '@commitlint/cli': 19.2.2_gnjvreqooqdty725fyfa66bkni
   '@commitlint/config-conventional': 19.2.2
-  '@faker-js/faker': 8.4.1
   '@rollup/plugin-commonjs': 25.0.0_rollup@3.29.4
   '@rollup/plugin-json': 6.0.0_rollup@3.29.4
   '@rollup/plugin-node-resolve': 15.0.1_rollup@3.29.4
@@ -43,7 +46,6 @@ devDependencies:
   jest: 29.3.1_n6hldgehq3pyv7xddzotgcm77y
   pinst: 3.0.0
   prettier: 3.2.5
-  randexp: 0.5.3
   rimraf: 5.0.5
   rollup: 3.29.4
   rollup-plugin-auto-external: 2.0.0_rollup@3.29.4
@@ -579,7 +581,7 @@ packages:
   /@faker-js/faker/8.4.1:
     resolution: {integrity: sha512-XQ3cU+Q8Uqmrbf2e0cIC/QN43sTBSC8KF12u29Mb47tWrt2hAgBXSgpZMj4Ao8Uk0iJcU99QsOCaIL8934obCg==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0, npm: '>=6.14.13'}
-    dev: true
+    dev: false
 
   /@hutson/parse-repository-url/3.0.2:
     resolution: {integrity: sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==}
@@ -1895,7 +1897,7 @@ packages:
   /drange/1.1.1:
     resolution: {integrity: sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==}
     engines: {node: '>=4'}
-    dev: true
+    dev: false
 
   /eastasianwidth/0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
@@ -3625,7 +3627,7 @@ packages:
     dependencies:
       drange: 1.1.1
       ret: 0.2.2
-    dev: true
+    dev: false
 
   /randombytes/2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
@@ -3755,7 +3757,7 @@ packages:
   /ret/0.2.2:
     resolution: {integrity: sha512-M0b3YWQs7R3Z917WRQy1HHA7Ba7D8hvZg6UE5mLykJxQVE2ju0IXbGlaHPPlkY+WN7wFP+wUMXmBFA0aV6vYGQ==}
     engines: {node: '>=4'}
-    dev: true
+    dev: false
 
   /rimraf/5.0.5:
     resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
