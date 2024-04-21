@@ -276,7 +276,7 @@ const data = {
   - ✅ safe
 - ✅ z.object
 - ✅ z.optional
-- ❌ z.pipe: not yet supported.
+- ✅ z.pipe
 - ✅ z.promise
 - ✅ z.readonly
 - ✅ z.record

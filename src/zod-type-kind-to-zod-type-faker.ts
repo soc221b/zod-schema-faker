@@ -22,6 +22,7 @@ import { ZodNullableFaker } from './zod-nullable-faker'
 import { ZodNumberFaker } from './zod-number-faker'
 import { ZodObjectFaker } from './zod-object-faker'
 import { ZodOptionalFaker } from './zod-optional-faker'
+import { ZodPipelineFaker } from './zod-pipe-faker'
 import { ZodPromiseFaker } from './zod-promise-faker'
 import { ZodReadonlyFaker } from './zod-readonly-faker'
 import { ZodRecordFaker } from './zod-record-faker'
@@ -59,6 +60,7 @@ export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNumber, ZodNumberFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodObject, ZodObjectFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodOptional, ZodOptionalFaker)
+  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPipeline, ZodPipelineFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPromise, ZodPromiseFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodReadonly, ZodReadonlyFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodRecord, ZodRecordFaker)
