@@ -236,16 +236,7 @@ const data = {
 
 - ✅ z.any
 - ✅ z.array
-- z.bigint
-  - ❌ gt: not yet supported
-  - ❌ gte: not yet supported
-  - ❌ lt: not yet supported
-  - ❌ lte: not yet supported
-  - ❌ positive: not yet supported
-  - ❌ nonnegative: not yet supported
-  - ❌ negative: not yet supported
-  - ❌ nonpositive: not yet supported
-  - ❌ multipleOf: not yet supported
+- ❌ z.bigint
 - ✅ z.boolean
 - z.date
   - ✅ min
