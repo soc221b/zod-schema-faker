@@ -13,12 +13,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: ^6
+          version: ^7
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install
@@ -41,12 +41,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: ^6
+          version: ^7
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install
@@ -92,12 +92,12 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: ^6
+          version: ^7
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 14
+          node-version-file: '.nvmrc'
           cache: 'pnpm'
 
       - name: Install
