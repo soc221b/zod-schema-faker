@@ -104,4 +104,4 @@ jobs:
         run: pnpm install
 
       - name: Test
-        run: pnpm run test -- --no-cache
+        run: pnpm run test
