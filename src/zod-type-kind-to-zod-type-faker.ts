@@ -9,7 +9,7 @@ import { ZodDefaultFaker } from './zod-default-faker'
 import { ZodDiscriminatedUnionFaker } from './zod-discriminated-union-faker'
 import { ZodEffectsFaker } from './zod-effects-faker'
 import { ZodEnumFaker } from './zod-enum-faker'
-// import { ZodFunctionFaker } from './zod-function-faker'
+import { ZodFunctionFaker } from './zod-function-faker'
 import { ZodIntersectionFaker } from './zod-intersection-faker'
 import { ZodLazyFaker } from './zod-lazy-faker'
 import { ZodLiteralFaker } from './zod-literal-faker'
@@ -47,7 +47,7 @@ export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion, ZodDiscriminatedUnionFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEffects, ZodEffectsFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEnum, ZodEnumFaker)
-  // zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodFunction, ZodFunctionFaker)
+  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodFunction, ZodFunctionFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodIntersection, ZodIntersectionFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLazy, ZodLazyFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLiteral, ZodLiteralFaker)
