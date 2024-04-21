@@ -10,6 +10,7 @@ test('seed', () => {
   const data1 = fake(schema)
   seed(3)
   const data2 = fake(schema)
+  expect(data1).toMatchSnapshot()
   expect(data1).toBe(data2)
 
   const data3 = fake(schema)
