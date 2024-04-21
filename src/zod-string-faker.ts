@@ -102,6 +102,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     }
     min = exact ?? min
     max = exact ?? max
+    max = Math.max(min, max)
 
     let result = ''
     while (Number.isFinite(min) && result.length < min) {
@@ -121,6 +122,12 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     }
     if (endsWith) {
       result = result.slice(-1 * endsWith.length) + endsWith
+    }
+    if (toLowercase) {
+      result = result.toLowerCase()
+    }
+    if (toUppercase) {
+      result = result.toUpperCase()
     }
     return result
   }

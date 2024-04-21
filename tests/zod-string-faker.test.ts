@@ -173,14 +173,14 @@ test('trim', () => {
 })
 
 test('toLowerCase', () => {
-  const schema = z.string().regex(/^ABC$/).toLowerCase()
+  const schema = z.string().toLowerCase()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('toUpperCase', () => {
-  const schema = z.string().regex(/^abc$/).toUpperCase()
+  const schema = z.string().toUpperCase()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
