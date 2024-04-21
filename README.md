@@ -31,6 +31,7 @@ if (process.env.NODE_ENV === 'development') {
 ## API
 
 - `install(): void`: register fakers, must be called before using `fake()`
+
 - `fake<T extends z.ZodType>(schema: T): z.infer<T>`: generate fake data based on schema
 
   > This function may throw `ZodSchemaFakerError` if a valid value cannot be generated for the Zod schema, or if the
@@ -247,6 +248,7 @@ const data = {
   - ✅ nonpositive
   - ✅ multipleOf
 - ✅ z.boolean
+- ✅ z.custom: [example](./tests/zod-custom-faker.test.ts)
 - z.date
   - ✅ min
   - ✅ max
