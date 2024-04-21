@@ -257,7 +257,7 @@ const data = {
   - ❌ refine: not yet supported.
   - ✅ transform: works as expected.
 - ✅ z.enum
-- ❌ z.function: not applicable.
+- ✅ z.function
 - ✅ z.intersection
 - ✅ z.lazy
 - ✅ z.literal
