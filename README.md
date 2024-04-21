@@ -278,7 +278,7 @@ const data = {
 - ✅ z.optional
 - ❌ z.pipe: not yet supported.
 - ✅ z.promise
-- ❌ z.readonly: not yet supported.
+- ✅ z.readonly
 - ✅ z.record
 - ✅ z.set
 - z.string
