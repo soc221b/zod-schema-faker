@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.2.0](https://github.com/iendeavor/zod-schema-faker/compare/v0.1.3...v0.2.0) (2024-04-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* use deps instead peer deps since there is no test for each versions
+
+### Features
+
+* bigint ([2fd3f74](https://github.com/iendeavor/zod-schema-faker/commit/2fd3f7473610f228bd3418b3ce12987e3de6454b))
+* custom ([1bf4bff](https://github.com/iendeavor/zod-schema-faker/commit/1bf4bffd243500b4c8869ae67b2d5ed0753a0c02))
+* date ([6b4b33a](https://github.com/iendeavor/zod-schema-faker/commit/6b4b33ad32375bb2ab5d9b75e722267787d6d63e))
+* discriminated union ([e3ceca7](https://github.com/iendeavor/zod-schema-faker/commit/e3ceca731521e433bd3d7f9eaaf54d1bba77be57))
+* function ([a83b69d](https://github.com/iendeavor/zod-schema-faker/commit/a83b69d26219f07499ab7f98e576eb749449bcd0))
+* number ([a945989](https://github.com/iendeavor/zod-schema-faker/commit/a945989248d3ccc803ca563d62fce6980ea16efc))
+* number multipleOf ([d2375a9](https://github.com/iendeavor/zod-schema-faker/commit/d2375a9b1150fde50c688e20d30db3018d0cdf14))
+* pipe ([fbfdec9](https://github.com/iendeavor/zod-schema-faker/commit/fbfdec9862c7cb80851bb7f88ec2a50b55e361e6))
+* reaonly ([f3d7f82](https://github.com/iendeavor/zod-schema-faker/commit/f3d7f8288926d08d0ed7730e3bb29bd2b839cde2))
+* string ([66144db](https://github.com/iendeavor/zod-schema-faker/commit/66144dbc3bbc3678a17b9f5487b703e71828a5a4))
+* string ([00977d5](https://github.com/iendeavor/zod-schema-faker/commit/00977d58b24302b6b26fc256543175d41911b663))
+* throw error for unimplemented kinds ([b115b4a](https://github.com/iendeavor/zod-schema-faker/commit/b115b4a71b652ea2e80cdf59f5aeae962be311d7))
+
+
+### Bug Fixes
+
+* array ([f7a2315](https://github.com/iendeavor/zod-schema-faker/commit/f7a2315a6c1b3ea972a94cbdecad09721e0dd62a))
+* **deps:** update dependency zod to v3.22.3 [security] ([#116](https://github.com/iendeavor/zod-schema-faker/issues/116)) ([2986348](https://github.com/iendeavor/zod-schema-faker/commit/298634893b9e0a2911a976de0f9773ca04d4f35f))
+* **deps:** update dependency zod to v3.22.5 ([#117](https://github.com/iendeavor/zod-schema-faker/issues/117)) ([a0ce6f3](https://github.com/iendeavor/zod-schema-faker/commit/a0ce6f322b9e26cad8a5898337e8a0818f18937c))
+* **deps:** update dependency zod to v3.23.0 ([#125](https://github.com/iendeavor/zod-schema-faker/issues/125)) ([1697faf](https://github.com/iendeavor/zod-schema-faker/commit/1697faf51035bd1c7c36ebc106a5ba1e3282737a))
+* effect ([4378f2f](https://github.com/iendeavor/zod-schema-faker/commit/4378f2fe41cbd03364058cdf790813af061277a9))
+* function ([19f68bc](https://github.com/iendeavor/zod-schema-faker/commit/19f68bcb570017c2918c12a50fc271dd241531fb))
+* intersection left and right may not have same length ([9a3a9f6](https://github.com/iendeavor/zod-schema-faker/commit/9a3a9f6bed95ee46737b520ad9da68d352f7a54e))
+* it should return one of dates for intersections ([fde5c1d](https://github.com/iendeavor/zod-schema-faker/commit/fde5c1d5477850f045cb14da5ed2cb7bef612c74))
+* string ([2b3e7fc](https://github.com/iendeavor/zod-schema-faker/commit/2b3e7fc8c880d69aaf6c57be413c1eb4d63e2daa))
+
+
+### build
+
+* use deps instead peer deps since there is no test for each versions ([f33ace0](https://github.com/iendeavor/zod-schema-faker/commit/f33ace0060db5d782473d67c577b4a1d8c5c8e1f))
+
 ### 0.1.6 (2023-01-25)
 
 ### 0.1.5 (2023-01-18)
