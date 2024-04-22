@@ -95,6 +95,20 @@ test.skip('emoji', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('endsWith', () => {
+  const schema = z.string().endsWith('ABC')
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('includes', () => {
+  const schema = z.string().includes('ABC')
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('ip', () => {
   const schema = z.string().ip()
   const faker = zodStringFaker(schema)
@@ -116,8 +130,71 @@ test('ip v6', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('length', () => {
+  const schema = z.string().length(5)
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('max', () => {
+  const schema = z.string().max(5)
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('min', () => {
+  const schema = z.string().min(100)
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('nanoid', () => {
+  const schema = z.string().nanoid()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('regex', () => {
   const schema = z.string().regex(/hello+ (world|to you)/)
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('startsWith', () => {
+  const schema = z.string().startsWith('ABC')
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('time', () => {
+  const schema = z.string().time()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('toLowerCase', () => {
+  const schema = z.string().toLowerCase()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('toUpperCase', () => {
+  const schema = z.string().toUpperCase()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('trim', () => {
+  const schema = z.string().trim()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -139,83 +216,6 @@ test('url', () => {
 
 test('uuid', () => {
   const schema = z.string().uuid()
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('min', () => {
-  const schema = z.string().min(100)
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('max', () => {
-  const schema = z.string().max(5)
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('nanoid', () => {
-  const schema = z.string().nanoid()
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('length', () => {
-  const schema = z.string().length(5)
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('includes', () => {
-  const schema = z.string().includes('ABC')
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('startsWith', () => {
-  const schema = z.string().startsWith('ABC')
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('endsWith', () => {
-  const schema = z.string().endsWith('ABC')
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('time', () => {
-  const schema = z.string().time()
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('trim', () => {
-  const schema = z.string().trim()
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('toLowerCase', () => {
-  const schema = z.string().toLowerCase()
-  const faker = zodStringFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-test('toUpperCase', () => {
-  const schema = z.string().toUpperCase()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)

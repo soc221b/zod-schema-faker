@@ -62,6 +62,9 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'endsWith':
           endsWith = check.value
           break
+        case 'includes':
+          includes = check.value
+          break
         case 'ip':
           return check.version === 'v6'
             ? randexp(
@@ -70,12 +73,19 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
             : randexp(
                 /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/,
               )
-        case 'includes':
-          includes = check.value
-          break
         case 'length':
           exact = check.value
           break
+        case 'max':
+          max = check.value
+          break
+        case 'min':
+          min = check.value
+          break
+        case 'nanoid':
+          return randexp(/^[a-z0-9_-]{21}$/i)
+        case 'regex':
+          return randexp(check.regex)
         case 'startsWith':
           startsWith = check.value
           break
@@ -89,16 +99,6 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'toUpperCase':
           toUppercase = true
           break
-        case 'max':
-          max = check.value
-          break
-        case 'min':
-          min = check.value
-          break
-        case 'nanoid':
-          return randexp(/^[a-z0-9_-]{21}$/i)
-        case 'regex':
-          return randexp(check.regex)
         case 'trim':
           trim = true
           break
