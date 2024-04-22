@@ -2,6 +2,7 @@ import * as z from 'zod'
 import { zodObjectFaker, ZodObjectFaker } from '../src/zod-object-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
+import { type } from 'os'
 
 test('ZodObjectFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -82,7 +83,14 @@ describe('catchall', () => {
   test('ZodObjectFaker.fake should return object type', () => {
     const schema = z.object({ foo: z.number(), bar: z.string() }).catchall(z.boolean())
     const faker = zodObjectFaker(schema)
-    expectType<TypeEqual<ReturnType<typeof faker.fake>, { foo: number; bar: string }>>(true)
+    expectType<
+      TypeEqual<
+        ReturnType<typeof faker.fake>,
+        { foo: number; bar: string } & {
+          [k: string]: boolean
+        }
+      >
+    >(true)
   })
 
   test('ZodObjectFaker.fake should return a valid data', () => {
