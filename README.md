@@ -255,7 +255,7 @@ const data = {
 - ✅ z.default
 - ✅ z.discriminatedUnion
 - z.effects
-  - ❌ preprocess: not applicable.
+  - ✅ preprocess[^2]
   - ❌ refine: not yet supported.
   - ✅ transform: works as expected.
 - ✅ z.enum
@@ -324,6 +324,7 @@ const data = {
 - ✅ z.void: return `fake(z.any())`, should not be used.
 
 [^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
+[^2]: Not applicable, ignored
 
 ## About
 
