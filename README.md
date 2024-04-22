@@ -293,37 +293,37 @@ const data = {
 - ✅ z.record
 - ✅ z.set
 - z.string
-  - ✅ base64<sup>1</sup>
-  - ✅ cuid<sup>1</sup>
-  - ✅ cuid2<sup>1</sup>
-  - ✅ date<sup>1</sup>
-  - ✅ datetime<sup>1</sup>
-  - ✅ duration<sup>1</sup>
-  - ✅ email<sup>1</sup>
-  - ❌ emoji<sup>1</sup>: not yet supported.
+  - ✅ base64[^1]
+  - ✅ cuid[^1]
+  - ✅ cuid2[^1]
+  - ✅ date[^1]
+  - ✅ datetime[^1]
+  - ✅ duration[^1]
+  - ✅ email[^1]
+  - ❌ emoji[^1]: not yet supported.
   - ✅ endsWith
   - ✅ includes
-  - ✅ ip<sup>1</sup>
+  - ✅ ip[^1]
   - ✅ length
   - ✅ max
   - ✅ min
-  - ✅ nanoid<sup>1</sup>
-  - ✅ regex<sup>1</sup>
+  - ✅ nanoid[^1]
+  - ✅ regex[^1]
   - ✅ startsWith
-  - ✅ time<sup>1</sup>
+  - ✅ time[^1]
   - ✅ toLowerCase
   - ✅ toUpperCase
   - ✅ trim
-  - ✅ ulid<sup>1</sup>
-  - ✅ url<sup>1</sup>
-  - ✅ uuid<sup>1</sup>
+  - ✅ ulid[^1]
+  - ✅ url[^1]
+  - ✅ uuid[^1]
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
 - ✅ z.unknown: return `fake(z.any())`, should not be used.
 - ✅ z.void: return `fake(z.any())`, should not be used.
 
-  1.: ^ Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
+[^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
 
 ## About
 
