@@ -7,10 +7,10 @@ const averageWordLength = 5
 const averageSentenceLength = averageWordLength * 15
 const averageParagraphLength = averageWordLength * 200
 // https://github.com/colinhacks/zod/blob/890556e/src/__tests__/string.test.ts#L232-L239
-const emojis = [
+const emojisLength1 = ['☘', '➡️', '⚜']
+const emojisLength2 = [
   '👋',
   '🍺',
-  '👩‍🚀',
   '💚',
   '💙',
   '💜',
@@ -25,16 +25,13 @@ const emojis = [
   '🏨',
   '💫',
   '🎌',
-  '☘',
   '🗡',
   '😹',
   '🔒',
   '🎬',
-  '➡️',
   '🍹',
   '🗂',
   '🚨',
-  '⚜',
   '🕑',
   '〽️',
   '🚦',
@@ -205,10 +202,13 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       result = result.toUpperCase()
     }
     if (emoji) {
-      result = Array(result.length)
+      result = Array(result.length - (result.length % 2))
         .fill(null)
-        .map(() => runFake(faker => emojis[faker.number.int({ min: 0, max: emojis.length - 1 })]))
+        .map(() => runFake(faker => emojisLength2[faker.number.int({ min: 0, max: emojisLength2.length - 1 })]))
         .join('')
+      if (result.length % 2) {
+        result += runFake(faker => emojisLength1[faker.number.int({ min: 0, max: emojisLength1.length - 1 })])
+      }
     }
     return result
   }

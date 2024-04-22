@@ -1,6 +1,7 @@
 import * as z from 'zod'
 import { zodStringFaker, ZodStringFaker } from '../src/zod-string-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { testMultipleTimes } from './util'
 
 test('ZodStringFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -88,7 +89,7 @@ test('email', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-test('emoji', () => {
+testMultipleTimes('emoji', () => {
   const schema = z.string().emoji()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
