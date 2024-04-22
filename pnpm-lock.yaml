@@ -26,7 +26,7 @@ specifiers:
   ts-jest: ^29.0.0
   ts-node: ^10.0.0
   typescript: ~4.5.5
-  zod: ^3.22.5
+  zod: ^3.23.0
 
 dependencies:
   '@faker-js/faker': 8.4.1
