@@ -39,7 +39,7 @@ test('it should ignore preprocess-effects', () => {
 
   faker.fake()
 
-  expect(fn).not.toBeCalled()
+  expect(fn).not.toHaveBeenCalled()
 })
 
 test('it should not throw error when schema has refine-effects', () => {
@@ -64,7 +64,7 @@ test('it should ignore refine-effects', () => {
 
   faker.fake()
 
-  expect(fn).not.toBeCalled()
+  expect(fn).not.toHaveBeenCalled()
 })
 
 test('it should not throw error when schema has transform-effects', () => {
