@@ -293,35 +293,37 @@ const data = {
 - ✅ z.record
 - ✅ z.set
 - z.string
+  - ✅ base64<sup>1</sup>
+  - ✅ cuid<sup>1</sup>
+  - ✅ cuid2<sup>1</sup>
+  - ✅ date<sup>1</sup>
+  - ✅ datetime<sup>1</sup>
+  - ✅ duration<sup>1</sup>
+  - ✅ email<sup>1</sup>
+  - ❌ emoji<sup>1</sup>: not yet supported.
+  - ✅ endsWith
+  - ✅ includes
+  - ✅ ip<sup>1</sup>
+  - ✅ length
   - ✅ max
   - ✅ min
-  - ✅ length
-  - ✅ email
-  - ✅ url
-  - ❌ emoji: not yet supported.
-  - ✅ uuid
-  - ✅ nanoid
-  - ✅ cuid
-  - ✅ cuid2
-  - ✅ ulid
-  - ✅ regex
-  - ✅ includes
+  - ✅ nanoid<sup>1</sup>
+  - ✅ regex<sup>1</sup>
   - ✅ startsWith
-  - ✅ endsWith
-  - ✅ datetime
-  - ✅ date
-  - ✅ time
-  - ✅ duration
-  - ✅ ip
-  - ✅ base64
-  - ✅ trim
+  - ✅ time<sup>1</sup>
   - ✅ toLowerCase
   - ✅ toUpperCase
+  - ✅ trim
+  - ✅ ulid<sup>1</sup>
+  - ✅ url<sup>1</sup>
+  - ✅ uuid<sup>1</sup>
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
 - ✅ z.unknown: return `fake(z.any())`, should not be used.
 - ✅ z.void: return `fake(z.any())`, should not be used.
+
+  1.: ^ Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
 
 ## About
 
