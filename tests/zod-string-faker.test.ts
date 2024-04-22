@@ -39,6 +39,13 @@ test('ZodStringFaker.fake should return a valid data', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('base64', () => {
+  const schema = z.string().base64()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('cuid', () => {
   const schema = z.string().cuid()
   const faker = zodStringFaker(schema)
@@ -53,8 +60,22 @@ test('cuid2', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('date', () => {
+  const schema = z.string().date()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('datetime', () => {
   const schema = z.string().datetime()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('duration', () => {
+  const schema = z.string().duration()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -137,6 +158,13 @@ test('max', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('nanoid', () => {
+  const schema = z.string().nanoid()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('length', () => {
   const schema = z.string().length(5)
   const faker = zodStringFaker(schema)
@@ -160,6 +188,13 @@ test('startsWith', () => {
 
 test('endsWith', () => {
   const schema = z.string().endsWith('ABC')
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('time', () => {
+  const schema = z.string().time()
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)

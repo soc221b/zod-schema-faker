@@ -300,7 +300,7 @@ const data = {
   - ✅ url
   - ❌ emoji: not yet supported.
   - ✅ uuid
-  - ~~nanoid~~
+  - ✅ nanoid
   - ✅ cuid
   - ✅ cuid2
   - ✅ ulid
@@ -309,11 +309,11 @@ const data = {
   - ✅ startsWith
   - ✅ endsWith
   - ✅ datetime
-  - ~~date~~
-  - ~~time~~
-  - ~~duration~~
+  - ✅ date
+  - ✅ time
+  - ✅ duration
   - ✅ ip
-  - ~~base64~~
+  - ✅ base64
   - ✅ trim
   - ✅ toLowerCase
   - ✅ toUpperCase

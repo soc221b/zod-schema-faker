@@ -40,12 +40,20 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
 
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
+        case 'base64':
+          return randexp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/)
         case 'cuid':
           return randexp(/^c[^\s-]{8,}$/i)
         case 'cuid2':
           return randexp(/^[0-9a-z]+$/)
+        case 'date':
+          return runFake(faker => faker.date.anytime())
+            .toISOString()
+            .slice(0, 10)
         case 'datetime':
           return runFake(faker => faker.date.anytime()).toISOString()
+        case 'duration':
+          return randexp(/^P[\d]{1,4}Y0?[0-9]M[0-2]?[0-8]DT[0-1]?[0-9]H[0-5]?[0-9]M[0-5]?[0-9]S$/)
         case 'email':
           return runFake(faker => faker.internet.email())
         // FIXME: unable to generate
@@ -71,6 +79,10 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'startsWith':
           startsWith = check.value
           break
+        case 'time':
+          return runFake(faker => faker.date.anytime())
+            .toISOString()
+            .slice(11, -1)
         case 'toLowerCase':
           toLowercase = true
           break
@@ -83,6 +95,8 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'min':
           min = check.value
           break
+        case 'nanoid':
+          return randexp(/^[a-z0-9_-]{21}$/i)
         case 'regex':
           return randexp(check.regex)
         case 'trim':
