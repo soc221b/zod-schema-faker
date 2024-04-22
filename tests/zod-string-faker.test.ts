@@ -88,7 +88,7 @@ test('email', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-test.skip('emoji', () => {
+test('emoji', () => {
   const schema = z.string().emoji()
   const faker = zodStringFaker(schema)
   const data = faker.fake()

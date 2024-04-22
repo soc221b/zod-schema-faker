@@ -6,6 +6,65 @@ import { ZodTypeFaker } from './zod-type-faker'
 const averageWordLength = 5
 const averageSentenceLength = averageWordLength * 15
 const averageParagraphLength = averageWordLength * 200
+// https://github.com/colinhacks/zod/blob/890556e/src/__tests__/string.test.ts#L232-L239
+const emojis = [
+  '👋',
+  '🍺',
+  '👩‍🚀',
+  '💚',
+  '💙',
+  '💜',
+  '💛',
+  '❤️',
+  '🐛',
+  '🗝',
+  '🐏',
+  '🍡',
+  '🎦',
+  '🚢',
+  '🏨',
+  '💫',
+  '🎌',
+  '☘',
+  '🗡',
+  '😹',
+  '🔒',
+  '🎬',
+  '➡️',
+  '🍹',
+  '🗂',
+  '🚨',
+  '⚜',
+  '🕑',
+  '〽️',
+  '🚦',
+  '🌊',
+  '🍴',
+  '💍',
+  '🍌',
+  '💰',
+  '😳',
+  '🌺',
+  '🍃',
+  '😀',
+  '😁',
+  '😂',
+  '🤣',
+  '😃',
+  '😄',
+  '😅',
+  '😆',
+  '😉',
+  '😊',
+  '😋',
+  '😎',
+  '😍',
+  '😘',
+  '🥰',
+  '😗',
+  '😈',
+  '👿',
+]
 
 export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
   fake(): z.infer<z.ZodString> {
@@ -37,6 +96,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     let toLowercase = false
     let toUppercase = false
     let trim = false
+    let emoji = false
 
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
@@ -56,9 +116,10 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           return randexp(/^P[\d]{1,4}Y0?[0-9]M[0-2]?[0-8]DT[0-1]?[0-9]H[0-5]?[0-9]M[0-5]?[0-9]S$/)
         case 'email':
           return runFake(faker => faker.internet.email())
-        // FIXME: unable to generate
-        case 'emoji':
-          return randexp(new RegExp(/^(\p{Extended_Pictographic}|\p{Emoji_Component})+$/, 'u'))
+        case 'emoji': {
+          emoji = true
+          break
+        }
         case 'endsWith':
           endsWith = check.value
           break
@@ -142,6 +203,12 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     }
     if (toUppercase) {
       result = result.toUpperCase()
+    }
+    if (emoji) {
+      result = Array(result.length)
+        .fill(null)
+        .map(() => runFake(faker => emojis[faker.number.int({ min: 0, max: emojis.length - 1 })]))
+        .join('')
     }
     return result
   }

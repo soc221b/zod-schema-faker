@@ -300,7 +300,7 @@ const data = {
   - ✅ datetime[^1]
   - ✅ duration[^1]
   - ✅ email[^1]
-  - ❌ emoji[^1]: not yet supported.
+  - ✅ emoji
   - ✅ endsWith
   - ✅ includes
   - ✅ ip[^1]
