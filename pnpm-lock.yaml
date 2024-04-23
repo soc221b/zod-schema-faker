@@ -56,7 +56,7 @@ devDependencies:
   ts-jest: 29.0.3_nt6g33by65yu7b4gqykyqotr4y
   ts-node: 10.9.1_b76woy6xmzqaeq4sowjzogjuem
   typescript: 4.5.5
-  zod: 3.23.0
+  zod: 3.23.3
 
 packages:
 
@@ -4629,6 +4629,6 @@ packages:
     engines: {node: '>=12.20'}
     dev: true
 
-  /zod/3.23.0:
-    resolution: {integrity: sha512-OFLT+LTocvabn6q76BTwVB0hExEBS0IduTr3cqZyMqEDbOnYmcU+y0tUAYbND4uwclpBGi4I4UUBGzylWpjLGA==}
+  /zod/3.23.3:
+    resolution: {integrity: sha512-tPvq1B/2Yu/dh2uAIH2/BhUlUeLIUvAjr6dpL/75I0pCYefHgjhXk1o1Kob3kTU8C7yU1j396jFHlsVWFi9ogg==}
     dev: true
