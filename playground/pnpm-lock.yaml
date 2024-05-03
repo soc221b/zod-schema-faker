@@ -7,7 +7,7 @@ specifiers:
   zod-schema-faker: link:..
 
 dependencies:
-  zod: 3.23.5
+  zod: 3.23.6
 
 devDependencies:
   typescript: 4.9.5
@@ -485,6 +485,6 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /zod/3.23.5:
-    resolution: {integrity: sha512-fkwiq0VIQTksNNA131rDOsVJcns0pfVUjHzLrNBiF/O/Xxb5lQyEXkhZWcJ7npWsYlvs+h0jFWXXy4X46Em1JA==}
+  /zod/3.23.6:
+    resolution: {integrity: sha512-RTHJlZhsRbuA8Hmp/iNL7jnfc4nZishjsanDAfEY1QpDQZCahUp3xDzl+zfweE9BklxMUcgBgS1b7Lvie/ZVwA==}
     dev: false
