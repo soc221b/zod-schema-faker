@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/soc221b/zod-schema-faker/compare/0.2.0...v1.0.0) (2024-06-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to vite ([#152](https://github.com/soc221b/zod-schema-faker/issues/152))
+
+### Features
+
+* emoji ([21d7d1d](https://github.com/soc221b/zod-schema-faker/commit/21d7d1d72fae31be7d49f20fcdc7480044f15101))
+* throw better errors ([#161](https://github.com/soc221b/zod-schema-faker/issues/161)) ([4d9c1de](https://github.com/soc221b/zod-schema-faker/commit/4d9c1de9da76eafda2b1551746b45d84c5100900))
+
+
+### Bug Fixes
+
+* **deps:** update dependency zod to v3.23.3 ([#131](https://github.com/soc221b/zod-schema-faker/issues/131)) ([5b7139b](https://github.com/soc221b/zod-schema-faker/commit/5b7139b86229d27959f3fe247f52d5f96f271fa9))
+* **deps:** update dependency zod to v3.23.4 ([#134](https://github.com/soc221b/zod-schema-faker/issues/134)) ([b40e515](https://github.com/soc221b/zod-schema-faker/commit/b40e5150fc3f3ddd130ab84534d7db75e08fd3f1))
+* **deps:** update dependency zod to v3.23.5 ([#138](https://github.com/soc221b/zod-schema-faker/issues/138)) ([fc29e6c](https://github.com/soc221b/zod-schema-faker/commit/fc29e6c816101db2d5d9282f051c3e71e66440dc))
+* **deps:** update dependency zod to v3.23.6 ([#142](https://github.com/soc221b/zod-schema-faker/issues/142)) ([2e0c115](https://github.com/soc221b/zod-schema-faker/commit/2e0c115dc851c0ce7a9a4482eae3426dfa313809))
+* **deps:** update dependency zod to v3.23.7 ([#144](https://github.com/soc221b/zod-schema-faker/issues/144)) ([22d2f4a](https://github.com/soc221b/zod-schema-faker/commit/22d2f4a665665abdd2e3d392a51cd96ea4fa448d))
+* **deps:** update dependency zod to v3.23.8 ([#146](https://github.com/soc221b/zod-schema-faker/issues/146)) ([c29a173](https://github.com/soc221b/zod-schema-faker/commit/c29a173e941a4e8013714f97a6a01231e576f085))
+* emoji ([f1717aa](https://github.com/soc221b/zod-schema-faker/commit/f1717aa2ee1c48026642d16a3587fa44f606fd4e))
+* uninstall custom fakers too ([#162](https://github.com/soc221b/zod-schema-faker/issues/162)) ([56c16ae](https://github.com/soc221b/zod-schema-faker/commit/56c16aec4eef32cccd2a9063e16c6e417654c585))
+
+
+### Build System
+
+* migrate to vite ([#152](https://github.com/soc221b/zod-schema-faker/issues/152)) ([afdeb6d](https://github.com/soc221b/zod-schema-faker/commit/afdeb6d3bebd6ae990da4723acf69a0e375234e2))
+
 ## [0.2.0](https://github.com/iendeavor/zod-schema-faker/compare/v0.1.3...v0.2.0) (2024-04-22)
 
 
