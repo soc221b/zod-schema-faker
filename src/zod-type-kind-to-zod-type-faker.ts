@@ -89,4 +89,5 @@ export function installCustom<T extends z.ZodType<any, any, any>>(
  */
 export const uninstall = (): void => {
   zodTypeKindToZodTypeFaker.clear()
+  zodTypeToZodTypeFaker.clear()
 }
