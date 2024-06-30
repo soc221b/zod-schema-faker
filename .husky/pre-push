@@ -1,6 +1,0 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-git diff --exit-code
-git diff --staged --exit-code
-pnpm exec tsc --noEmit

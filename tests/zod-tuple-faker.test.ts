@@ -28,7 +28,8 @@ test('ZodTupleFaker.fake should be a function', () => {
 
 describe('without rest', () => {
   test('ZodTupleFaker.fake should return tuple type', () => {
-    const faker = zodTupleFaker(z.tuple([z.number(), z.string()]))
+    const schema = z.tuple([z.number(), z.string()])
+    const faker = zodTupleFaker(schema)
     expectType<TypeEqual<ReturnType<typeof faker.fake>['0'], number>>(true)
     expectType<TypeEqual<ReturnType<typeof faker.fake>['1'], string>>(true)
   })

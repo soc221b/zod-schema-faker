@@ -83,8 +83,8 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       faker.datatype.boolean()
         ? averageWordLength
         : faker.datatype.boolean()
-          ? averageSentenceLength
-          : averageParagraphLength,
+        ? averageSentenceLength
+        : averageParagraphLength,
     )
     let exact: number | undefined = undefined
     let endsWith: string | undefined = undefined
