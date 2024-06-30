@@ -96,6 +96,7 @@
 - ✅ z.void: return `fake(z.any())`
 
 [^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
+
 [^2]: Not applicable, ignored
 
 ## Installation
