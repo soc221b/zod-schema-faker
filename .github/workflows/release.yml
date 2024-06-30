@@ -1,52 +1,18 @@
-name: Release
-
 on:
-  schedule:
-    - cron: '0 0 * * 3'
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
 
 jobs:
-  release:
+  release-please:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: googleapis/release-please-action@v4.1.3
         with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Use pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 6
-
-      - name: Install
-        run: pnpm install
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Test
-        run: pnpm run test
-        env:
-          CI: true
-
-      - name: Release
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          pnpm run release
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
-        with:
-          delete-branch: true
-          reviewers: 'iendeavor'
+          token: ${{ secrets.RELEASE_PLEASE }}
