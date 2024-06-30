@@ -3,7 +3,9 @@
  * https://jestjs.io/docs/en/configuration.html
  */
 
-export default {
+const jestConfig = {
+  extensionsToTreatAsEsm: ['.ts'],
+
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -170,7 +172,16 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transform: {
+    // '^.+\\.[tj]sx?$' to process ts,js,tsx,jsx with `ts-jest`
+    // '^.+\\.m?[tj]sx?$' to process ts,js,tsx,jsx,mts,mjs,mtsx,mjsx with `ts-jest`
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        useESM: true,
+      },
+    ],
+  },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
@@ -190,3 +201,5 @@ export default {
   // Whether to use watchman for file crawling
   // watchman: true,
 }
+
+export default jestConfig
