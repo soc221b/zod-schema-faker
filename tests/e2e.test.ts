@@ -6,7 +6,7 @@ beforeEach(() => {
   install()
 })
 
-testMultipleTimes('e2e', () => {
+testMultipleTimes('e2e', async () => {
   const Person = z.object({
     name: z.string(),
   })
@@ -103,4 +103,6 @@ testMultipleTimes('e2e', () => {
   const data = fake(schema)
 
   expect(schema.safeParse(data).success).toBe(true)
+
+  await data.promise
 })

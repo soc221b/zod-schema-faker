@@ -40,4 +40,5 @@ test('ZodPromiseFaker.fake should return a valid data', async () => {
   const faker = zodPromiseFaker(schema)
   const data = faker.fake()
   expect((await schema.safeParseAsync(data)).success).toBe(true)
+  await data
 })
