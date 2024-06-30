@@ -3,7 +3,7 @@
   "type": "module",
   "sideEffects": false,
   "version": "0.2.0",
-  "description": "Zod-schema-faker will generate you a fake data based on your zod schema.",
+  "description": "Generates mock data from zod schema. Powered by @faker-js/faker and randexp.js",
   "keywords": [
     "zod",
     "faker-js",

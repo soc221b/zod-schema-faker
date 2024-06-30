@@ -1,8 +1,102 @@
 # zod-schema-faker
 
-> Zod-schema-faker will generate you a fake data based on your [zod](https://github.com/colinhacks/zod) schema.
+> Generates mock data from [zod](https://github.com/colinhacks/zod) schema. Powered by
+> [@faker-js/faker](https://github.com/faker-js/faker) and [randexp.js](https://github.com/fent/randexp.js)
 
 [![zod-schema-faker version](https://img.shields.io/npm/v/zod-schema-faker.svg?label=zod-schema-faker&color=brightgreen)](https://www.npmjs.com/package/zod-schema-faker)
+
+## Supported APIs
+
+- ✅ z.any
+- ✅ z.array
+- z.bigint
+  - ✅ gt
+  - ✅ gte
+  - ✅ lt
+  - ✅ lte
+  - ✅ positive
+  - ✅ nonnegative
+  - ✅ negative
+  - ✅ nonpositive
+  - ✅ multipleOf
+- ✅ z.boolean
+- ✅ z.custom: see [example](./tests/zod-custom-faker.test.ts) for details.
+- z.date
+  - ✅ min
+  - ✅ max
+- ✅ z.default
+- ✅ z.discriminatedUnion
+- z.effects
+  - ✅ preprocess[^2]
+  - ❌ refine: not yet supported.
+  - ✅ transform: works as expected.
+- ✅ z.enum
+- ✅ z.function
+- ✅ z.intersection
+- ✅ z.lazy
+- ✅ z.literal
+- ✅ z.map
+- ✅ z.nan
+- z.nativeEnum
+  - ✅ numeric enums
+  - ✅ string enums
+  - ✅ const enums
+- ✅ z.never: return `undefined`
+- ✅ z.null
+- ✅ z.nullable
+- z.number
+  - ✅ gt
+  - ✅ gte
+  - ✅ lt
+  - ✅ lte
+  - ✅ int
+  - ✅ positive
+  - ✅ nonnegative
+  - ✅ negative
+  - ✅ nonpositive
+  - ✅ multipleOf
+  - ✅ finite
+  - ✅ safe
+- ✅ z.object
+- ✅ z.optional
+- ✅ z.pipe
+- ✅ z.promise
+- ✅ z.readonly
+- ✅ z.record
+- ✅ z.set
+- z.string
+  - ✅ base64[^1]
+  - ✅ cuid[^1]
+  - ✅ cuid2[^1]
+  - ✅ date[^1]
+  - ✅ datetime[^1]
+  - ✅ duration[^1]
+  - ✅ email[^1]
+  - ✅ emoji
+  - ✅ endsWith
+  - ✅ includes
+  - ✅ ip[^1]
+  - ✅ length
+  - ✅ max
+  - ✅ min
+  - ✅ nanoid[^1]
+  - ✅ regex[^1]
+  - ✅ startsWith
+  - ✅ time[^1]
+  - ✅ toLowerCase
+  - ✅ toUpperCase
+  - ✅ trim
+  - ✅ ulid[^1]
+  - ✅ url[^1]
+  - ✅ uuid[^1]
+- ✅ z.tuple
+- ✅ z.undefined
+- ✅ z.union
+- ✅ z.unknown: return `fake(z.any())`
+- ✅ z.void: return `fake(z.any())`
+
+[^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
+[^2]: Not applicable, ignored
 
 ## Installation
 
@@ -28,44 +122,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 ```
 
-## API
-
-- `function install()`: register fakers, must be called before using `fake()`
-
-- `function installCustom(schema, faker)`: register custom fakers for custom zod types, must be called before using
-  `fake()`
-
-- `function fake(schema)`: generate fake data based on schema
-
-  > This function may throw `ZodSchemaFakerError` if a valid value cannot be generated for the Zod schema, or if the
-  > schema is not supported.
-
-- `function seed(value)`: sets the seed to use
-
-  ```ts
-  import * as z from 'zod'
-  import { install, fake, seed } from 'zod-schema-faker'
-
-  install()
-
-  const schema = z.number()
-
-  seed(1)
-  console.log(fake(schema)) // => 8399729968525060
-  seed(1)
-  console.log(fake(schema)) // => 8399729968525060
-  console.log(fake(schema)) // => 62.93956000000001
-  ```
-
-- `function randexp(pattern, flags)`: see [example](./tests/zod-custom-faker.test.ts) for details
-
-- `function runFake(runner)`: see [example](./tests/zod-custom-faker.test.ts) for details
-
-- `class ZodTypeFaker`: see [example](./tests/zod-custom-faker.test.ts) for details
-
-- `class ZodSchemaFakerError`
-
-## Example
+## Full Example
 
 <details>
 <summary>
@@ -242,98 +299,42 @@ const data = {
 
 </details>
 
-## Supported APIs
+## API
 
-- ✅ z.any
-- ✅ z.array
-- z.bigint
-  - ✅ gt
-  - ✅ gte
-  - ✅ lt
-  - ✅ lte
-  - ✅ positive
-  - ✅ nonnegative
-  - ✅ negative
-  - ✅ nonpositive
-  - ✅ multipleOf
-- ✅ z.boolean
-- ✅ z.custom: [example](./tests/zod-custom-faker.test.ts)
-- z.date
-  - ✅ min
-  - ✅ max
-- ✅ z.default
-- ✅ z.discriminatedUnion
-- z.effects
-  - ✅ preprocess[^2]
-  - ❌ refine: not yet supported.
-  - ✅ transform: works as expected.
-- ✅ z.enum
-- ✅ z.function
-- ✅ z.intersection
-- ✅ z.lazy
-- ✅ z.literal
-- ✅ z.map
-- ✅ z.nan
-- z.nativeEnum
-  - ✅ numeric enums
-  - ✅ string enums
-  - ✅ const enums
-- ✅ z.never: return nothing, should not be used.
-- ✅ z.null
-- ✅ z.nullable
-- z.number
-  - ✅ gt
-  - ✅ gte
-  - ✅ lt
-  - ✅ lte
-  - ✅ int
-  - ✅ positive
-  - ✅ nonnegative
-  - ✅ negative
-  - ✅ nonpositive
-  - ✅ multipleOf
-  - ✅ finite
-  - ✅ safe
-- ✅ z.object
-- ✅ z.optional
-- ✅ z.pipe
-- ✅ z.promise
-- ✅ z.readonly
-- ✅ z.record
-- ✅ z.set
-- z.string
-  - ✅ base64[^1]
-  - ✅ cuid[^1]
-  - ✅ cuid2[^1]
-  - ✅ date[^1]
-  - ✅ datetime[^1]
-  - ✅ duration[^1]
-  - ✅ email[^1]
-  - ✅ emoji
-  - ✅ endsWith
-  - ✅ includes
-  - ✅ ip[^1]
-  - ✅ length
-  - ✅ max
-  - ✅ min
-  - ✅ nanoid[^1]
-  - ✅ regex[^1]
-  - ✅ startsWith
-  - ✅ time[^1]
-  - ✅ toLowerCase
-  - ✅ toUpperCase
-  - ✅ trim
-  - ✅ ulid[^1]
-  - ✅ url[^1]
-  - ✅ uuid[^1]
-- ✅ z.tuple
-- ✅ z.undefined
-- ✅ z.union
-- ✅ z.unknown: return `fake(z.any())`, should not be used.
-- ✅ z.void: return `fake(z.any())`, should not be used.
+- `function install()`: register fakers, must be called before using `fake()`
 
-[^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
-[^2]: Not applicable, ignored
+- `function installCustom(schema, faker)`: register custom fakers for custom zod types, must be called before using
+  `fake()`
+
+- `function fake(schema)`: generate fake data based on schema
+
+  > This function may throw `ZodSchemaFakerError` if a valid value cannot be generated for the Zod schema, or if the
+  > schema is not supported.
+
+- `function seed(value)`: sets the seed to use
+
+  ```ts
+  import * as z from 'zod'
+  import { install, fake, seed } from 'zod-schema-faker'
+
+  install()
+
+  const schema = z.number()
+
+  seed(1)
+  console.log(fake(schema)) // => 8399729968525060
+  seed(1)
+  console.log(fake(schema)) // => 8399729968525060
+  console.log(fake(schema)) // => 62.93956000000001
+  ```
+
+- `function randexp(pattern, flags)`: see [example](./tests/zod-custom-faker.test.ts) for details
+
+- `function runFake(runner)`: see [example](./tests/zod-custom-faker.test.ts) for details
+
+- `class ZodTypeFaker`: see [example](./tests/zod-custom-faker.test.ts) for details
+
+- `class ZodSchemaFakerError`
 
 ## About
 
