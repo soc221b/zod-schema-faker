@@ -27,4 +27,4 @@ export class ZodSetFaker<T extends z.ZodSet<any>> extends ZodTypeFaker<T> {
   }
 }
 
-export const zodSetFaker: <T extends z.ZodSet<any>>(schema: T) => ZodSetFaker<T> = ZodSetFaker.create
+export const zodSetFaker: typeof ZodSetFaker.create = ZodSetFaker.create

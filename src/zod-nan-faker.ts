@@ -11,4 +11,4 @@ export class ZodNaNFaker extends ZodTypeFaker<z.ZodNaN> {
   }
 }
 
-export const zodNaNFaker: (schema: z.ZodNaN) => ZodNaNFaker = ZodNaNFaker.create
+export const zodNaNFaker: typeof ZodNaNFaker.create = ZodNaNFaker.create

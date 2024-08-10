@@ -13,5 +13,4 @@ export class ZodOptionalFaker<T extends z.ZodOptional<any>> extends ZodTypeFaker
   }
 }
 
-export const zodOptionalFaker: <T extends z.ZodOptional<any>>(schema: T) => ZodOptionalFaker<T> =
-  ZodOptionalFaker.create
+export const zodOptionalFaker: typeof ZodOptionalFaker.create = ZodOptionalFaker.create

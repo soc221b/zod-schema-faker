@@ -20,6 +20,4 @@ export class ZodDiscriminatedUnionFaker<T extends z.ZodDiscriminatedUnion<any, a
   }
 }
 
-export const zodDiscriminatedUnionFaker: <T extends z.ZodDiscriminatedUnion<any, any>>(
-  schema: T,
-) => ZodDiscriminatedUnionFaker<T> = ZodDiscriminatedUnionFaker.create
+export const zodDiscriminatedUnionFaker: typeof ZodDiscriminatedUnionFaker.create = ZodDiscriminatedUnionFaker.create

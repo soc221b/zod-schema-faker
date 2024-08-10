@@ -35,4 +35,4 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
   }
 }
 
-export const zodDateFaker: (schema: z.ZodDate) => ZodDateFaker = ZodDateFaker.create
+export const zodDateFaker: typeof ZodDateFaker.create = ZodDateFaker.create
