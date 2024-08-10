@@ -12,4 +12,5 @@ export class ZodPipelineFaker<T extends z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny
   }
 }
 
-export const zodPipelineFaker = ZodPipelineFaker.create
+export const zodPipelineFaker: <T extends z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>>(schema: T) => ZodPipelineFaker<T> =
+  ZodPipelineFaker.create

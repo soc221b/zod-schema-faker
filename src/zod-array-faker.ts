@@ -21,4 +21,4 @@ export class ZodArrayFaker<T extends z.ZodArray<any, any>> extends ZodTypeFaker<
   }
 }
 
-export const zodArrayFaker = ZodArrayFaker.create
+export const zodArrayFaker: <T extends z.ZodArray<any, any>>(schema: T) => ZodArrayFaker<T> = ZodArrayFaker.create

@@ -119,7 +119,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
   }
 }
 
-export const zodNumberFaker = ZodNumberFaker.create
+export const zodNumberFaker: (schema: z.ZodNumber) => ZodNumberFaker = ZodNumberFaker.create
 
 function findMinimumOffsetPrecision(number: number) {
   number = Math.abs(number)

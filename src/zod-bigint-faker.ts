@@ -44,4 +44,4 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
   }
 }
 
-export const zodBigIntFaker = ZodBigIntFaker.create
+export const zodBigIntFaker: (schema: z.ZodBigInt) => ZodBigIntFaker = ZodBigIntFaker.create

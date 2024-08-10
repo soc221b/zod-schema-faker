@@ -20,7 +20,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   }
 }
 
-export const zodIntersectionFaker = ZodIntersectionFaker.create
+export const zodIntersectionFaker: <T extends z.ZodIntersection<any, any>>(schema: T) => ZodIntersectionFaker<T> =
+  ZodIntersectionFaker.create
 
 function mergeValues(a: any, b: any): { valid: true; data: any } | { valid: false } {
   const aType = z.getParsedType(a)

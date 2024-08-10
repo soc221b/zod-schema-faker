@@ -12,4 +12,4 @@ export class ZodBooleanFaker extends ZodTypeFaker<z.ZodBoolean> {
   }
 }
 
-export const zodBooleanFaker = ZodBooleanFaker.create
+export const zodBooleanFaker: (schema: z.ZodBoolean) => ZodBooleanFaker = ZodBooleanFaker.create

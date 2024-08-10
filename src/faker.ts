@@ -19,7 +19,7 @@ export const runFake = <Runner extends (faker: Faker) => any>(runner: Runner): R
   return result
 }
 
-export const randexp = (pattern: string | RegExp, flags?: string) => {
+export const randexp = (pattern: string | RegExp, flags?: string): string => {
   const randexp = new RandExp(pattern, flags)
   randexp.randInt = (from, to) => runFake(faker => faker.number.int({ min: from, max: to }))
   return randexp.gen()
