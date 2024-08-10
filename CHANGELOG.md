@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.1](https://github.com/soc221b/zod-schema-faker/compare/1.0.0...v1.0.1) (2024-08-10)
+
+
+### Bug Fixes
+
+* [#189](https://github.com/soc221b/zod-schema-faker/issues/189) ([b8d1622](https://github.com/soc221b/zod-schema-faker/commit/b8d162244d4ffee29d0c0744ed1d0299b78c0978))
+* unable to resolve exported members ([#193](https://github.com/soc221b/zod-schema-faker/issues/193)) ([b8d1622](https://github.com/soc221b/zod-schema-faker/commit/b8d162244d4ffee29d0c0744ed1d0299b78c0978)), closes [#189](https://github.com/soc221b/zod-schema-faker/issues/189)
+
 ## [1.0.0](https://github.com/soc221b/zod-schema-faker/compare/0.2.0...v1.0.0) (2024-06-30)
 
 
