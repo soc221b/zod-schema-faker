@@ -33,4 +33,5 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
   }
 }
 
-export const zodObjectFaker = ZodObjectFaker.create
+export const zodObjectFaker: <T extends z.ZodObject<any, any, any, any, any>>(schema: T) => ZodObjectFaker<T> =
+  ZodObjectFaker.create

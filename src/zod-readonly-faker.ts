@@ -12,4 +12,5 @@ export class ZodReadonlyFaker<T extends z.ZodReadonly<z.ZodTypeAny>> extends Zod
   }
 }
 
-export const zodReadonlyFaker = ZodReadonlyFaker.create
+export const zodReadonlyFaker: <T extends z.ZodReadonly<z.ZodTypeAny>>(schema: T) => ZodReadonlyFaker<T> =
+  ZodReadonlyFaker.create

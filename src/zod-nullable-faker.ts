@@ -13,4 +13,5 @@ export class ZodNullableFaker<T extends z.ZodNullable<any>> extends ZodTypeFaker
   }
 }
 
-export const zodNullableFaker = ZodNullableFaker.create
+export const zodNullableFaker: <T extends z.ZodNullable<any>>(schema: T) => ZodNullableFaker<T> =
+  ZodNullableFaker.create

@@ -61,4 +61,4 @@ export class ZodAnyFaker extends ZodTypeFaker<z.ZodAny> {
   }
 }
 
-export const zodAnyFaker = ZodAnyFaker.create
+export const zodAnyFaker: (schema: z.ZodAny) => ZodAnyFaker = ZodAnyFaker.create

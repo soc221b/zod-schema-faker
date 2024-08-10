@@ -218,4 +218,4 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
   }
 }
 
-export const zodStringFaker = ZodStringFaker.create
+export const zodStringFaker: (schema: z.ZodString) => ZodStringFaker = ZodStringFaker.create
