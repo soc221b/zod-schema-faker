@@ -6,7 +6,7 @@ beforeEach(() => {
   install()
 })
 
-testMultipleTimes('e2e', async () => {
+testMultipleTimes('integration', async () => {
   const Person = z.object({
     name: z.string(),
   })
