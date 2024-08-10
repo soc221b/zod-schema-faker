@@ -11,4 +11,4 @@ export class ZodNullFaker extends ZodTypeFaker<z.ZodNull> {
   }
 }
 
-export const zodNullFaker: (schema: z.ZodNull) => ZodNullFaker = ZodNullFaker.create
+export const zodNullFaker: typeof ZodNullFaker.create = ZodNullFaker.create

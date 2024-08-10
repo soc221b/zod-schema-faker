@@ -11,4 +11,4 @@ export class ZodUndefinedFaker extends ZodTypeFaker<z.ZodUndefined> {
   }
 }
 
-export const zodUndefinedFaker: (schema: z.ZodUndefined) => ZodUndefinedFaker = ZodUndefinedFaker.create
+export const zodUndefinedFaker: typeof ZodUndefinedFaker.create = ZodUndefinedFaker.create

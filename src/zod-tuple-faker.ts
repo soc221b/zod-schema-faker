@@ -15,4 +15,4 @@ export class ZodTupleFaker<T extends z.ZodTuple<any, any>> extends ZodTypeFaker<
   }
 }
 
-export const zodTupleFaker: <T extends z.ZodTuple<any, any>>(schema: T) => ZodTupleFaker<T> = ZodTupleFaker.create
+export const zodTupleFaker: typeof ZodTupleFaker.create = ZodTupleFaker.create
