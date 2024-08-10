@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "module": "Node16"
+  }
+}
