@@ -13,7 +13,7 @@ test('ZodVoidFaker should accepts a ZodVoid schema', () => {
   expect(() => zodVoidFaker(schema)).not.toThrow()
 })
 
-test('zodVoidFaker should return a ZodVoidFaker instance', () => {
+test('ZodVoidFaker should return a ZodVoidFaker instance', () => {
   expect(typeof zodVoidFaker).toBe('function')
 
   const schema = z.void()

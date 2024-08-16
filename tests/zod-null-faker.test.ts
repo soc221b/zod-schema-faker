@@ -12,7 +12,7 @@ test('ZodNullFaker should accepts a ZodNull schema', () => {
   expect(() => zodNullFaker(schema)).not.toThrow()
 })
 
-test('zodNullFaker should return a ZodNullFaker instance', () => {
+test('ZodNullFaker should return a ZodNullFaker instance', () => {
   expect(typeof zodNullFaker).toBe('function')
 
   const schema = z.null()

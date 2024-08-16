@@ -13,7 +13,7 @@ test('ZodNullableFaker should accepts a ZodNullable schema', () => {
   expect(() => zodNullableFaker(schema)).not.toThrow()
 })
 
-test('zodNullableFaker should return a ZodNullableFaker instance', () => {
+test('ZodNullableFaker should return a ZodNullableFaker instance', () => {
   expect(typeof zodNullableFaker).toBe('function')
 
   const schema = z.nullable(z.string())

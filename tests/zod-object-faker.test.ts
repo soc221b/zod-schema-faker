@@ -14,7 +14,7 @@ test('ZodObjectFaker should accepts a ZodObject schema', () => {
   expect(() => zodObjectFaker(schema)).not.toThrow()
 })
 
-test('zodObjectFaker should return a ZodObjectFaker instance', () => {
+test('ZodObjectFaker should return a ZodObjectFaker instance', () => {
   expect(typeof zodObjectFaker).toBe('function')
 
   const schema = z.object({ foo: z.number(), bar: z.string() })

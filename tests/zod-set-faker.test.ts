@@ -13,7 +13,7 @@ test('ZodSetFaker should accepts a ZodSet schema', () => {
   expect(() => zodSetFaker(schema)).not.toThrow()
 })
 
-test('zodSetFaker should return a ZodSetFaker instance', () => {
+test('ZodSetFaker should return a ZodSetFaker instance', () => {
   expect(typeof zodSetFaker).toBe('function')
 
   const schema = z.set(z.number())

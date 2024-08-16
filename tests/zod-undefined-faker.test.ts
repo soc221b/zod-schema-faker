@@ -12,7 +12,7 @@ test('ZodUndefinedFaker should accepts a ZodUndefined schema', () => {
   expect(() => zodUndefinedFaker(schema)).not.toThrow()
 })
 
-test('zodUndefinedFaker should return a ZodUndefinedFaker instance', () => {
+test('ZodUndefinedFaker should return a ZodUndefinedFaker instance', () => {
   expect(typeof zodUndefinedFaker).toBe('function')
   const schema = z.undefined()
   const faker = zodUndefinedFaker(schema)
