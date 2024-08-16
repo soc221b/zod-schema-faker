@@ -36,7 +36,7 @@ testMultipleTimes('integration', async () => {
     emptyValues: z.object({
       undefined: z.undefined(),
       null: z.null(),
-      // void: z.void(), // should not use its return value
+      void: z.void(),
     }),
     any: z.any(),
     unknown: z.unknown(),

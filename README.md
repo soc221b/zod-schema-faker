@@ -93,7 +93,7 @@
 - ✅ z.undefined
 - ✅ z.union
 - ✅ z.unknown: returns `fake(z.any())`
-- ✅ z.void: return `fake(z.any())`
+- ✅ z.void
 
 [^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
 
@@ -160,7 +160,7 @@ const schema = z.object({
   emptyValues: z.object({
     undefined: z.undefined(),
     null: z.null(),
-    // void: z.void(), // should not use its return value
+    void: z.void(),
   }),
   any: z.any(),
   unknown: z.unknown(),
@@ -240,7 +240,11 @@ const data = {
     boolean: true,
     date: 2022-04-08T08:31:40.690Z,
   },
-  emptyValues: { undefined: undefined, null: null },
+  emptyValues: {
+    undefined: undefined,
+    null: null,
+    void: undefined,
+  },
   any: undefined,
   unknown: undefined,
   literal: 'tuna',
