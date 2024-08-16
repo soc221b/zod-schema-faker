@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.2](https://github.com/soc221b/zod-schema-faker/compare/1.0.1...v1.0.2) (2024-08-16)
+
+
+### Bug Fixes
+
+* it should return `undefined` when fake z.void ([#203](https://github.com/soc221b/zod-schema-faker/issues/203)) ([ded1efa](https://github.com/soc221b/zod-schema-faker/commit/ded1efa5890753cc05c831f719f456149424179b))
+* it should throws an error when fake z.never ([#201](https://github.com/soc221b/zod-schema-faker/issues/201)) ([d4e9652](https://github.com/soc221b/zod-schema-faker/commit/d4e9652540a4468915d8abf009f27e34c5e3b54a))
+
+
+### Performance Improvements
+
+* enable isolated declarations ([#197](https://github.com/soc221b/zod-schema-faker/issues/197)) ([2425c04](https://github.com/soc221b/zod-schema-faker/commit/2425c042c8c91114f931c11b21fd37f53ff5d102))
+
 ## [1.0.1](https://github.com/soc221b/zod-schema-faker/compare/1.0.0...v1.0.1) (2024-08-10)
 
 
