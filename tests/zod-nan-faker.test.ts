@@ -12,7 +12,7 @@ test('ZodNaNFaker should accepts a ZodNaN schema', () => {
   expect(() => zodNaNFaker(schema)).not.toThrow()
 })
 
-test('zodNaNFaker should return a ZodNaNFaker instance', () => {
+test('ZodNaNFaker should return a ZodNaNFaker instance', () => {
   expect(typeof zodNaNFaker).toBe('function')
 
   const schema = z.nan()
@@ -26,7 +26,7 @@ test('ZodNaNFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodNaNFaker.fake should return nan type', () => {
+test('ZodNaNFaker.fake should return number type', () => {
   const schema = z.nan()
   const faker = zodNaNFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, number>>(true)
