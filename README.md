@@ -185,7 +185,7 @@ const schema = z.object({
     nonnegative: z.number().nonnegative(),
     negative: z.number().negative(),
     nonpositive: z.number().nonpositive(),
-    // multipleOf: z.number().multipleOf() // not supported
+    multipleOf: z.number().multipleOf(42),
   }),
   nan: z.nan(),
   boolean: z.boolean(),
@@ -267,7 +267,8 @@ const data = {
     positive: 531694153629695.06,
     nonnegative: 579.4830352,
     negative: -38.025,
-    nonpositive: -1725.5520665581
+    nonpositive: -1725.5520665581,
+    multipleOf: 84,
   },
   nan: NaN,
   boolean: false,
