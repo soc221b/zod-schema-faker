@@ -31,13 +31,6 @@ test('ZodUndefinedFaker.fake should return undefined type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, undefined>>(true)
 })
 
-test('ZodUndefinedFaker.fake should return undefined', () => {
-  const schema = z.undefined()
-  const faker = zodUndefinedFaker(schema)
-  const data = faker.fake()
-  expect(data).toBe(void 0)
-})
-
 test('ZodUndefinedFaker.fake should return a valid data', () => {
   const schema = z.undefined()
   const faker = zodUndefinedFaker(schema)

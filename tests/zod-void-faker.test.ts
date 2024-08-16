@@ -33,13 +33,6 @@ test('ZodVoidFaker.fake should return void type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, void>>(true)
 })
 
-test('ZodVoidFaker.fake should return a data (but should not be used)', () => {
-  install()
-  const schema = z.void()
-  const faker = zodVoidFaker(schema)
-  expect(() => faker.fake()).not.toThrow()
-})
-
 test('ZodVoidFaker.fake should return a valid data', () => {
   install()
   const schema = z.void()
