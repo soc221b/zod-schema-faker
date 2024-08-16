@@ -5,7 +5,9 @@ let _seedValue: number | undefined
 
 // https://github.com/faker-js/faker/issues/448
 // TODO: create standalone faker instead of use following workaround
-export const runFake = <Runner extends (faker: Faker) => any>(runner: Runner): ReturnType<Runner> => {
+export const runFake = <Runner extends (faker: Faker) => any>(
+  runner: Awaited<ReturnType<Runner>> extends ReturnType<Runner> ? Runner : never,
+): ReturnType<Runner> => {
   const oldSeedValue = _faker.seed()
   _faker.seed(_seedValue)
 
