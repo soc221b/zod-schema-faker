@@ -62,7 +62,7 @@ testMultipleTimes('integration', async () => {
       nonnegative: z.number().nonnegative(),
       negative: z.number().negative(),
       nonpositive: z.number().nonpositive(),
-      // multipleOf: z.number().multipleOf() // not supported
+      multipleOf: z.number().multipleOf(31),
     }),
     nan: z.nan(),
     boolean: z.boolean(),
