@@ -12,7 +12,7 @@ test('ZodLiteralFaker should accepts a ZodLiteral schema', () => {
   expect(() => zodLiteralFaker(schema)).not.toThrow()
 })
 
-test('zodLiteralFaker should return a ZodLiteralFaker instance', () => {
+test('ZodLiteralFaker should return a ZodLiteralFaker instance', () => {
   expect(typeof zodLiteralFaker).toBe('function')
 
   const schema = z.literal('foo')
@@ -26,7 +26,7 @@ test('ZodLiteralFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodLiteralFaker.fake should return literal type', () => {
+test('ZodLiteralFaker.fake should return the given type', () => {
   const schema = z.literal('foo')
   const faker = zodLiteralFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, 'foo'>>(true)
