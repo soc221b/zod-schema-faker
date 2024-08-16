@@ -13,7 +13,7 @@ test('ZodEnumFaker should accepts a ZodEnum schema', () => {
   expect(() => zodEnumFaker(schema)).not.toThrow()
 })
 
-test('zodEnumFaker should return a ZodEnumFaker instance', () => {
+test('ZodEnumFaker should return a ZodEnumFaker instance', () => {
   expect(typeof zodEnumFaker).toBe('function')
 
   const schema = z.enum(['foo', 'bar'])
@@ -27,7 +27,7 @@ test('ZodEnumFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodEnumFaker.fake should return enum type', () => {
+test('ZodEnumFaker.fake should return the given type', () => {
   const schema = z.enum(['foo', 'bar'])
   const faker = zodEnumFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, 'foo' | 'bar'>>(true)

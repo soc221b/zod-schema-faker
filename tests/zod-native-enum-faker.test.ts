@@ -20,7 +20,7 @@ test('ZodNativeEnumFaker should accepts a ZodNativeEnum schema', () => {
   expect(() => zodNativeEnumFaker(schema)).not.toThrow()
 })
 
-test('zodNativeEnumFaker should return a ZodNativeEnumFaker instance', () => {
+test('ZodNativeEnumFaker should return a ZodNativeEnumFaker instance', () => {
   expect(typeof zodNativeEnumFaker).toBe('function')
 
   const schema = z.nativeEnum(NativeEnum)
@@ -34,7 +34,7 @@ test('ZodNativeEnumFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodNativeEnumFaker.fake should return nativeEnum type', () => {
+test('ZodNativeEnumFaker.fake should return the give type', () => {
   const schema = z.nativeEnum(NativeEnum)
   const faker = zodNativeEnumFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, NativeEnum>>(false)

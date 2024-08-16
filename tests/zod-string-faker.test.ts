@@ -13,7 +13,7 @@ test('ZodStringFaker should accepts a ZodString schema', () => {
   expect(() => zodStringFaker(schema)).not.toThrow()
 })
 
-test('zodStringFaker should return a ZodStringFaker instance', () => {
+test('ZodStringFaker should return a ZodStringFaker instance', () => {
   expect(typeof zodStringFaker).toBe('function')
 
   const schema = z.string()

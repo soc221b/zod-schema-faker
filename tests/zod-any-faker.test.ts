@@ -13,7 +13,7 @@ test('ZodAnyFaker should accepts a ZodAny schema', () => {
   expect(() => zodAnyFaker(schema)).not.toThrow()
 })
 
-test('zodAnyFaker should return a ZodAnyFaker instance', () => {
+test('ZodAnyFaker should return a ZodAnyFaker instance', () => {
   expect(typeof zodAnyFaker).toBe('function')
 
   const schema = z.any()

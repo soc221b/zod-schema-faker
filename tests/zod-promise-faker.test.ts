@@ -13,7 +13,7 @@ test('ZodPromiseFaker should accepts a ZodPromise schema', () => {
   expect(() => zodPromiseFaker(schema)).not.toThrow()
 })
 
-test('zodPromiseFaker should return a ZodPromiseFaker instance', () => {
+test('ZodPromiseFaker should return a ZodPromiseFaker instance', () => {
   expect(typeof zodPromiseFaker).toBe('function')
 
   const schema = z.promise(z.string())

@@ -13,7 +13,7 @@ test('ZodRecordFaker should accepts a ZodRecord schema', () => {
   expect(() => zodRecordFaker(schema)).not.toThrow()
 })
 
-test('zodRecordFaker should return a ZodRecordFaker instance', () => {
+test('ZodRecordFaker should return a ZodRecordFaker instance', () => {
   expect(typeof zodRecordFaker).toBe('function')
 
   const schema = z.record(z.string(), z.number())

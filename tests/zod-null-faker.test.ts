@@ -12,7 +12,7 @@ test('ZodNullFaker should accepts a ZodNull schema', () => {
   expect(() => zodNullFaker(schema)).not.toThrow()
 })
 
-test('zodNullFaker should return a ZodNullFaker instance', () => {
+test('ZodNullFaker should return a ZodNullFaker instance', () => {
   expect(typeof zodNullFaker).toBe('function')
 
   const schema = z.null()
@@ -30,13 +30,6 @@ test('ZodNullFaker.fake should return null type', () => {
   const schema = z.null()
   const faker = zodNullFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, null>>(true)
-})
-
-test('ZodNullFaker.fake should return null', () => {
-  const schema = z.null()
-  const faker = zodNullFaker(schema)
-  const data = faker.fake()
-  expect(data).toBe(null)
 })
 
 test('ZodNullFaker.fake should return a valid data', () => {

@@ -13,7 +13,7 @@ test('ZodVoidFaker should accepts a ZodVoid schema', () => {
   expect(() => zodVoidFaker(schema)).not.toThrow()
 })
 
-test('zodVoidFaker should return a ZodVoidFaker instance', () => {
+test('ZodVoidFaker should return a ZodVoidFaker instance', () => {
   expect(typeof zodVoidFaker).toBe('function')
 
   const schema = z.void()
@@ -31,13 +31,6 @@ test('ZodVoidFaker.fake should return void type', () => {
   const schema = z.void()
   const faker = zodVoidFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, void>>(true)
-})
-
-test('ZodVoidFaker.fake should return a data (but should not be used)', () => {
-  install()
-  const schema = z.void()
-  const faker = zodVoidFaker(schema)
-  expect(() => faker.fake()).not.toThrow()
 })
 
 test('ZodVoidFaker.fake should return a valid data', () => {

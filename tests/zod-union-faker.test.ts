@@ -13,7 +13,7 @@ test('ZodUnionFaker should accepts a ZodUnion schema', () => {
   expect(() => zodUnionFaker(schema)).not.toThrow()
 })
 
-test('zodUnionFaker should return a ZodUnionFaker instance', () => {
+test('ZodUnionFaker should return a ZodUnionFaker instance', () => {
   expect(typeof zodUnionFaker).toBe('function')
 
   const schema = z.union([z.number(), z.string()])

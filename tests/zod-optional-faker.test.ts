@@ -13,7 +13,7 @@ test('ZodOptionalFaker should accepts a ZodOptional schema', () => {
   expect(() => zodOptionalFaker(schema)).not.toThrow()
 })
 
-test('zodOptionalFaker should return a ZodOptionalFaker instance', () => {
+test('ZodOptionalFaker should return a ZodOptionalFaker instance', () => {
   expect(typeof zodOptionalFaker).toBe('function')
 
   const schema = z.optional(z.string())

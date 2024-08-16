@@ -13,7 +13,7 @@ test('ZodTupleFaker should accepts a ZodTuple schema', () => {
   expect(() => zodTupleFaker(schema)).not.toThrow()
 })
 
-test('zodTupleFaker should return a ZodTupleFaker instance', () => {
+test('ZodTupleFaker should return a ZodTupleFaker instance', () => {
   expect(typeof zodTupleFaker).toBe('function')
   const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
   const faker = zodTupleFaker(schema)

@@ -15,7 +15,7 @@ test('ZodDefaultFaker should accepts a ZodDefault schema', () => {
   expect(() => zodDefaultFaker(schema)).not.toThrow()
 })
 
-test('zodDefaultFaker should return a ZodDefaultFaker instance', () => {
+test('ZodDefaultFaker should return a ZodDefaultFaker instance', () => {
   expect(typeof zodDefaultFaker).toBe('function')
 
   const schema = z.object({}).default(defaultData)
