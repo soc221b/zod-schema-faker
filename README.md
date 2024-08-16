@@ -92,7 +92,7 @@
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
-- ✅ z.unknown: return `fake(z.any())`
+- ✅ z.unknown: returns `fake(z.any())`
 - ✅ z.void: return `fake(z.any())`
 
 [^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
