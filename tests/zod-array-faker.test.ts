@@ -13,7 +13,7 @@ test('ZodArrayFaker should accepts a ZodArray schema', () => {
   expect(() => zodArrayFaker(schema)).not.toThrow()
 })
 
-test('zodArrayFaker should return a ZodArrayFaker instance', () => {
+test('ZodArrayFaker should return a ZodArrayFaker instance', () => {
   expect(typeof zodArrayFaker).toBe('function')
   const schema = z.array(z.number())
   const faker = zodArrayFaker(schema)
