@@ -40,7 +40,7 @@ testMultipleTimes('integration', async () => {
     }),
     any: z.any(),
     unknown: z.unknown(),
-    // never: z.never(), // should not use its return value
+    // never: z.never(), // always throws an error
     literal: z.literal('tuna'),
     strings: z.object({
       max: z.string().max(5),
