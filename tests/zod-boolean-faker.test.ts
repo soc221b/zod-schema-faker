@@ -12,7 +12,7 @@ test('ZodBooleanFaker should accepts a ZodBoolean schema', () => {
   expect(() => zodBooleanFaker(schema)).not.toThrow()
 })
 
-test('zodBooleanFaker should return a ZodBooleanFaker instance', () => {
+test('ZodBooleanFaker should return a ZodBooleanFaker instance', () => {
   expect(typeof zodBooleanFaker).toBe('function')
 
   const schema = z.boolean()
