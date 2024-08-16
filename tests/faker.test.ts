@@ -17,6 +17,11 @@ test('seed', () => {
   expect(data1).not.toBe(data3)
 })
 
+test('runFake can be used with sync functions', () => {
+  expect(() => runFake(() => {})).not.toThrow()
+})
+
 test('runFake can not be used with async functions', () => {
+  // @ts-expect-error
   expect(() => runFake(async () => {})).toThrow()
 })
