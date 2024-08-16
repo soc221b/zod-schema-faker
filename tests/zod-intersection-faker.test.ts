@@ -21,7 +21,7 @@ test('ZodIntersectionFaker should accepts a ZodIntersection schema', () => {
   expect(() => zodIntersectionFaker(schema)).not.toThrow()
 })
 
-test('zodIntersectionFaker should return a ZodIntersectionFaker instance', () => {
+test('ZodIntersectionFaker should return a ZodIntersectionFaker instance', () => {
   expect(typeof zodIntersectionFaker).toBe('function')
 
   const schema = z.intersection(Person, Employee)
@@ -35,7 +35,7 @@ test('ZodIntersectionFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodIntersectionFaker.fake should return intersection type', () => {
+test('ZodIntersectionFaker.fake should return the given type', () => {
   const schema = z.intersection(Person, Employee)
   const faker = zodIntersectionFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
