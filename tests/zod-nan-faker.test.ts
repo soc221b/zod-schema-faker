@@ -32,13 +32,6 @@ test('ZodNaNFaker.fake should return number type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, number>>(true)
 })
 
-test('ZodNaNFaker.fake should return NaN', () => {
-  const schema = z.nan()
-  const faker = zodNaNFaker(schema)
-  const data = faker.fake()
-  expect(data).toBe(NaN)
-})
-
 test('ZodNaNFaker.fake should return a valid data', () => {
   const schema = z.nan()
   const faker = zodNaNFaker(schema)
