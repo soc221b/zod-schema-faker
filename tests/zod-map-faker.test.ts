@@ -13,7 +13,7 @@ test('ZodMapFaker should accepts a ZodMap schema', () => {
   expect(() => zodMapFaker(schema)).not.toThrow()
 })
 
-test('zodMapFaker should return a ZodMapFaker instance', () => {
+test('ZodMapFaker should return a ZodMapFaker instance', () => {
   expect(typeof zodMapFaker).toBe('function')
   const schema = z.map(z.number(), z.string())
   const faker = zodMapFaker(schema)
