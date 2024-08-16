@@ -33,7 +33,7 @@ test('ZodFunctionFaker.fake should return function type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, (_: number, __: string) => boolean>>(true)
 })
 
-test('ZodFunctionFaker.fake should return fn', () => {
+test('ZodFunctionFaker.fake should return a valid data', () => {
   install()
 
   const schema = z.function(z.tuple([z.number(), z.string()]), z.boolean())
@@ -42,7 +42,7 @@ test('ZodFunctionFaker.fake should return fn', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-test('ZodFunctionFaker.fake should generate a valid return value', () => {
+test('ZodFunctionFaker.fake when the returned function is called, it should return a valid data', () => {
   install()
 
   const schema = z.function(z.tuple([z.number(), z.string()]), z.boolean())
