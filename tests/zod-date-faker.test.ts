@@ -12,7 +12,7 @@ test('ZodDateFaker should accepts a ZodDate schema', () => {
   expect(() => zodDateFaker(schema)).not.toThrow()
 })
 
-test('zodDateFaker should return a ZodDateFaker instance', () => {
+test('ZodDateFaker should return a ZodDateFaker instance', () => {
   expect(typeof zodDateFaker).toBe('function')
 
   const schema = z.date()
