@@ -9,7 +9,7 @@ const pxSchema = z.custom<`${number}px`>(val => {
 // 2. define custom faker
 class pxFaker extends ZodTypeFaker<typeof pxSchema> {
   fake(): `${number}px` {
-    // you can use `runFake` to generate fake data, or
+    // you can use `runFake` to generate fake data
     return `${runFake(faker => faker.number.int({ min: 0 }))}px`
     // or use `randexp` if applicable
     // return randexp(/[1-9]\d+?px/) as `${number}px`
@@ -30,7 +30,7 @@ test('basic', () => {
   expect(pxSchema.safeParse(data).success).toBe(true)
 })
 
-test('used with other schemas', () => {
+test('integration', () => {
   const schema = z
     .object({
       padding: pxSchema,
