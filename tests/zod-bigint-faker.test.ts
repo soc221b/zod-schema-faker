@@ -13,7 +13,7 @@ test('ZodBigIntFaker should accepts a ZodBigInt schema', () => {
   expect(() => zodBigIntFaker(schema)).not.toThrow()
 })
 
-test('zodBigIntFaker should return a ZodBigIntFaker instance', () => {
+test('ZodBigIntFaker should return a ZodBigIntFaker instance', () => {
   expect(typeof zodBigIntFaker).toBe('function')
   const schema = z.bigint()
   const faker = zodBigIntFaker(schema)
