@@ -27,7 +27,7 @@ test('ZodEnumFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodEnumFaker.fake should return enum type', () => {
+test('ZodEnumFaker.fake should return the given type', () => {
   const schema = z.enum(['foo', 'bar'])
   const faker = zodEnumFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, 'foo' | 'bar'>>(true)
