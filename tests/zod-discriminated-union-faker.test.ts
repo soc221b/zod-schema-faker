@@ -16,7 +16,7 @@ test('ZodDiscriminatedUnionFaker should accepts a ZodDiscriminatedUnion schema',
   expect(() => zodDiscriminatedUnionFaker(schema)).not.toThrow()
 })
 
-test('zodDiscriminatedUnionFaker should return a ZodDiscriminatedUnionFaker instance', () => {
+test('ZodDiscriminatedUnionFaker should return a ZodDiscriminatedUnionFaker instance', () => {
   expect(typeof zodDiscriminatedUnionFaker).toBe('function')
 
   const schema = z.discriminatedUnion('type', [
@@ -36,7 +36,7 @@ test('ZodDiscriminatedUnionFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodDiscriminatedUnionFaker.fake should return union type', () => {
+test('ZodDiscriminatedUnionFaker.fake should return the given type', () => {
   const schema = z.discriminatedUnion('type', [
     z.object({ type: z.literal('a'), a: z.string() }),
     z.object({ type: z.literal('b'), b: z.string() }),
