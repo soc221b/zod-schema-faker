@@ -24,7 +24,7 @@ test('ZodLazyFaker should accepts a ZodLazy schema', () => {
   expect(() => zodLazyFaker(schema)).not.toThrow()
 })
 
-test('zodLazyFaker should return a ZodLazyFaker instance', () => {
+test('ZodLazyFaker should return a ZodLazyFaker instance', () => {
   expect(typeof zodLazyFaker).toBe('function')
 
   const schema = z.lazy(() =>
@@ -48,7 +48,7 @@ test('ZodLazyFaker.fake should be a function', () => {
   expect(typeof faker.fake).toBe('function')
 })
 
-test('ZodLazyFaker.fake should return object type', () => {
+test('ZodLazyFaker.fake should return the given type', () => {
   const schema = z.lazy(() =>
     z.object({
       name: z.string(),
