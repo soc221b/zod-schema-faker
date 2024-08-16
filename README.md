@@ -41,7 +41,7 @@
   - ✅ numeric enums
   - ✅ string enums
   - ✅ const enums
-- ✅ z.never: return `undefined`
+- ✅ z.never: always throws an error
 - ✅ z.null
 - ✅ z.nullable
 - z.number
@@ -164,7 +164,6 @@ const schema = z.object({
   }),
   any: z.any(),
   unknown: z.unknown(),
-  // never: z.never(), // should not use its return value
   literal: z.literal('tuna'),
   strings: z.object({
     max: z.string().max(5),
