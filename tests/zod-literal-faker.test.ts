@@ -32,13 +32,6 @@ test('ZodLiteralFaker.fake should return literal type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, 'foo'>>(true)
 })
 
-test('ZodLiteralFaker.fake should return Literal', () => {
-  const schema = z.literal('foo')
-  const faker = zodLiteralFaker(schema)
-  const data = faker.fake()
-  expect(data).toBe('foo')
-})
-
 test('ZodLiteralFaker.fake should return a valid data', () => {
   const schema = z.literal('foo')
   const faker = zodLiteralFaker(schema)
