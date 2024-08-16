@@ -32,13 +32,6 @@ test('ZodNullFaker.fake should return null type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, null>>(true)
 })
 
-test('ZodNullFaker.fake should return null', () => {
-  const schema = z.null()
-  const faker = zodNullFaker(schema)
-  const data = faker.fake()
-  expect(data).toBe(null)
-})
-
 test('ZodNullFaker.fake should return a valid data', () => {
   const schema = z.null()
   const faker = zodNullFaker(schema)
