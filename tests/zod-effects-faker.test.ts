@@ -9,7 +9,7 @@ test('type', () => {
   expectType<TypeEqual<typeof data, string>>(true)
 })
 
-test('zodEffectsFaker should return a ZodEffectsFaker instance', () => {
+test('ZodEffectsFaker should return a ZodEffectsFaker instance', () => {
   expect(typeof zodEffectsFaker).toBe('function')
 
   const schema = z.preprocess(val => String(val), z.string().min(5).max(10))
