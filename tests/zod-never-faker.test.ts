@@ -12,7 +12,7 @@ test('ZodNeverFaker should accepts a ZodNever schema', () => {
   expect(() => zodNeverFaker(schema)).not.toThrow()
 })
 
-test('zodNeverFaker should return a ZodNeverFaker instance', () => {
+test('ZodNeverFaker should return a ZodNeverFaker instance', () => {
   expect(typeof zodNeverFaker).toBe('function')
   const schema = z.never()
   const faker = zodNeverFaker(schema)
