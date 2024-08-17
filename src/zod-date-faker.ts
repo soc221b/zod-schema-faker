@@ -20,6 +20,7 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
         case 'max':
           max = Math.min(max, check.value)
           break
+        /* istanbul ignore next */
         default: {
           const _: never = check
           throw Error('unimplemented')

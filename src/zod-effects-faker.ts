@@ -17,6 +17,7 @@ export class ZodEffectsFaker<T extends z.ZodEffects<any, any, any>> extends ZodT
       case 'transform':
         return this.schema._def.effect.transform(result, { addIssue: () => void 0, path: [] })
 
+      /* istanbul ignore next */
       default: {
         const _: never = this.schema._def.effect
         throw Error('unimplemented')
