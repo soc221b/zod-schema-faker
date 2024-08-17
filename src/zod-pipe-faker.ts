@@ -6,10 +6,4 @@ export class ZodPipelineFaker<T extends z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny
   fake(): z.infer<T> {
     return fake(this.schema._def.out)
   }
-
-  static create<T extends z.ZodPipeline<z.ZodTypeAny, z.ZodTypeAny>>(schema: T): ZodPipelineFaker<T> {
-    return new ZodPipelineFaker(schema)
-  }
 }
-
-export const zodPipelineFaker: typeof ZodPipelineFaker.create = ZodPipelineFaker.create

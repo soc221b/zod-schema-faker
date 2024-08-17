@@ -6,10 +6,4 @@ export class ZodReadonlyFaker<T extends z.ZodReadonly<z.ZodTypeAny>> extends Zod
   fake(): z.infer<T> {
     return fake(this.schema._def.innerType)
   }
-
-  static create<T extends z.ZodReadonly<z.ZodTypeAny>>(schema: T): ZodReadonlyFaker<T> {
-    return new ZodReadonlyFaker(schema)
-  }
 }
-
-export const zodReadonlyFaker: typeof ZodReadonlyFaker.create = ZodReadonlyFaker.create
