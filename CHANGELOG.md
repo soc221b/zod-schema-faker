@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.3](https://github.com/soc221b/zod-schema-faker/compare/1.0.2...v1.0.3) (2024-08-17)
+
+
+### Bug Fixes
+
+* readonly fake data should be freezed ([#211](https://github.com/soc221b/zod-schema-faker/issues/211)) ([0bab5a7](https://github.com/soc221b/zod-schema-faker/commit/0bab5a7272a181c14bcd82dae33a66b1de2c2e98))
+
 ## [1.0.2](https://github.com/soc221b/zod-schema-faker/compare/1.0.1...v1.0.2) (2024-08-16)
 
 
