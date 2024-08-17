@@ -2,6 +2,18 @@ import * as z from 'zod'
 import { install, fake } from '../src'
 import { expectType, TypeEqual } from 'ts-expect'
 
+test('freeze', () => {
+  const schema = z.object({ key: z.string() }).readonly()
+
+  install()
+  const data = fake(schema)
+
+  expect(() => {
+    // @ts-expect-error
+    data.key = ''
+  }).toThrow()
+})
+
 test('object', () => {
   const schema = z.object({ key: z.string() }).readonly()
 
