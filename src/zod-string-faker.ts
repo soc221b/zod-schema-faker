@@ -166,6 +166,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           return runFake(faker => faker.internet.url())
         case 'uuid':
           return runFake(faker => faker.string.uuid())
+        /* istanbul ignore next */
         default: {
           const _: never = check
           throw Error('unimplemented')

@@ -69,6 +69,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
           return { min: check.value, max: check.value, precision: 0.1 }
         case 'finite':
           break
+        /* istanbul ignore next */
         default:
           const _: never = check
           throw Error('unimplemented')
@@ -97,6 +98,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
         case 'int':
         case 'multipleOf':
           break
+        /* istanbul ignore next */
         default:
           const _: never = check
           throw Error('unimplemented')
