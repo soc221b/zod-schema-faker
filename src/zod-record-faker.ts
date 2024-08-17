@@ -6,12 +6,8 @@ import { runFake } from './faker'
 export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
     let i = 0
-    const min = 0
     const max = 10
     const result: Record<any, any> = {}
-    while (++i < min) {
-      result[fake(this.schema._def.keyType)] = fake(this.schema._def.valueType)
-    }
     while (++i < max) {
       result[fake(this.schema._def.keyType)] = fake(this.schema._def.valueType)
       if (runFake(faker => faker.datatype.boolean())) {
