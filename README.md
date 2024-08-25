@@ -32,7 +32,7 @@
   - ✅ transform: works as expected.
 - ✅ z.enum
 - ✅ z.function
-- ✅ z.intersection
+- ❌ z.intersection
 - ✅ z.lazy
 - ✅ z.literal
 - ✅ z.map
@@ -131,13 +131,6 @@ Input
 </summary>
 
 ```ts
-const Person = z.object({
-  name: z.string(),
-})
-const Employee = z.object({
-  role: z.string(),
-})
-
 interface Category {
   name: string
   subcategories: Category[]
@@ -218,7 +211,6 @@ const schema = z.object({
   record: z.record(z.string(), z.number()),
   map: z.map(z.string(), z.number()),
   set: z.set(z.number()),
-  intersection: z.intersection(Person, Employee),
   lazy: category,
   promise: z.promise(z.number()),
 })
