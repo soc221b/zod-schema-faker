@@ -68,14 +68,6 @@ test('ZodIntersectionFaker.fake should return a valid data (object)', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-test('ZodIntersectionFaker.fake should return a valid data (object, no intersection)', () => {
-  install()
-
-  const schema = z.intersection(z.object({ foo: z.literal('foo') }), z.object({ foo: z.literal('bar') }))
-  const faker = zodIntersectionFaker(schema)
-  expect(() => faker.fake()).toThrow()
-})
-
 testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array)', () => {
   install()
 
@@ -85,18 +77,28 @@ testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array)'
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('ZodIntersectionFaker.fake should return a valid data (array, no intersection)', () => {
-  install()
+describe('no intersection', () => {
+  test('ZodIntersectionFaker.fake should throw a error (object)', () => {
+    install()
 
-  const schema = z.intersection(z.array(z.literal('foo')).length(1), z.array(z.literal('bar')).length(1))
-  const faker = zodIntersectionFaker(schema)
-  expect(() => faker.fake()).toThrow()
-})
+    const schema = z.intersection(z.object({ foo: z.literal('foo') }), z.object({ foo: z.literal('bar') }))
+    const faker = zodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
 
-test('ZodIntersectionFaker.fake should return a valid data (no intersection)', () => {
-  install()
+  test('ZodIntersectionFaker.fake should throw a error (array)', () => {
+    install()
 
-  const schema = z.intersection(z.literal('foo'), z.literal('bar'))
-  const faker = zodIntersectionFaker(schema)
-  expect(() => faker.fake()).toThrow()
+    const schema = z.intersection(z.array(z.literal('foo')).length(1), z.array(z.literal('bar')).length(1))
+    const faker = zodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  test('ZodIntersectionFaker.fake should throw a error', () => {
+    install()
+
+    const schema = z.intersection(z.literal('foo'), z.literal('bar'))
+    const faker = zodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
 })
