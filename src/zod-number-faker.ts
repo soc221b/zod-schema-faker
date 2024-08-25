@@ -49,10 +49,23 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
     }
 
     let min =
-      -1 * (Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1)
-    let max = Math.pow(2, exponents[runFake(faker => faker.number.int({ min: 0, max: exponents.length - 1 }))]) - 1
+      -1 *
+      (Math.pow(
+        2,
+        runFake(faker => faker.helpers.arrayElement(exponents)),
+      ) -
+        1)
+    let max =
+      Math.pow(
+        2,
+        runFake(faker => faker.helpers.arrayElement(exponents)),
+      ) - 1
     let precision =
-      1 / Math.pow(10, precisions[runFake(faker => faker.number.int({ min: 0, max: precisions.length - 1 }))])
+      1 /
+      Math.pow(
+        10,
+        runFake(faker => faker.helpers.arrayElement(precisions)),
+      )
 
     for (const check of this.schema._def.checks) {
       switch (check.kind) {

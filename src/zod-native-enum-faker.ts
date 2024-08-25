@@ -15,8 +15,7 @@ export class ZodNativeEnumFaker<T extends z.ZodNativeEnum<any>> extends ZodTypeF
   fake(): z.infer<T> {
     const values = this.schema._def.values
     const validEnumValues = getValidEnumValues(values)
-    const randomIndex = runFake(faker => faker.number.int({ min: 0, max: validEnumValues.length - 1 }))
-    return validEnumValues[randomIndex]
+    return runFake(faker => faker.helpers.arrayElement(validEnumValues))
   }
 
   static create<T extends z.ZodNativeEnum<any>>(schema: T): ZodNativeEnumFaker<T> {

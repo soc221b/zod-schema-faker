@@ -4,8 +4,7 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodEnumFaker<T extends z.ZodEnum<any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    const randomIndex = runFake(faker => faker.number.int({ min: 0, max: this.schema._def.values.length - 1 }))
-    return this.schema._def.values[randomIndex]
+    return runFake(faker => faker.helpers.arrayElement(this.schema._def.values))
   }
 
   static create<T extends z.ZodEnum<any>>(schema: T): ZodEnumFaker<T> {
