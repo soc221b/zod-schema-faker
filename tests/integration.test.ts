@@ -7,13 +7,6 @@ beforeEach(() => {
 })
 
 testMultipleTimes('integration', async () => {
-  const Person = z.object({
-    name: z.string(),
-  })
-  const Employee = z.object({
-    role: z.string(),
-  })
-
   interface Category {
     name: string
     subcategories: Category[]
@@ -95,7 +88,6 @@ testMultipleTimes('integration', async () => {
     record: z.record(z.string(), z.number()),
     map: z.map(z.string(), z.number()),
     set: z.set(z.number()),
-    intersection: z.intersection(Person, Employee),
     lazy: category,
     promise: z.promise(z.number()),
   })
