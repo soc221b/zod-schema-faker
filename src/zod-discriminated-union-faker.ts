@@ -10,8 +10,7 @@ export class ZodDiscriminatedUnionFaker<T extends z.ZodDiscriminatedUnion<any, a
         ? this.schema._def.options.values()
         : this.schema._def.options.values,
     )
-    const randomIndex = runFake(faker => faker.number.int({ min: 0, max: Math.max(0, options.length - 1) }))
-    const randomSchema = options[randomIndex]
+    const randomSchema = runFake(faker => faker.helpers.arrayElement(options))
     return fake(randomSchema as any)
   }
 
