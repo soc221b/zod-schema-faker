@@ -2,9 +2,14 @@ import * as z from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 import { runFake } from './faker'
+import { ZodSchemaFakerError } from './error'
 
 export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
+    if (this.schema._def.keyType instanceof z.ZodString === false) {
+      throw new ZodSchemaFakerError('Invalid record key type: In runtime JavaScript, all keys are strings.')
+    }
+
     let i = 0
     const max = 10
     const result: Record<any, any> = {}

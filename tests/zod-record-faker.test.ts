@@ -8,6 +8,14 @@ test('ZodRecordFaker should assert parameters', () => {
   expect(() => zodRecordFaker(invalidSchema)).toThrow()
 })
 
+test('ZodRecordFaker should assert type of key', () => {
+  install()
+
+  const numericalKeySchema = z.record(z.number(), z.any())
+  const faker = zodRecordFaker(numericalKeySchema)
+  expect(() => faker.fake()).toThrow()
+})
+
 test('ZodRecordFaker should accepts a ZodRecord schema', () => {
   const schema = z.record(z.string(), z.number())
   expect(() => zodRecordFaker(schema)).not.toThrow()
