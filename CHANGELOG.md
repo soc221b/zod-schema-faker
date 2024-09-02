@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.4](https://github.com/soc221b/zod-schema-faker/compare/1.0.3...v1.0.4) (2024-09-02)
+
+
+### Bug Fixes
+
+* validate the type of record keys ([#225](https://github.com/soc221b/zod-schema-faker/issues/225)) ([8e1393b](https://github.com/soc221b/zod-schema-faker/commit/8e1393bcfb563b0b9ff386ec0fd5d93c96b0b308))
+
 ## [1.0.3](https://github.com/soc221b/zod-schema-faker/compare/1.0.2...v1.0.3) (2024-08-17)
 
 
