@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.5](https://github.com/soc221b/zod-schema-faker/compare/1.0.4...v1.0.5) (2024-09-14)
+
+
+### Bug Fixes
+
+* [#235](https://github.com/soc221b/zod-schema-faker/issues/235) ([f13da23](https://github.com/soc221b/zod-schema-faker/commit/f13da2346eeeb4659ec91fa55635af19d4b780e7))
+* emit additional JavaScript to ease support for importing CommonJS modules ([#238](https://github.com/soc221b/zod-schema-faker/issues/238)) ([f13da23](https://github.com/soc221b/zod-schema-faker/commit/f13da2346eeeb4659ec91fa55635af19d4b780e7)), closes [#235](https://github.com/soc221b/zod-schema-faker/issues/235)
+
 ## [1.0.4](https://github.com/soc221b/zod-schema-faker/compare/1.0.3...v1.0.4) (2024-09-02)
 
 
