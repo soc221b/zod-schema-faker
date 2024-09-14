@@ -1,5 +1,5 @@
 import { Faker, faker as _faker } from '@faker-js/faker'
-import * as RandExp from 'randexp'
+import RandExp from 'randexp'
 
 let _seedValue: number | undefined
 
