@@ -9,8 +9,8 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
   }
 
   private resolveCheck(): { min: number; max: number } {
-    let min: number = 0
-    let max: number = Infinity
+    let min: number = -8640000000000000
+    let max: number = 8640000000000000
 
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
