@@ -99,6 +99,8 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       switch (check.kind) {
         case 'base64':
           return randexp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/)
+        case 'base64url':
+          return randexp(/^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/)
         case 'cidr': {
           switch (check.version) {
             case 'v4':

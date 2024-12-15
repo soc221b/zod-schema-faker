@@ -47,6 +47,13 @@ test('base64', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('base64url', () => {
+  const schema = z.string().base64url()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('cidr', () => {
   const schema = z.string().cidr()
   const faker = zodStringFaker(schema)
