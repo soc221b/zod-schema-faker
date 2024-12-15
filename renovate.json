@@ -3,6 +3,5 @@
   "automerge": true,
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "extends": ["config:base"],
-  "ignorePaths": ["e2e/**"]
+  "extends": ["config:base"]
 }
