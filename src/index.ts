@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { fake as _fake } from './fake'
-import { seed } from './faker'
+import { resetSeed } from './faker'
 
 export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
   const result = _fake(schema)
-  seed()
+  resetSeed()
   return result
 }
 
