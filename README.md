@@ -66,6 +66,8 @@
 - ✅ z.set
 - z.string
   - ✅ base64[^1]
+  - ✅ base64url[^1]
+  - ✅ cidr[^1]
   - ✅ cuid[^1]
   - ✅ cuid2[^1]
   - ✅ date[^1]
@@ -76,6 +78,7 @@
   - ✅ endsWith
   - ✅ includes
   - ✅ ip[^1]
+  - ✅ jwt[^1]
   - ✅ length
   - ✅ max
   - ✅ min

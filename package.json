@@ -52,7 +52,7 @@
     "typescript": "5.7.2",
     "vite": "6.0.3",
     "vite-plugin-dts": "4.3.0",
-    "zod": "3.23.8"
+    "zod": "3.24.1"
   },
   "peerDependencies": {
     "zod": "*"
