@@ -4,17 +4,17 @@ import { runFake } from '../src/faker'
 
 test('seed', () => {
   install()
-  const schema = z.number()
+  const schema = z.object({ foo: z.number(), bar: z.number() })
 
   seed(3)
   const data1 = fake(schema)
   seed(3)
   const data2 = fake(schema)
   expect(data1).toMatchSnapshot()
-  expect(data1).toBe(data2)
+  expect(data1).toEqual(data2)
 
   const data3 = fake(schema)
-  expect(data1).not.toBe(data3)
+  expect(data1).not.toEqual(data3)
 })
 
 test('runFake can be used with sync functions', () => {
