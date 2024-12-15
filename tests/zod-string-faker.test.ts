@@ -47,6 +47,27 @@ test('base64', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('cidr', () => {
+  const schema = z.string().cidr()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('cidr v4', () => {
+  const schema = z.string().cidr()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('cidr v6', () => {
+  const schema = z.string().cidr({ version: 'v6' })
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('cuid', () => {
   const schema = z.string().cuid()
   const faker = zodStringFaker(schema)
