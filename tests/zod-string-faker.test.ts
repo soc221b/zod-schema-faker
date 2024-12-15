@@ -152,6 +152,13 @@ test('ip v6', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('jwt', () => {
+  const schema = z.string().jwt()
+  const faker = zodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('length', () => {
   const schema = z.string().length(5)
   const faker = zodStringFaker(schema)

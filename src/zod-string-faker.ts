@@ -155,6 +155,8 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
             : randexp(
                 /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/,
               )
+        case 'jwt':
+          return runFake(faker => faker.internet.jwt())
         case 'length':
           exact = check.value
           break
