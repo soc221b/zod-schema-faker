@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.8](https://github.com/soc221b/zod-schema-faker/compare/1.0.7...1.0.8) (2024-12-15)
+
+
+### Performance Improvements
+
+* should not seed every time ([#293](https://github.com/soc221b/zod-schema-faker/issues/293)) ([6d58cf0](https://github.com/soc221b/zod-schema-faker/commit/6d58cf0c085b703e9be95c69b8a07c753b0ba985))
+
 ## [1.0.7](https://github.com/soc221b/zod-schema-faker/compare/1.0.6...1.0.7) (2024-12-03)
 
 
