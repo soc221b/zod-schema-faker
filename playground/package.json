@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/node": "22.10.4",
     "typescript": "5.7.2",
-    "vite": "6.0.6"
+    "vite": "6.0.7"
   },
   "dependencies": {
     "zod": "3.24.1"
