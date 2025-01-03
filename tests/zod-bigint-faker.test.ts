@@ -132,3 +132,99 @@ testMultipleTimes('multiplyOf 4', () => {
   }
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+describe('edge case', () => {
+  test('gt', () => {
+    const schema = z.bigint().gt(100n).lte(101n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(101n)
+  })
+
+  test('gte', () => {
+    const schema = z.bigint().gte(100n).lt(101n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(100n)
+  })
+
+  test('lt', () => {
+    const schema = z.bigint().lt(100n).gte(99n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(99n)
+  })
+
+  test('lte', () => {
+    const schema = z.bigint().lte(100n).gt(99n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(100n)
+  })
+
+  test('positive', () => {
+    const schema = z.bigint().positive().lt(2n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(1n)
+  })
+
+  test('nonnegative', () => {
+    const schema = z.bigint().nonnegative().lt(1n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(0n)
+  })
+
+  test('negative', () => {
+    const schema = z.bigint().negative().gt(-2n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(-1n)
+  })
+
+  test('nonpositive', () => {
+    const schema = z.bigint().nonpositive().gt(-1n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(0n)
+  })
+
+  test('multiplyOf positive', () => {
+    const schema = z.bigint().multipleOf(37n).gte(37n).lte(37n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(37n)
+  })
+
+  test('multiplyOf negative', () => {
+    const schema = z.bigint().multipleOf(-37n).gte(-37n).lte(-37n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+    expect(data).toBe(-37n)
+  })
+
+  test('multiplyOf + min', () => {
+    const schema = z.bigint().multipleOf(37n).min(37n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('multiplyOf + max', () => {
+    const schema = z.bigint().multipleOf(37n).max(37n)
+    const faker = zodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+})
