@@ -228,4 +228,47 @@ describe('edge case', () => {
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
   })
+
+  test('multiplyOf', () => {
+    for (let i = 0n; i < 2000n; i++) {
+      const schema = z
+        .bigint()
+        .multipleOf(37n)
+        .min(i)
+        .max(i + 37n)
+      const faker = zodBigIntFaker(schema)
+      const data = faker.fake()
+      expect(schema.safeParse(data).success).toBe(true)
+    }
+    for (let i = 0n; i > -2000n; i--) {
+      const schema = z
+        .bigint()
+        .multipleOf(37n)
+        .min(i - 37n)
+        .max(i)
+      const faker = zodBigIntFaker(schema)
+      const data = faker.fake()
+      expect(schema.safeParse(data).success).toBe(true)
+    }
+    for (let i = 0n; i < 2000n; i++) {
+      const schema = z
+        .bigint()
+        .multipleOf(-37n)
+        .min(i)
+        .max(i + 37n)
+      const faker = zodBigIntFaker(schema)
+      const data = faker.fake()
+      expect(schema.safeParse(data).success).toBe(true)
+    }
+    for (let i = 0n; i > -2000n; i--) {
+      const schema = z
+        .bigint()
+        .multipleOf(-37n)
+        .min(i - 37n)
+        .max(i)
+      const faker = zodBigIntFaker(schema)
+      const data = faker.fake()
+      expect(schema.safeParse(data).success).toBe(true)
+    }
+  })
 })
