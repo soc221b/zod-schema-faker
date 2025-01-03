@@ -46,6 +46,7 @@
 - ✅ z.record
 - ✅ z.set
 - ✅ z.string[^1]
+- ✅ z.symbol
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
