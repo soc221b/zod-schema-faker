@@ -63,7 +63,7 @@ test('cidr', () => {
 })
 
 test('cidr v4', () => {
-  const schema = z.string().cidr()
+  const schema = z.string().cidr({ version: 'v4' })
   const faker = zodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
