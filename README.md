@@ -10,7 +10,7 @@
 - methods
   - ❌ .and: impossible to generate
   - ✅ .array
-  - ❌ .brand
+  - ✅ .brand
   - ✅ .default
   - ✅ .nullable
   - ✅ .nullish
