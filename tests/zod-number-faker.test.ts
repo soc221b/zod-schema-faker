@@ -1,7 +1,6 @@
 import * as z from 'zod'
 import { zodNumberFaker, ZodNumberFaker } from '../src/zod-number-faker'
 import { expectType, TypeEqual } from 'ts-expect'
-import { testMultipleTimes } from './util'
 
 test('ZodNumberFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -40,100 +39,165 @@ test('ZodNumberFaker.fake should return a valid data', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('gt', () => {
+test('gt', () => {
   const schema = z.number().gt(1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('gte', () => {
+test('gte', () => {
   const schema = z.number().gte(1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('min', () => {
+test('min', () => {
   const schema = z.number().min(1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('lt', () => {
+test('lt', () => {
   const schema = z.number().gt(-1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('lte', () => {
+test('lte', () => {
   const schema = z.number().gte(-1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('max', () => {
+test('max', () => {
   const schema = z.number().max(-1e9)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('int', () => {
+test('int', () => {
   const schema = z.number().int()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('positive', () => {
+test('positive', () => {
   const schema = z.number().positive()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('non-positive', () => {
+test('non-positive', () => {
   const schema = z.number().nonpositive()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('negative', () => {
+test('negative', () => {
   const schema = z.number().negative()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('non-negative', () => {
+test('non-negative', () => {
   const schema = z.number().nonnegative()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('multipleOf', () => {
-  const schema = z.number().multipleOf(0.1 + 0.2)
+test('multipleOf', () => {
+  const schema = z.number().multipleOf(37)
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('finite', () => {
+test('finite', () => {
   const schema = z.number().finite()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('safe', () => {
+test('safe', () => {
   const schema = z.number().safe()
   const faker = zodNumberFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+describe('edge case', () => {
+  test('positive + int', () => {
+    const schema = z.number().positive().int().lte(1)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(1)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('nonpositive + int', () => {
+    const schema = z.number().nonpositive().int().gte(0)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(0)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('negative + int', () => {
+    const schema = z.number().negative().int().gte(-1)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(-1)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('nonnegative + int', () => {
+    const schema = z.number().nonnegative().int().lte(0)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(0)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('positive + float', () => {
+    const schema = z.number().positive().lte(0.000000000000001)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(0.000000000000001)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('negative + float', () => {
+    const schema = z.number().negative().gte(-0.000000000000001)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toBe(-0.000000000000001)
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('multipleOf', () => {
+    // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L1480
+    const schema = z.number().multipleOf(0.000001)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  test('multipleOf', () => {
+    const schema = z.number().multipleOf(1_234_567_890)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
 })
