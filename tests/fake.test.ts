@@ -1,5 +1,7 @@
-import { fake, install } from '../src'
+import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
+import { fake, install } from '../src'
+import { uninstall } from '../src/zod-type-kind-to-zod-type-faker'
 
 describe('fake', () => {
   test('fake is a function', () => {
@@ -13,6 +15,7 @@ describe('fake', () => {
   test('fake should accepts a ZodType schema', () => {
     install()
     expect(() => fake(z.number())).not.toThrow()
+    uninstall()
   })
 
   test('fake should throw an error if not installed', () => {

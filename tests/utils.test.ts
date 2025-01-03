@@ -1,5 +1,6 @@
-import { assertZodSchema } from '../src/utils'
+import { expect, test } from 'vitest'
 import * as z from 'zod'
+import { assertZodSchema } from '../src/utils'
 
 test('assertZodSchema should throw an error if schema is not a zod schema', () => {
   expect(() => assertZodSchema(null)).toThrow()

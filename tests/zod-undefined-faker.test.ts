@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest'
 import * as z from 'zod'
 import { zodUndefinedFaker, ZodUndefinedFaker } from '../src/zod-undefined-faker'
 import { expectType, TypeEqual } from 'ts-expect'

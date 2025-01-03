@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import { zodBigIntFaker, ZodBigIntFaker } from '../src/zod-bigint-faker'
 import { expectType, TypeEqual } from 'ts-expect'

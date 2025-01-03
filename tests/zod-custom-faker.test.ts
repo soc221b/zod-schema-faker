@@ -1,3 +1,4 @@
+import { beforeEach, expect, test } from 'vitest'
 import * as z from 'zod'
 import { fake, installCustom, ZodTypeFaker, runFake, install } from '../src'
 

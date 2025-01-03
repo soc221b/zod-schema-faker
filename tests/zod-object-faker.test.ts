@@ -1,8 +1,8 @@
+import { describe, expect, test } from 'vitest'
 import * as z from 'zod'
 import { zodObjectFaker, ZodObjectFaker } from '../src/zod-object-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
-import { type } from 'os'
 
 test('ZodObjectFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
