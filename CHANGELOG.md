@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/soc221b/zod-schema-faker/compare/1.0.10...1.1.0) (2025-01-03)
+
+
+### Features
+
+* .brand ([#312](https://github.com/soc221b/zod-schema-faker/issues/312)) ([4f9eafe](https://github.com/soc221b/zod-schema-faker/commit/4f9eafeef7364d864848013f25a2fdcb7ae87947))
+
+
+### Bug Fixes
+
+* string - cidr v4 ([#308](https://github.com/soc221b/zod-schema-faker/issues/308)) ([8466a2c](https://github.com/soc221b/zod-schema-faker/commit/8466a2cdd34d24c07ec78d709655ba78bfe5e1b5))
+
 ## [1.0.10](https://github.com/soc221b/zod-schema-faker/compare/1.0.9...1.0.10) (2025-01-03)
 
 
