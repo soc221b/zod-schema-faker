@@ -1,3 +1,4 @@
+import { expect, test } from 'vitest'
 import * as z from 'zod'
 import { zodNativeEnumFaker, ZodNativeEnumFaker } from '../src/zod-native-enum-faker'
 import { expectType, TypeEqual } from 'ts-expect'

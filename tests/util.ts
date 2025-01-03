@@ -1,3 +1,5 @@
+import { test } from 'vitest'
+
 const count = 50
 
 export const testMultipleTimes = (name: string, fn: () => void) => {

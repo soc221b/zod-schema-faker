@@ -30,7 +30,7 @@ jobs:
       - run: npm ci
 
       - run: |
-          npx jest
+          npx vitest run
           npm run build && cd e2e/issue-189 && npm ci && npm run test
 
   build:
