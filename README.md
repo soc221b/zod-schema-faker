@@ -7,95 +7,49 @@
 
 ## Supported APIs
 
+- methods
+  - ❌ .and: impossible to generate
+  - ✅ .array
+  - ❌ .brand
+  - ✅ .default
+  - ✅ .nullable
+  - ✅ .nullish
+  - ✅ .optional
+  - ✅ .or
+  - ✅ .pipe
+  - ✅ .promise
+  - ✅ .readonly
+  - ❌ .refine
+  - ❌ .superRefine
+  - ✅ .transform
 - ✅ z.any
 - ✅ z.array
-- z.bigint
-  - ✅ gt
-  - ✅ gte
-  - ✅ lt
-  - ✅ lte
-  - ✅ positive
-  - ✅ nonnegative
-  - ✅ negative
-  - ✅ nonpositive
-  - ✅ multipleOf
+- ✅ z.bigint
 - ✅ z.boolean
 - ✅ z.custom: see [example](./tests/zod-custom-faker.test.ts) for details.
-- z.date
-  - ✅ min
-  - ✅ max
-- ✅ z.default
+- ✅ z.date
 - ✅ z.discriminatedUnion
-- z.effects
-  - ✅ preprocess[^2]
-  - ❌ refine: not yet supported.
-  - ✅ transform: works as expected.
 - ✅ z.enum
+- ❌ z.intersection: impossible to generate
 - ✅ z.function
-- ❌ z.intersection
 - ✅ z.lazy
 - ✅ z.literal
 - ✅ z.map
 - ✅ z.nan
-- z.nativeEnum
-  - ✅ numeric enums
-  - ✅ string enums
-  - ✅ const enums
+- ✅ z.nativeEnum
 - ✅ z.never: always throws an error
 - ✅ z.null
-- ✅ z.nullable
-- z.number
-  - ✅ gt
-  - ✅ gte
-  - ✅ lt
-  - ✅ lte
-  - ✅ int
-  - ✅ positive
-  - ✅ nonnegative
-  - ✅ negative
-  - ✅ nonpositive
-  - ✅ multipleOf
-  - ✅ finite
-  - ✅ safe
+- ✅ z.number
 - ✅ z.object
-- ✅ z.optional
-- ✅ z.pipe
+- ✅ z.preprocess[^2]
 - ✅ z.promise
-- ✅ z.readonly
 - ✅ z.record
 - ✅ z.set
-- z.string
-  - ✅ base64[^1]
-  - ✅ base64url[^1]
-  - ✅ cidr[^1]
-  - ✅ cuid[^1]
-  - ✅ cuid2[^1]
-  - ✅ date[^1]
-  - ✅ datetime[^1]
-  - ✅ duration[^1]
-  - ✅ email[^1]
-  - ✅ emoji
-  - ✅ endsWith
-  - ✅ includes
-  - ✅ ip[^1]
-  - ✅ jwt[^1]
-  - ✅ length
-  - ✅ max
-  - ✅ min
-  - ✅ nanoid[^1]
-  - ✅ regex[^1]
-  - ✅ startsWith
-  - ✅ time[^1]
-  - ✅ toLowerCase
-  - ✅ toUpperCase
-  - ✅ trim
-  - ✅ ulid[^1]
-  - ✅ url[^1]
-  - ✅ uuid[^1]
+- ✅ z.string[^1]
 - ✅ z.tuple
 - ✅ z.undefined
 - ✅ z.union
-- ✅ z.unknown: returns `fake(z.any())`
+- ✅ z.unknown
 - ✅ z.void
 
 [^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
