@@ -29,6 +29,7 @@ import { ZodReadonlyFaker } from './zod-readonly-faker'
 import { ZodRecordFaker } from './zod-record-faker'
 import { ZodSetFaker } from './zod-set-faker'
 import { ZodStringFaker } from './zod-string-faker'
+import { ZodSymbolFaker } from './zod-symbol-faker'
 import { ZodTupleFaker } from './zod-tuple-faker'
 import { ZodTypeFaker } from './zod-type-faker'
 import { ZodUndefinedFaker } from './zod-undefined-faker'
@@ -69,6 +70,7 @@ export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodRecord, ZodRecordFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSet, ZodSetFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodString, ZodStringFaker)
+  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSymbol, ZodSymbolFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodTuple, ZodTupleFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUndefined, ZodUndefinedFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUnion, ZodUnionFaker)
