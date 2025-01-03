@@ -4,6 +4,7 @@ import { ZodAnyFaker } from './zod-any-faker'
 import { ZodArrayFaker } from './zod-array-faker'
 import { ZodBigIntFaker } from './zod-bigint-faker'
 import { ZodBooleanFaker } from './zod-boolean-faker'
+import { ZodBrandedFaker } from './zod-branded-faker'
 import { ZodDateFaker } from './zod-date-faker'
 import { ZodDefaultFaker } from './zod-default-faker'
 import { ZodDiscriminatedUnionFaker } from './zod-discriminated-union-faker'
@@ -43,6 +44,7 @@ export function install(): void {
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodArray, ZodArrayFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBigInt, ZodBigIntFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBoolean, ZodBooleanFaker)
+  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBranded, ZodBrandedFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDate, ZodDateFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDefault, ZodDefaultFaker)
   zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion, ZodDiscriminatedUnionFaker)
