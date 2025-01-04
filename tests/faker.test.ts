@@ -1,7 +1,6 @@
 import { expect, test } from 'vitest'
-import * as z from 'zod'
-import { install, fake, seed } from '../src'
-import { runFake } from '../src/faker'
+import { z } from 'zod'
+import { install, fake, seed, runFake } from '../src'
 
 test('seed', () => {
   install()

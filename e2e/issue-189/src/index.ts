@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { install, fake } from 'zod-schema-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 

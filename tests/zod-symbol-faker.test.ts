@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { zodSymbolFaker, ZodSymbolFaker } from '../src/zod-symbol-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 

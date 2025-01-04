@@ -1,5 +1,4 @@
-import * as z from 'zod'
-import { fake } from './fake'
+import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodVoidFaker extends ZodTypeFaker<z.ZodVoid> {

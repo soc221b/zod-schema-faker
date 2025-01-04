@@ -1,13 +1,9 @@
-import * as z from 'zod'
-import { assertZodSchema } from './utils'
+import { z } from 'zod'
+import { assertsZodSchema } from './utils'
 
-export abstract class ZodTypeFaker<T extends z.ZodType<any, any, any>> {
-  protected schema: T
-
-  constructor(schema: T) {
-    assertZodSchema(schema)
-
-    this.schema = schema
+export abstract class ZodTypeFaker<T extends z.ZodTypeAny> {
+  constructor(protected schema: T) {
+    assertsZodSchema(schema)
   }
 
   abstract fake(): z.infer<T>

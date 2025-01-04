@@ -1,5 +1,5 @@
-import * as z from 'zod'
-import { runFake } from './faker'
+import { z } from 'zod'
+import { runFake } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {

@@ -66,7 +66,7 @@ npm install --save-dev zod-schema-faker
 ## Usage
 
 ```ts
-import * as z from 'zod'
+import { z } from 'zod'
 import { install, fake } from 'zod-schema-faker'
 
 const schema = z.number()
@@ -269,7 +269,7 @@ const data = {
 - `function seed(value)`: sets the seed to use
 
   ```ts
-  import * as z from 'zod'
+  import { z } from 'zod'
   import { install, fake, seed } from 'zod-schema-faker'
 
   install()

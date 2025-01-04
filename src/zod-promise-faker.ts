@@ -1,7 +1,7 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
-import { runFake } from './faker'
+import { runFake } from './random'
 
 export class ZodPromiseFaker<T extends z.ZodPromise<any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {

@@ -1,7 +1,7 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
-import { runFake } from './faker'
+import { runFake } from './random'
 import { ZodSchemaFakerError } from './error'
 
 export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFaker<T> {

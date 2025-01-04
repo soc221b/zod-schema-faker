@@ -1,5 +1,5 @@
 import { beforeEach, expect } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake, install } from '../src'
 import { testMultipleTimes } from './util'
 

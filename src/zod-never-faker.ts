@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodNeverFaker extends ZodTypeFaker<z.ZodNever> {

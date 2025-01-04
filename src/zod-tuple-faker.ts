@@ -1,6 +1,6 @@
-import * as z from 'zod'
-import { fake } from './fake'
+import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
+import { fake } from './fake'
 
 export class ZodTupleFaker<T extends z.ZodTuple<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
