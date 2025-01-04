@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.2](https://github.com/soc221b/zod-schema-faker/compare/1.1.1...1.1.2) (2025-01-04)
+
+
+### Bug Fixes
+
+* string ipv6, ulid ([#316](https://github.com/soc221b/zod-schema-faker/issues/316)) ([ca72f3d](https://github.com/soc221b/zod-schema-faker/commit/ca72f3d565c975423709ffb392a742093e2385d4))
+
 ## [1.1.1](https://github.com/soc221b/zod-schema-faker/compare/1.1.0...1.1.1) (2025-01-03)
 
 
