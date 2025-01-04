@@ -1,83 +1,21 @@
 import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
-import { ZodSchemaFakerError } from './error'
 import { randexp, runFake } from './random'
 
 const averageWordLength = 5
 const averageSentenceLength = averageWordLength * 15
 const averageParagraphLength = averageWordLength * 200
-// https://github.com/colinhacks/zod/blob/890556e/src/__tests__/string.test.ts#L232-L239
+
+// https://github.com/colinhacks/zod/blob/main/src/types.ts
+const cuidRegex = /^c[^\s-]{8,}$/i
+const cuid2Regex = /^[0-9a-z]+$/
 const emojisLength1 = ['☘', '➡️', '⚜']
-const emojisLength2 = [
-  '👋',
-  '🍺',
-  '💚',
-  '💙',
-  '💜',
-  '💛',
-  '❤️',
-  '🐛',
-  '🗝',
-  '🐏',
-  '🍡',
-  '🎦',
-  '🚢',
-  '🏨',
-  '💫',
-  '🎌',
-  '🗡',
-  '😹',
-  '🔒',
-  '🎬',
-  '🍹',
-  '🗂',
-  '🚨',
-  '🕑',
-  '〽️',
-  '🚦',
-  '🌊',
-  '🍴',
-  '💍',
-  '🍌',
-  '💰',
-  '😳',
-  '🌺',
-  '🍃',
-  '😀',
-  '😁',
-  '😂',
-  '🤣',
-  '😃',
-  '😄',
-  '😅',
-  '😆',
-  '😉',
-  '😊',
-  '😋',
-  '😎',
-  '😍',
-  '😘',
-  '🥰',
-  '😗',
-  '😈',
-  '👿',
-]
+const emojisLength2 = ['😳', '😀', '😁', '🤣', '😃', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '🥰', '😗', '😈', '👿']
+const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
+const base64UrlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/
 
 export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
   fake(): z.infer<z.ZodString> {
-    const safeCount = 10
-    let count = 0
-    do {
-      const result = this.doFake()
-      if (this.schema.safeParse(result).success) {
-        return result
-      }
-    } while (++count < safeCount)
-
-    throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
-  }
-
-  private doFake(): z.infer<z.ZodString> {
     let min = 0
     let max = runFake(faker =>
       faker.datatype.boolean()
@@ -98,27 +36,19 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
         case 'base64':
-          return randexp(/^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/)
+          return randexp(base64Regex)
         case 'base64url':
-          return randexp(/^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/)
+          return randexp(base64UrlRegex)
         case 'cidr': {
           switch (check.version) {
             case 'v4':
-              return randexp(
-                /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/,
-              )
+              return runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
             case 'v6':
-              return randexp(
-                /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/,
-              )
+              return runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
             case undefined:
               return runFake(faker => faker.datatype.boolean())
-                ? randexp(
-                    /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/,
-                  )
-                : randexp(
-                    /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/,
-                  )
+                ? runFake(faker => faker.internet.ip() + '/' + faker.number.int({ min: 0, max: 32 }))
+                : runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
             default: {
               const _: never = check.version
               throw SyntaxError()
@@ -126,9 +56,9 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           }
         }
         case 'cuid':
-          return randexp(/^c[^\s-]{8,}$/i)
+          return randexp(cuidRegex)
         case 'cuid2':
-          return randexp(/^[0-9a-z]+$/)
+          return randexp(cuid2Regex)
         case 'date':
           return runFake(faker => faker.date.anytime())
             .toISOString()
@@ -136,7 +66,23 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'datetime':
           return runFake(faker => faker.date.anytime()).toISOString()
         case 'duration':
-          return randexp(/^P[\d]{1,4}Y0?[0-9]M[0-2]?[0-8]DT[0-1]?[0-9]H[0-5]?[0-9]M[0-5]?[0-9]S$/)
+          return (
+            [
+              'P',
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 2000 }) + 'Y' : '')),
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 12 }) + 'M' : '')),
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 31 }) + 'D' : '')),
+              'T',
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 24 }) + 'H' : '')),
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 60 }) + 'M' : '')),
+              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 60 }) + 'S' : '')),
+            ]
+              .join('')
+              // PnYT => PnY
+              .replace(/T$/, '')
+              // P => PnW
+              .replace(/^P$/, 'P' + runFake(faker => faker.number.int({ min: 0, max: 100 })) + 'W')
+          )
         case 'email':
           return runFake(faker => faker.internet.email())
         case 'emoji': {
@@ -150,13 +96,18 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           includes = check.value
           break
         case 'ip':
-          return check.version === 'v6'
-            ? randexp(
-                /^(([a-f0-9]{1,4}:){7}|::([a-f0-9]{1,4}:){0,6}|([a-f0-9]{1,4}:){1}:([a-f0-9]{1,4}:){0,5}|([a-f0-9]{1,4}:){2}:([a-f0-9]{1,4}:){0,4}|([a-f0-9]{1,4}:){3}:([a-f0-9]{1,4}:){0,3}|([a-f0-9]{1,4}:){4}:([a-f0-9]{1,4}:){0,2}|([a-f0-9]{1,4}:){5}:([a-f0-9]{1,4}:){0,1})([a-f0-9]{1,4}|(((25[0-5])|(2[0-4][0-9])|(1[0-9]{2})|([0-9]{1,2}))\.){3}((25[0-5])|(2[0-4][0-9])|(1[0-9]{2})|([0-9]{1,2})))$/,
-              )
-            : randexp(
-                /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/,
-              )
+          switch (check.version) {
+            case 'v4':
+              return runFake(faker => faker.internet.ipv4())
+            case 'v6':
+              return runFake(faker => faker.internet.ipv6())
+            case undefined:
+              return runFake(faker => faker.internet.ip())
+            default: {
+              const _: never = check.version
+              throw SyntaxError()
+            }
+          }
         case 'jwt':
           return runFake(faker => faker.internet.jwt())
         case 'length':
@@ -169,7 +120,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           min = check.value
           break
         case 'nanoid':
-          return randexp(/^[a-z0-9_-]{21}$/i)
+          return runFake(faker => faker.string.nanoid())
         case 'regex':
           return randexp(check.regex)
         case 'startsWith':
@@ -189,7 +140,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           trim = true
           break
         case 'ulid':
-          return randexp(/^[0-9A-HJKMNP-TV-Z]{26}$/)
+          return runFake(faker => faker.string.ulid())
         case 'url':
           return runFake(faker => faker.internet.url())
         case 'uuid':
