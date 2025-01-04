@@ -1,5 +1,5 @@
-import * as z from 'zod'
-import { runFake } from './faker'
+import { z } from 'zod'
+import { runFake } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 const getValidEnumValues = (obj: any) => {

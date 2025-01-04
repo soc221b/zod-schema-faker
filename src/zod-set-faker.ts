@@ -1,6 +1,6 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake } from './fake'
-import { runFake } from './faker'
+import { runFake } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodSetFaker<T extends z.ZodSet<any>> extends ZodTypeFaker<T> {

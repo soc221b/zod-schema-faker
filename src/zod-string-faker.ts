@@ -1,7 +1,7 @@
-import * as z from 'zod'
-import { ZodSchemaFakerError } from './error'
-import { randexp, runFake } from './faker'
+import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
+import { ZodSchemaFakerError } from './error'
+import { randexp, runFake } from './random'
 
 const averageWordLength = 5
 const averageSentenceLength = averageWordLength * 15

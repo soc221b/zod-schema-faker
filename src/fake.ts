@@ -1,6 +1,6 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { ZodSchemaFakerError } from './error'
-import { assertZodSchema } from './utils'
+import { assertsZodSchema } from './utils'
 
 export const zodTypeKindToZodTypeFaker: Map<z.ZodFirstPartyTypeKind, any /* TODO: should not use any */> = new Map()
 export const zodTypeToZodTypeFaker: Map<z.ZodType, any /* TODO: should not use any */> = new Map()
@@ -9,7 +9,7 @@ export const zodTypeToZodTypeFaker: Map<z.ZodType, any /* TODO: should not use a
  * generate fake data based on schema
  */
 export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
-  assertZodSchema(schema)
+  assertsZodSchema(schema)
 
   const typeName = (schema._def as any).typeName
   const faker = zodTypeToZodTypeFaker.get(schema) ?? zodTypeKindToZodTypeFaker.get(typeName)

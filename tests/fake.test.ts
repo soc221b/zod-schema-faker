@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake, install } from '../src'
 import { uninstall } from '../src/zod-type-kind-to-zod-type-faker'
 

@@ -1,5 +1,5 @@
 import { beforeEach, expect, test } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake, installCustom, ZodTypeFaker, runFake, install } from '../src'
 
 // 1/5. define custom schema

@@ -1,19 +1,19 @@
 import { expect, test } from 'vitest'
-import * as z from 'zod'
-import { assertZodSchema } from '../src/utils'
+import { z } from 'zod'
+import { assertsZodSchema } from '../src/utils'
 
-test('assertZodSchema should throw an error if schema is not a zod schema', () => {
-  expect(() => assertZodSchema(null)).toThrow()
-  expect(() => assertZodSchema(undefined)).toThrow()
-  expect(() => assertZodSchema(42)).toThrow()
-  expect(() => assertZodSchema('foo')).toThrow()
-  expect(() => assertZodSchema({})).toThrow()
+test('assertsZodSchema should throw an error if schema is not a zod schema', () => {
+  expect(() => assertsZodSchema(null)).toThrow()
+  expect(() => assertsZodSchema(undefined)).toThrow()
+  expect(() => assertsZodSchema(42)).toThrow()
+  expect(() => assertsZodSchema('foo')).toThrow()
+  expect(() => assertsZodSchema({})).toThrow()
 })
 
-test('assertZodSchema should not throw an error if schema is a zod schema', () => {
-  expect(() => assertZodSchema(z.null())).not.toThrow()
-  expect(() => assertZodSchema(z.undefined())).not.toThrow()
-  expect(() => assertZodSchema(z.number())).not.toThrow()
-  expect(() => assertZodSchema(z.string())).not.toThrow()
-  expect(() => assertZodSchema(z.object({}))).not.toThrow()
+test('assertsZodSchema should not throw an error if schema is a zod schema', () => {
+  expect(() => assertsZodSchema(z.null())).not.toThrow()
+  expect(() => assertsZodSchema(z.undefined())).not.toThrow()
+  expect(() => assertsZodSchema(z.number())).not.toThrow()
+  expect(() => assertsZodSchema(z.string())).not.toThrow()
+  expect(() => assertsZodSchema(z.object({}))).not.toThrow()
 })

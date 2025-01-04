@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake, install } from '../src'
 
 test('branded', () => {

@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { zodTypeKindToZodTypeFaker, zodTypeToZodTypeFaker } from './fake'
 import { ZodAnyFaker } from './zod-any-faker'
 import { ZodArrayFaker } from './zod-array-faker'

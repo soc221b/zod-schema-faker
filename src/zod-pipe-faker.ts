@@ -1,4 +1,4 @@
-import * as z from 'zod'
+import { z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 

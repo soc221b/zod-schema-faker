@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import * as z from 'zod'
+import { z } from 'zod'
 import { zodAnyFaker, ZodAnyFaker } from '../src/zod-any-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
