@@ -2,6 +2,8 @@ import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { zodNumberFaker, ZodNumberFaker } from '../src/zod-number-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { runFake } from '../src'
+import { testMultipleTimes } from './util'
 
 test('ZodNumberFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -197,6 +199,16 @@ describe('edge case', () => {
 
   test('multipleOf', () => {
     const schema = z.number().multipleOf(1_234_567_890)
+    const faker = zodNumberFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
+
+  testMultipleTimes('integration', () => {
+    const min = runFake(faker => faker.number.int({ min: -10000, max: 10000 }))
+    const max = runFake(faker => faker.number.int({ min, max: min + 10000 }))
+    const multipleOf = runFake(faker => faker.number.int({ min: 1, max: 10 }))
+    const schema = z.number().multipleOf(multipleOf).min(min).max(max)
     const faker = zodNumberFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
