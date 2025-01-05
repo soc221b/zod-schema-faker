@@ -12,7 +12,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "declaration": true,
-    "isolatedDeclarations": true,
     "esModuleInterop": true,
 
     /* Linting */
@@ -28,5 +27,5 @@
     "noImplicitReturns": true,
     "noImplicitThis": true
   },
-  "include": ["src"]
+  "include": ["src", "tests"]
 }

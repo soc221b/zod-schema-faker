@@ -1,5 +1,4 @@
 /// <reference types="vitest/config" />
-import { renameSync } from 'fs'
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
@@ -22,9 +21,8 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      afterBuild: () => {
-        renameSync('./dist/index.d.ts', './dist/zod-schema-faker.d.ts')
-      },
+      include: ['src'],
+      rollupTypes: true,
     }),
   ],
 })
