@@ -31,10 +31,6 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
       }
     }
 
-    if (multipleOf !== undefined) {
-      return multipleOf
-    }
-
     if (finite === false && int === false && multipleOf === undefined) {
       if (min === undefined && runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
         return -Infinity

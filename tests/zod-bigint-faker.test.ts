@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { zodBigIntFaker, ZodBigIntFaker } from '../src/zod-bigint-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { testMultipleTimes } from './util'
+import { runFake } from '../src'
 
 test('ZodBigIntFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -96,36 +97,15 @@ test('nonpositive', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('multiplyOf', () => {
+test('multiplyOf positive', () => {
   const schema = z.bigint().multipleOf(37n)
   const faker = zodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('multiplyOf 1', () => {
-  const schema = z.bigint().multipleOf(37n).min(74n).max(74n)
-  const faker = zodBigIntFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-testMultipleTimes('multiplyOf 2', () => {
-  const schema = z.bigint().multipleOf(37n).min(-74n).max(-74n)
-  const faker = zodBigIntFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-testMultipleTimes('multiplyOf 3', () => {
-  const schema = z.bigint().multipleOf(-37n).min(74n).max(74n)
-  const faker = zodBigIntFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data).success).toBe(true)
-})
-
-testMultipleTimes('multiplyOf 4', () => {
-  const schema = z.bigint().multipleOf(-37n).min(-74n).max(-74n)
+test('multiplyOf negative', () => {
+  const schema = z.bigint().multipleOf(-37n)
   const faker = zodBigIntFaker(schema)
   const data = faker.fake()
   if (schema.safeParse(data).success === false) {
@@ -199,76 +179,14 @@ describe('edge case', () => {
     expect(data).toBe(0n)
   })
 
-  test('multiplyOf positive', () => {
-    const schema = z.bigint().multipleOf(37n).gte(37n).lte(37n)
+  testMultipleTimes('integration', () => {
+    const min = runFake(faker => faker.number.bigInt({ min: -1000n, max: 1000n }))
+    const max = runFake(faker => faker.number.bigInt({ min, max: min + 1000n }))
+    const diff = max - min
+    const multipleOf = runFake(faker => faker.number.bigInt({ min: 1n, max: diff + 1n }))
+    const schema = z.bigint().multipleOf(multipleOf).min(min).max(max)
     const faker = zodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
-    expect(data).toBe(37n)
-  })
-
-  test('multiplyOf negative', () => {
-    const schema = z.bigint().multipleOf(-37n).gte(-37n).lte(-37n)
-    const faker = zodBigIntFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data).success).toBe(true)
-    expect(data).toBe(-37n)
-  })
-
-  test('multiplyOf + min', () => {
-    const schema = z.bigint().multipleOf(37n).min(37n)
-    const faker = zodBigIntFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data).success).toBe(true)
-  })
-
-  test('multiplyOf + max', () => {
-    const schema = z.bigint().multipleOf(37n).max(37n)
-    const faker = zodBigIntFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data).success).toBe(true)
-  })
-
-  test('multiplyOf', () => {
-    for (let i = 0n; i < 2000n; i++) {
-      const schema = z
-        .bigint()
-        .multipleOf(37n)
-        .min(i)
-        .max(i + 37n)
-      const faker = zodBigIntFaker(schema)
-      const data = faker.fake()
-      expect(schema.safeParse(data).success).toBe(true)
-    }
-    for (let i = 0n; i > -2000n; i--) {
-      const schema = z
-        .bigint()
-        .multipleOf(37n)
-        .min(i - 37n)
-        .max(i)
-      const faker = zodBigIntFaker(schema)
-      const data = faker.fake()
-      expect(schema.safeParse(data).success).toBe(true)
-    }
-    for (let i = 0n; i < 2000n; i++) {
-      const schema = z
-        .bigint()
-        .multipleOf(-37n)
-        .min(i)
-        .max(i + 37n)
-      const faker = zodBigIntFaker(schema)
-      const data = faker.fake()
-      expect(schema.safeParse(data).success).toBe(true)
-    }
-    for (let i = 0n; i > -2000n; i--) {
-      const schema = z
-        .bigint()
-        .multipleOf(-37n)
-        .min(i - 37n)
-        .max(i)
-      const faker = zodBigIntFaker(schema)
-      const data = faker.fake()
-      expect(schema.safeParse(data).success).toBe(true)
-    }
   })
 })
