@@ -204,8 +204,8 @@ describe('edge case', () => {
 
   testMultipleTimes('integration', () => {
     const min = runFake(faker => faker.number.int({ min: -10000, max: 10000 }))
-    const max = runFake(faker => faker.number.int({ min, max: min + 10000 }))
     const multipleOf = runFake(faker => faker.number.int({ min: 1, max: 10 }))
+    const max = runFake(faker => faker.number.int({ min: min + multipleOf, max: min + multipleOf + 10000 }))
     const schema = z.number().multipleOf(multipleOf).min(min).max(max)
     const faker = new ZodNumberFaker(schema)
     const data = faker.fake()
