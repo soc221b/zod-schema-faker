@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/soc221b/zod-schema-faker/compare/1.1.3...1.2.0) (2025-01-11)
+
+
+### Features
+
+* date edge case values should be generated occasionally, while more realistic values should be generated frequently ([c223f46](https://github.com/soc221b/zod-schema-faker/commit/c223f4648bcd1b93fe40c7c2c156668e5c53466e))
+
+
+### Bug Fixes
+
+* missing .catch ([916cfaa](https://github.com/soc221b/zod-schema-faker/commit/916cfaa1a61454e5e078ddf5ab039f0535b0991c))
+* set should sometimes generate a set which size equals min ([63d0246](https://github.com/soc221b/zod-schema-faker/commit/63d02469e76b36ef3dbb5ee3341ac7afafa877ad))
+
 ## [1.1.3](https://github.com/soc221b/zod-schema-faker/compare/1.1.2...1.1.3) (2025-01-05)
 
 
