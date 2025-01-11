@@ -5,7 +5,7 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodLazyFaker<T extends z.ZodTypeAny> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    const schema = (this.schema._def as any).getter()
+    const schema = this.schema._def.getter()
 
     const safeCount = 10
     let count = 0
