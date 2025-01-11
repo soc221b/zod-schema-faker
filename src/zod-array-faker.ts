@@ -15,10 +15,4 @@ export class ZodArrayFaker<T extends z.ZodArray<any, any>> extends ZodTypeFaker<
       .fill(null)
       .map(() => fake(this.schema._def.type))
   }
-
-  static create<T extends z.ZodArray<any, any>>(schema: T): ZodArrayFaker<T> {
-    return new ZodArrayFaker(schema)
-  }
 }
-
-export const zodArrayFaker: typeof ZodArrayFaker.create = ZodArrayFaker.create

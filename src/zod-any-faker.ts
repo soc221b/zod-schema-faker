@@ -55,10 +55,4 @@ export class ZodAnyFaker extends ZodTypeFaker<z.ZodAny> {
     const randomSchema = runFake(faker => faker.helpers.arrayElement(schemas))
     return fake(randomSchema)
   }
-
-  static create(schema: z.ZodAny): ZodAnyFaker {
-    return new ZodAnyFaker(schema)
-  }
 }
-
-export const zodAnyFaker: typeof ZodAnyFaker.create = ZodAnyFaker.create

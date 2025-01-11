@@ -9,10 +9,4 @@ export class ZodDefaultFaker<T extends z.ZodDefault<any>> extends ZodTypeFaker<T
       ? this.schema._def.defaultValue()
       : fake(this.schema._def.innerType)
   }
-
-  static create<T extends z.ZodDefault<any>>(schema: T): ZodDefaultFaker<T> {
-    return new ZodDefaultFaker(schema)
-  }
 }
-
-export const zodDefaultFaker: typeof ZodDefaultFaker.create = ZodDefaultFaker.create

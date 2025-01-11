@@ -17,10 +17,4 @@ export class ZodPromiseFaker<T extends z.ZodPromise<any>> extends ZodTypeFaker<T
       })
     }
   }
-
-  static create<T extends z.ZodPromise<any>>(schema: T): ZodPromiseFaker<T> {
-    return new ZodPromiseFaker(schema)
-  }
 }
-
-export const zodPromiseFaker: typeof ZodPromiseFaker.create = ZodPromiseFaker.create

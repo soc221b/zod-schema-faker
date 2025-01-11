@@ -18,10 +18,4 @@ export class ZodMapFaker<T extends z.ZodMap<any, any>> extends ZodTypeFaker<T> {
 
     return result
   }
-
-  static create<T extends z.ZodMap<any, any>>(schema: T): ZodMapFaker<T> {
-    return new ZodMapFaker(schema)
-  }
 }
-
-export const zodMapFaker: typeof ZodMapFaker.create = ZodMapFaker.create

@@ -13,10 +13,4 @@ export class ZodDiscriminatedUnionFaker<T extends z.ZodDiscriminatedUnion<any, a
     const randomSchema = runFake(faker => faker.helpers.arrayElement(options))
     return fake(randomSchema as any)
   }
-
-  static create<T extends z.ZodDiscriminatedUnion<any, any>>(schema: T): ZodDiscriminatedUnionFaker<T> {
-    return new ZodDiscriminatedUnionFaker(schema)
-  }
 }
-
-export const zodDiscriminatedUnionFaker: typeof ZodDiscriminatedUnionFaker.create = ZodDiscriminatedUnionFaker.create

@@ -14,13 +14,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
     }
   }
-
-  static create<T extends z.ZodIntersection<any, any>>(schema: T): ZodIntersectionFaker<T> {
-    return new ZodIntersectionFaker(schema)
-  }
 }
-
-export const zodIntersectionFaker: typeof ZodIntersectionFaker.create = ZodIntersectionFaker.create
 
 function mergeValues(a: any, b: any): { valid: true; data: any } | { valid: false } {
   const aType = z.getParsedType(a)

@@ -30,10 +30,4 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
 
     return { min, max }
   }
-
-  static create(schema: z.ZodDate): ZodDateFaker {
-    return new ZodDateFaker(schema)
-  }
 }
-
-export const zodDateFaker: typeof ZodDateFaker.create = ZodDateFaker.create

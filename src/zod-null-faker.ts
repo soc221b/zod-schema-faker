@@ -5,10 +5,4 @@ export class ZodNullFaker extends ZodTypeFaker<z.ZodNull> {
   fake(): z.infer<z.ZodNull> {
     return null
   }
-
-  static create(schema: z.ZodNull): ZodNullFaker {
-    return new ZodNullFaker(schema)
-  }
 }
-
-export const zodNullFaker: typeof ZodNullFaker.create = ZodNullFaker.create

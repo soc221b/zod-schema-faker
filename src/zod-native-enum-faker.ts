@@ -17,10 +17,4 @@ export class ZodNativeEnumFaker<T extends z.ZodNativeEnum<any>> extends ZodTypeF
     const validEnumValues = getValidEnumValues(values)
     return runFake(faker => faker.helpers.arrayElement(validEnumValues))
   }
-
-  static create<T extends z.ZodNativeEnum<any>>(schema: T): ZodNativeEnumFaker<T> {
-    return new ZodNativeEnumFaker(schema)
-  }
 }
-
-export const zodNativeEnumFaker: typeof ZodNativeEnumFaker.create = ZodNativeEnumFaker.create

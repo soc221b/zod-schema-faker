@@ -192,10 +192,4 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     }
     return result
   }
-
-  static create(schema: z.ZodString): ZodStringFaker {
-    return new ZodStringFaker(schema)
-  }
 }
-
-export const zodStringFaker: typeof ZodStringFaker.create = ZodStringFaker.create

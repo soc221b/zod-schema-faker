@@ -17,10 +17,4 @@ export class ZodLazyFaker<T extends z.ZodTypeAny> extends ZodTypeFaker<T> {
 
     throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
   }
-
-  static create<T extends z.ZodTypeAny>(schema: T): ZodLazyFaker<T> {
-    return new ZodLazyFaker(schema)
-  }
 }
-
-export const zodLazyFaker: typeof ZodLazyFaker.create = ZodLazyFaker.create

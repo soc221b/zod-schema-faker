@@ -42,10 +42,4 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
         ? data + (multipleOf - remaining)
         : data - remaining
   }
-
-  static create(schema: z.ZodBigInt): ZodBigIntFaker {
-    return new ZodBigIntFaker(schema)
-  }
 }
-
-export const zodBigIntFaker: typeof ZodBigIntFaker.create = ZodBigIntFaker.create

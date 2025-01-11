@@ -9,10 +9,4 @@ export class ZodTupleFaker<T extends z.ZodTuple<any, any>> extends ZodTypeFaker<
       ...(this.schema._def.rest ? [fake(this.schema._def.rest)] : []),
     ] satisfies z.infer<T>
   }
-
-  static create<T extends z.ZodTuple<any, any>>(schema: T): ZodTupleFaker<T> {
-    return new ZodTupleFaker(schema)
-  }
 }
-
-export const zodTupleFaker: typeof ZodTupleFaker.create = ZodTupleFaker.create

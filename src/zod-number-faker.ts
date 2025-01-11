@@ -45,10 +45,4 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
     const method = int ? 'int' : 'float'
     return runFake(faker => faker.number[method]({ min, max, multipleOf }))
   }
-
-  static create(schema: z.ZodNumber): ZodNumberFaker {
-    return new ZodNumberFaker(schema)
-  }
 }
-
-export const zodNumberFaker: typeof ZodNumberFaker.create = ZodNumberFaker.create

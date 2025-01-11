@@ -27,10 +27,4 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
 
     return result
   }
-
-  static create<T extends z.ZodObject<any, any, any, any, any>>(schema: T): ZodObjectFaker<T> {
-    return new ZodObjectFaker(schema)
-  }
 }
-
-export const zodObjectFaker: typeof ZodObjectFaker.create = ZodObjectFaker.create
