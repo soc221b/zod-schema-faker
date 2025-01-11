@@ -4,21 +4,15 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
   fake(): z.infer<z.ZodDate> {
-    const { min, max } = this.resolveCheck()
-    return runFake(faker => faker.date.between({ from: min, to: max }))
-  }
-
-  private resolveCheck(): { min: number; max: number } {
-    let min: number = -8640000000000000
-    let max: number = 8640000000000000
-
+    let min: undefined | number = undefined
+    let max: undefined | number = undefined
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = Math.max(min, check.value)
+          min = check.value
           break
         case 'max':
-          max = Math.min(max, check.value)
+          max = check.value
           break
         /* istanbul ignore next */
         default: {
@@ -27,7 +21,21 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
         }
       }
     }
+    if (min === undefined) {
+      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+        min = -8640000000000000
+      } else {
+        min = (max ?? Date.now()) - 31536000000
+      }
+    }
+    if (max === undefined) {
+      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+        max = 8640000000000000
+      } else {
+        max = (min ?? Date.now()) + 31536000000
+      }
+    }
 
-    return { min, max }
+    return runFake(faker => faker.date.between({ from: min, to: max }))
   }
 }
