@@ -5,6 +5,10 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodOptionalFaker<T extends z.ZodOptional<any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    return runFake(faker => faker.datatype.boolean()) ? undefined : fake(this.schema._def.innerType)
+    if (runFake(faker => faker.datatype.boolean())) {
+      return undefined
+    } else {
+      return fake(this.schema._def.innerType)
+    }
   }
 }
