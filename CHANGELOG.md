@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.1](https://github.com/soc221b/zod-schema-faker/compare/1.2.0...1.2.1) (2025-01-11)
+
+
+### Bug Fixes
+
+* should generate consistent values for z.date(), z.string().date(), z.string().datetime(), z.string().time() when seed ([#328](https://github.com/soc221b/zod-schema-faker/issues/328)) ([1f23704](https://github.com/soc221b/zod-schema-faker/commit/1f237046c35a982632242f8eaccd8a63e0bf773a))
+
 ## [1.2.0](https://github.com/soc221b/zod-schema-faker/compare/1.1.3...1.2.0) (2025-01-11)
 
 
