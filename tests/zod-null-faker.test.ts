@@ -1,41 +1,39 @@
 import { expect, test } from 'vitest'
 import { z } from 'zod'
-import { zodNullFaker, ZodNullFaker } from '../src/zod-null-faker'
+import { ZodNullFaker } from '../src/zod-null-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 
 test('ZodNullFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
-  expect(() => zodNullFaker(invalidSchema)).toThrow()
+  expect(() => new ZodNullFaker(invalidSchema)).toThrow()
 })
 
 test('ZodNullFaker should accepts a ZodNull schema', () => {
   const schema = z.null()
-  expect(() => zodNullFaker(schema)).not.toThrow()
+  expect(() => new ZodNullFaker(schema)).not.toThrow()
 })
 
 test('ZodNullFaker should return a ZodNullFaker instance', () => {
-  expect(typeof zodNullFaker).toBe('function')
-
   const schema = z.null()
-  const faker = zodNullFaker(schema)
+  const faker = new ZodNullFaker(schema)
   expect(faker instanceof ZodNullFaker).toBe(true)
 })
 
 test('ZodNullFaker.fake should be a function', () => {
   const schema = z.null()
-  const faker = zodNullFaker(schema)
+  const faker = new ZodNullFaker(schema)
   expect(typeof faker.fake).toBe('function')
 })
 
 test('ZodNullFaker.fake should return null type', () => {
   const schema = z.null()
-  const faker = zodNullFaker(schema)
+  const faker = new ZodNullFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, null>>(true)
 })
 
 test('ZodNullFaker.fake should return a valid data', () => {
   const schema = z.null()
-  const faker = zodNullFaker(schema)
+  const faker = new ZodNullFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })

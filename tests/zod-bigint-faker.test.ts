@@ -1,112 +1,111 @@
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
-import { zodBigIntFaker, ZodBigIntFaker } from '../src/zod-bigint-faker'
+import { ZodBigIntFaker } from '../src/zod-bigint-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { testMultipleTimes } from './util'
 import { runFake } from '../src'
 
 test('ZodBigIntFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
-  expect(() => zodBigIntFaker(invalidSchema)).toThrow()
+  expect(() => new ZodBigIntFaker(invalidSchema)).toThrow()
 })
 
 test('ZodBigIntFaker should accepts a ZodBigInt schema', () => {
   const schema = z.bigint()
-  expect(() => zodBigIntFaker(schema)).not.toThrow()
+  expect(() => new ZodBigIntFaker(schema)).not.toThrow()
 })
 
 test('ZodBigIntFaker should return a ZodBigIntFaker instance', () => {
-  expect(typeof zodBigIntFaker).toBe('function')
   const schema = z.bigint()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   expect(faker instanceof ZodBigIntFaker).toBe(true)
 })
 
 test('ZodBigIntFaker.fake should be a function', () => {
   const schema = z.bigint()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   expect(typeof faker.fake).toBe('function')
 })
 
 test('ZodBigIntFaker.fake should return bigint type', () => {
   const schema = z.bigint()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, bigint>>(true)
 })
 
 test('ZodBigIntFaker.fake should return a valid data', () => {
   const schema = z.bigint()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('gt', () => {
   const schema = z.bigint().gt(100n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('gte', () => {
   const schema = z.bigint().gte(100n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('lt', () => {
   const schema = z.bigint().lt(100n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('lte', () => {
   const schema = z.bigint().lte(100n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('positive', () => {
   const schema = z.bigint().positive()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('nonnegative', () => {
   const schema = z.bigint().nonnegative()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('negative', () => {
   const schema = z.bigint().negative()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('nonpositive', () => {
   const schema = z.bigint().nonpositive()
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('multiplyOf positive', () => {
   const schema = z.bigint().multipleOf(37n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
 
 test('multiplyOf negative', () => {
   const schema = z.bigint().multipleOf(-37n)
-  const faker = zodBigIntFaker(schema)
+  const faker = new ZodBigIntFaker(schema)
   const data = faker.fake()
   if (schema.safeParse(data).success === false) {
     console.log(data)
@@ -117,7 +116,7 @@ test('multiplyOf negative', () => {
 describe('edge case', () => {
   test('gt', () => {
     const schema = z.bigint().gt(100n).lte(101n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(101n)
@@ -125,7 +124,7 @@ describe('edge case', () => {
 
   test('gte', () => {
     const schema = z.bigint().gte(100n).lt(101n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(100n)
@@ -133,7 +132,7 @@ describe('edge case', () => {
 
   test('lt', () => {
     const schema = z.bigint().lt(100n).gte(99n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(99n)
@@ -141,7 +140,7 @@ describe('edge case', () => {
 
   test('lte', () => {
     const schema = z.bigint().lte(100n).gt(99n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(100n)
@@ -149,7 +148,7 @@ describe('edge case', () => {
 
   test('positive', () => {
     const schema = z.bigint().positive().lt(2n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(1n)
@@ -157,7 +156,7 @@ describe('edge case', () => {
 
   test('nonnegative', () => {
     const schema = z.bigint().nonnegative().lt(1n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(0n)
@@ -165,7 +164,7 @@ describe('edge case', () => {
 
   test('negative', () => {
     const schema = z.bigint().negative().gt(-2n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(-1n)
@@ -173,7 +172,7 @@ describe('edge case', () => {
 
   test('nonpositive', () => {
     const schema = z.bigint().nonpositive().gt(-1n)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
     expect(data).toBe(0n)
@@ -185,7 +184,7 @@ describe('edge case', () => {
     const diff = max - min
     const multipleOf = runFake(faker => faker.number.bigInt({ min: 1n, max: diff + 1n }))
     const schema = z.bigint().multipleOf(multipleOf).min(min).max(max)
-    const faker = zodBigIntFaker(schema)
+    const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
   })

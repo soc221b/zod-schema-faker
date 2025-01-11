@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { z } from 'zod'
-import { zodLazyFaker, ZodLazyFaker } from '../src/zod-lazy-faker'
+import { ZodLazyFaker } from '../src/zod-lazy-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
 import { testMultipleTimes } from './util'
@@ -12,7 +12,7 @@ interface Category {
 
 test('ZodLazyFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
-  expect(() => zodLazyFaker(invalidSchema)).toThrow()
+  expect(() => new ZodLazyFaker(invalidSchema)).toThrow()
 })
 
 test('ZodLazyFaker should accepts a ZodLazy schema', () => {
@@ -22,19 +22,17 @@ test('ZodLazyFaker should accepts a ZodLazy schema', () => {
       subcategories: z.array(schema),
     }),
   ) as z.ZodType<Category>
-  expect(() => zodLazyFaker(schema)).not.toThrow()
+  expect(() => new ZodLazyFaker(schema)).not.toThrow()
 })
 
 test('ZodLazyFaker should return a ZodLazyFaker instance', () => {
-  expect(typeof zodLazyFaker).toBe('function')
-
   const schema = z.lazy(() =>
     z.object({
       name: z.string(),
       subcategories: z.array(schema),
     }),
   ) as z.ZodType<Category>
-  const faker = zodLazyFaker(schema)
+  const faker = new ZodLazyFaker(schema)
   expect(faker instanceof ZodLazyFaker).toBe(true)
 })
 
@@ -45,7 +43,7 @@ test('ZodLazyFaker.fake should be a function', () => {
       subcategories: z.array(schema),
     }),
   ) as z.ZodType<Category>
-  const faker = zodLazyFaker(schema)
+  const faker = new ZodLazyFaker(schema)
   expect(typeof faker.fake).toBe('function')
 })
 
@@ -56,7 +54,7 @@ test('ZodLazyFaker.fake should return the given type', () => {
       subcategories: z.array(schema),
     }),
   ) as z.ZodType<Category>
-  const faker = zodLazyFaker(schema)
+  const faker = new ZodLazyFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, Category>>(true)
 })
 
@@ -69,7 +67,7 @@ testMultipleTimes('ZodLazyFaker.fake should return a valid data', () => {
       subcategories: z.array(schema),
     }),
   ) as z.ZodType<Category>
-  const faker = zodLazyFaker(schema)
+  const faker = new ZodLazyFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
