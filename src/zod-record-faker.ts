@@ -10,15 +10,12 @@ export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFake
       throw new ZodSchemaFakerError('Invalid record key type: In runtime JavaScript, all keys are strings.')
     }
 
-    let i = 0
-    const max = 10
-    const result: Record<any, any> = {}
-    while (++i < max) {
-      result[fake(this.schema._def.keyType)] = fake(this.schema._def.valueType)
-      if (runFake(faker => faker.datatype.boolean())) {
-        break
-      }
-    }
-    return result
+    return Object.fromEntries(
+      runFake(faker =>
+        faker.helpers.multiple(() => [fake(this.schema._def.keyType), fake(this.schema._def.valueType)], {
+          count: { min: 0, max: 10 },
+        }),
+      ),
+    )
   }
 }
