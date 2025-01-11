@@ -11,6 +11,7 @@
   - ❌ .and: impossible to generate
   - ✅ .array
   - ✅ .brand
+  - ✅ .catch
   - ✅ .default
   - ✅ .nullable
   - ✅ .nullish
