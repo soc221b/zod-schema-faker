@@ -3,7 +3,7 @@ import { ZodSchemaFakerError } from './error'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 
-export class ZodLazyFaker<T extends z.ZodType<any, any, any>> extends ZodTypeFaker<T> {
+export class ZodLazyFaker<T extends z.ZodTypeAny> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
     const schema = (this.schema._def as any).getter()
 
@@ -18,7 +18,7 @@ export class ZodLazyFaker<T extends z.ZodType<any, any, any>> extends ZodTypeFak
     throw new ZodSchemaFakerError('Unable to generate valid values for Zod schema: ' + this.schema.toString())
   }
 
-  static create<T extends z.ZodType<any, any, any>>(schema: T): ZodLazyFaker<T> {
+  static create<T extends z.ZodTypeAny>(schema: T): ZodLazyFaker<T> {
     return new ZodLazyFaker(schema)
   }
 }

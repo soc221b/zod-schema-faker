@@ -81,10 +81,7 @@ export function install(): void {
 /**
  * register custom fakers for custom schemas, must be called before using `fake()`
  */
-export function installCustom<T extends z.ZodType<any, any, any>>(
-  schema: T,
-  faker: { new (schema: T): ZodTypeFaker<T> },
-): void {
+export function installCustom<T extends z.ZodTypeAny>(schema: T, faker: { new (schema: T): ZodTypeFaker<T> }): void {
   zodTypeToZodTypeFaker.set(schema, faker)
 }
 
