@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
 import { randexp, runFake } from './random'
+import { ZodDateFaker } from './zod-date-faker'
 
 const averageWordLength = 5
 const averageSentenceLength = averageWordLength * 15
@@ -13,6 +14,8 @@ const emojisLength1 = ['☘', '➡️', '⚜']
 const emojisLength2 = ['😳', '😀', '😁', '🤣', '😃', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '🥰', '😗', '😈', '👿']
 const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
 const base64UrlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/
+
+const isoDateSchema = z.date().min(new Date('0000-01-01T00:00:00.000Z')).max(new Date('9999-12-31T23:59:59.999Z'))
 
 export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
   fake(): z.infer<z.ZodString> {
@@ -64,11 +67,9 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'cuid2':
           return randexp(cuid2Regex)
         case 'date':
-          return runFake(faker => faker.date.anytime())
-            .toISOString()
-            .slice(0, 10)
+          return new ZodDateFaker(isoDateSchema).fake().toISOString().slice(0, 10)
         case 'datetime':
-          return runFake(faker => faker.date.anytime()).toISOString()
+          return new ZodDateFaker(isoDateSchema).fake().toISOString()
         case 'duration':
           return (
             [
@@ -136,9 +137,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           startsWith = check.value
           break
         case 'time':
-          return runFake(faker => faker.date.anytime())
-            .toISOString()
-            .slice(11, -1)
+          return new ZodDateFaker(isoDateSchema).fake().toISOString().slice(11, -5)
         case 'toLowerCase':
           toLowercase = true
           break

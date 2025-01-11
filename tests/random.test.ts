@@ -16,7 +16,16 @@ test('randexp', () => {
 
 test('seed', () => {
   install()
-  const schema = z.object({ foo: z.number(), bar: z.number() })
+  const schema = z.object({
+    foo: z.number(),
+    bar: z.number(),
+    date: z.date(),
+    string: z.object({
+      date: z.string().date(),
+      datetime: z.string().datetime(),
+      time: z.string().time(),
+    }),
+  })
 
   seed(3)
   const data1 = fake(schema)

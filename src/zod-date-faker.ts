@@ -24,14 +24,14 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
       if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
         min = -8640000000000000
       } else {
-        min = (max ?? Date.now()) - 31536000000
+        min = (max ?? new Date('2025-01-01T00:00:00.000Z').getTime()) - 31536000000
       }
     }
     if (max === undefined) {
       if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
         max = 8640000000000000
       } else {
-        max = (min ?? Date.now()) + 31536000000
+        max = (min ?? new Date('2025-01-01T00:00:00.000Z').getTime()) + 31536000000
       }
     }
 
