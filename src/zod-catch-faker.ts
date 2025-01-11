@@ -6,8 +6,10 @@ import { ZodNeverFaker } from './zod-never-faker'
 
 export class ZodCatchFaker<T extends z.ZodCatch<z.ZodTypeAny>> extends ZodTypeFaker<T> {
   fake(): z.infer<z.ZodCatch<T>> {
-    return runFake(faker => faker.datatype.boolean())
-      ? this.schema.parse(new ZodNeverFaker(z.never()))
-      : fake(this.schema._def.innerType)
+    if (runFake(faker => faker.datatype.boolean())) {
+      return this.schema.parse(new ZodNeverFaker(z.never()))
+    } else {
+      return fake(this.schema._def.innerType)
+    }
   }
 }
