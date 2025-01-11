@@ -4,24 +4,26 @@ import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodEffectsFaker<T extends z.ZodEffects<any, any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    const result = fake(this.schema._def.schema)
+    let result: any
     switch (this.schema._def.effect.type) {
       case 'preprocess':
-        // ignored
-        return result
+        result = fake(this.schema._def.schema)
+        break
 
       case 'refinement':
-        // ignored
-        return result
+        result = fake(this.schema._def.schema)
+        break
 
       case 'transform':
-        return this.schema._def.effect.transform(result, { addIssue: () => void 0, path: [] })
+        result = this.schema._def.effect.transform(fake(this.schema._def.schema), { addIssue: () => void 0, path: [] })
+        break
 
       /* istanbul ignore next */
       default: {
         const _: never = this.schema._def.effect
-        throw Error('unimplemented')
       }
     }
+
+    return result
   }
 }

@@ -17,7 +17,6 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
         /* istanbul ignore next */
         default: {
           const _: never = check
-          throw Error('unimplemented')
         }
       }
     }

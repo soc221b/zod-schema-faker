@@ -40,20 +40,24 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'base64url':
           return randexp(base64UrlRegex)
         case 'cidr': {
+          let cidr: string = ''
           switch (check.version) {
             case 'v4':
-              return runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
+              cidr = runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
+              break
             case 'v6':
-              return runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
+              cidr = runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
+              break
             case undefined:
-              return runFake(faker => faker.datatype.boolean())
+              cidr = runFake(faker => faker.datatype.boolean())
                 ? runFake(faker => faker.internet.ip() + '/' + faker.number.int({ min: 0, max: 32 }))
                 : runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
+              break
             default: {
               const _: never = check.version
-              throw SyntaxError()
             }
           }
+          return cidr
         }
         case 'cuid':
           return randexp(cuidRegex)
@@ -95,19 +99,24 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'includes':
           includes = check.value
           break
-        case 'ip':
+        case 'ip': {
+          let ip: string = ''
           switch (check.version) {
             case 'v4':
-              return runFake(faker => faker.internet.ipv4())
+              ip = runFake(faker => faker.internet.ipv4())
+              break
             case 'v6':
-              return runFake(faker => faker.internet.ipv6())
+              ip = runFake(faker => faker.internet.ipv6())
+              break
             case undefined:
-              return runFake(faker => faker.internet.ip())
+              ip = runFake(faker => faker.internet.ip())
+              break
             default: {
               const _: never = check.version
-              throw SyntaxError()
             }
           }
+          return ip
+        }
         case 'jwt':
           return runFake(faker => faker.internet.jwt())
         case 'length':
@@ -148,7 +157,6 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         /* istanbul ignore next */
         default: {
           const _: never = check
-          throw Error('unimplemented')
         }
       }
     }
