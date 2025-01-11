@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { zodTypeKindToZodTypeFaker, zodTypeToZodTypeFaker } from './fake'
+import { zodFirstPartyTypeKindToZodTypeFaker, zodTypeToZodTypeFaker } from './fake'
 import { ZodAnyFaker } from './zod-any-faker'
 import { ZodArrayFaker } from './zod-array-faker'
 import { ZodBigIntFaker } from './zod-bigint-faker'
@@ -41,41 +41,41 @@ import { ZodVoidFaker } from './zod-void-faker'
  * register fakers, must be called before using `fake()`
  */
 export function install(): void {
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodAny, ZodAnyFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodArray, ZodArrayFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBigInt, ZodBigIntFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBoolean, ZodBooleanFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBranded, ZodBrandedFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDate, ZodDateFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDefault, ZodDefaultFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion, ZodDiscriminatedUnionFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEffects, ZodEffectsFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEnum, ZodEnumFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodFunction, ZodFunctionFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodIntersection, ZodIntersectionFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLazy, ZodLazyFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLiteral, ZodLiteralFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodMap, ZodMapFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNaN, ZodNaNFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNativeEnum, ZodNativeEnumFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNever, ZodNeverFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNull, ZodNullFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNullable, ZodNullableFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNumber, ZodNumberFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodObject, ZodObjectFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodOptional, ZodOptionalFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPipeline, ZodPipelineFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPromise, ZodPromiseFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodReadonly, ZodReadonlyFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodRecord, ZodRecordFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSet, ZodSetFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodString, ZodStringFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSymbol, ZodSymbolFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodTuple, ZodTupleFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUndefined, ZodUndefinedFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUnion, ZodUnionFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUnknown, ZodUnknownFaker)
-  zodTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodVoid, ZodVoidFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodAny, ZodAnyFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodArray, ZodArrayFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBigInt, ZodBigIntFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBoolean, ZodBooleanFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodBranded, ZodBrandedFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDate, ZodDateFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDefault, ZodDefaultFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodDiscriminatedUnion, ZodDiscriminatedUnionFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEffects, ZodEffectsFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodEnum, ZodEnumFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodFunction, ZodFunctionFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodIntersection, ZodIntersectionFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLazy, ZodLazyFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodLiteral, ZodLiteralFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodMap, ZodMapFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNaN, ZodNaNFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNativeEnum, ZodNativeEnumFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNever, ZodNeverFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNull, ZodNullFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNullable, ZodNullableFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodNumber, ZodNumberFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodObject, ZodObjectFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodOptional, ZodOptionalFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPipeline, ZodPipelineFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodPromise, ZodPromiseFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodReadonly, ZodReadonlyFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodRecord, ZodRecordFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSet, ZodSetFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodString, ZodStringFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodSymbol, ZodSymbolFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodTuple, ZodTupleFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUndefined, ZodUndefinedFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUnion, ZodUnionFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodUnknown, ZodUnknownFaker)
+  zodFirstPartyTypeKindToZodTypeFaker.set(z.ZodFirstPartyTypeKind.ZodVoid, ZodVoidFaker)
 }
 
 /**
@@ -92,6 +92,6 @@ export function installCustom<T extends z.ZodType<any, any, any>>(
  * @internal This is a private API, do not use. It is a utility function for testing.
  */
 export const uninstall = (): void => {
-  zodTypeKindToZodTypeFaker.clear()
+  zodFirstPartyTypeKindToZodTypeFaker.clear()
   zodTypeToZodTypeFaker.clear()
 }
