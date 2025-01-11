@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { UnknownKeysParam, z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 import { runFake } from './random'
@@ -8,7 +8,7 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
     const result = {} as any
 
     const catchall = this.schema._def.catchall
-    const unknownKeys = this.schema._def.unknownKeys
+    const unknownKeys = this.schema._def.unknownKeys as UnknownKeysParam
     if (catchall instanceof z.ZodNever) {
       switch (unknownKeys) {
         case 'passthrough': {
@@ -22,6 +22,10 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
               ),
             ),
           )
+          break
+        }
+        default: {
+          const _: 'strip' | 'strict' = unknownKeys
         }
       }
     } else {
