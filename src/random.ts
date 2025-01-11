@@ -9,19 +9,13 @@ let _seedValue: number | undefined
 export const runFake = <Runner extends (faker: Faker) => any>(
   runner: Awaited<ReturnType<Runner>> extends ReturnType<Runner> ? Runner : never,
 ): ReturnType<Runner> => {
-  let oldSeedValue: number
   if (shouldSeed) {
-    oldSeedValue = _faker.seed()
     _faker.seed(_seedValue)
   }
 
   const result = runner(_faker)
   if (result instanceof Promise) {
     throw new SyntaxError('InternalError: runFake cannot be used with async functions')
-  }
-
-  if (shouldSeed) {
-    _faker.seed(oldSeedValue!)
   }
 
   return result
