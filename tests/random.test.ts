@@ -1,6 +1,18 @@
 import { expect, test } from 'vitest'
 import { z } from 'zod'
-import { install, fake, seed, runFake } from '../src'
+import { install, fake, seed, runFake, randexp } from '../src'
+
+test('runFake', () => {
+  const data = runFake(faker => faker.datatype.boolean())
+  expect(data).toBeTypeOf('boolean')
+})
+
+test('randexp', () => {
+  const regex = /^foo|bar$/
+  const data = randexp(regex)
+  expect(data).toBeTypeOf('string')
+  expect(data).toMatch(regex)
+})
 
 test('seed', () => {
   install()
