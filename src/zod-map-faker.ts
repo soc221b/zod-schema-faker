@@ -5,17 +5,12 @@ import { runFake } from './random'
 
 export class ZodMapFaker<T extends z.ZodMap<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    let i = 0
-    const max = 10
-    const result: z.infer<T> = new Map()
-    while (++i < max) {
-      result.set(fake(this.schema._def.keyType), fake(this.schema._def.valueType))
-
-      if (runFake(faker => faker.datatype.boolean())) {
-        break
-      }
-    }
-
-    return result
+    return new Map(
+      runFake(faker =>
+        faker.helpers.multiple(() => [fake(this.schema._def.keyType), fake(this.schema._def.valueType)], {
+          count: { min: 1, max: 10 },
+        }),
+      ),
+    )
   }
 }
