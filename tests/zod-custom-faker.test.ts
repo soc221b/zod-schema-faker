@@ -22,6 +22,9 @@ beforeEach(() => {
   install()
   // 4/5. install custom faker
   installCustom(pxSchema, pxFaker)
+
+  // @ts-expect-error
+  installCustom(z.custom(), ZodTypeFaker)
 })
 
 test('basic', () => {

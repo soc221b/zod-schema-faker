@@ -8,3 +8,9 @@ export abstract class ZodTypeFaker<T extends z.ZodTypeAny> {
 
   abstract fake(): z.infer<T>
 }
+
+export class ZodTypeFakerConcrete<T extends z.ZodTypeAny> extends ZodTypeFaker<T> {
+  fake(): z.infer<T> {
+    throw new Error('Method not implemented.')
+  }
+}

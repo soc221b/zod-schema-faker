@@ -31,7 +31,7 @@ import { ZodSetFaker } from './zod-set-faker'
 import { ZodStringFaker } from './zod-string-faker'
 import { ZodSymbolFaker } from './zod-symbol-faker'
 import { ZodTupleFaker } from './zod-tuple-faker'
-import { ZodTypeFaker } from './zod-type-faker'
+import { ZodTypeFakerConcrete } from './zod-type-faker'
 import { ZodUndefinedFaker } from './zod-undefined-faker'
 import { ZodUnionFaker } from './zod-union-faker'
 import { ZodUnknownFaker } from './zod-unknown-faker'
@@ -44,7 +44,7 @@ import { ZodCatchFaker } from './zod-catch-faker'
 export function install(): void {
   const exhaustiveZodFirstPartyTypeKindToZodTypeFaker: Record<
     z.ZodFirstPartyTypeKind,
-    typeof ZodTypeFaker<z.ZodTypeAny>
+    typeof ZodTypeFakerConcrete<z.ZodTypeAny>
   > = {
     [z.ZodFirstPartyTypeKind.ZodAny]: ZodAnyFaker,
     [z.ZodFirstPartyTypeKind.ZodArray]: ZodArrayFaker,
@@ -96,7 +96,7 @@ export function install(): void {
 /**
  * register custom fakers for custom schemas, must be called before using `fake()`
  */
-export function installCustom<T extends z.ZodTypeAny>(schema: T, faker: { new (schema: T): ZodTypeFaker<T> }): void {
+export function installCustom<T extends z.ZodTypeAny>(schema: T, faker: typeof ZodTypeFakerConcrete<T>): void {
   zodTypeToZodTypeFaker.set(schema, faker)
 }
 
