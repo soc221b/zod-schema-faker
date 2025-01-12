@@ -8,7 +8,7 @@ const pxSchema = z.custom<`${number}px`>(val => {
 })
 
 // 2/5. define custom faker
-class pxFaker extends ZodTypeFaker<typeof pxSchema> {
+class ZodPxFaker extends ZodTypeFaker<typeof pxSchema> {
   fake(): `${number}px` {
     // you can use `runFake` to generate fake data
     return `${runFake(faker => faker.number.int({ min: 0 }))}px`
@@ -21,10 +21,7 @@ beforeEach(() => {
   // 3/5. install basic faker
   install()
   // 4/5. install custom faker
-  installCustom(pxSchema, pxFaker)
-
-  // @ts-expect-error
-  installCustom(z.custom(), ZodTypeFaker)
+  installCustom(pxSchema, ZodPxFaker)
 })
 
 test('basic', () => {
@@ -44,4 +41,11 @@ test('integration', () => {
   const data = fake(schema)
 
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('type', () => {
+  // @ts-expect-error
+  installCustom(z.custom(), ZodTypeFaker)
+
+  expect(true).toBe(true)
 })
