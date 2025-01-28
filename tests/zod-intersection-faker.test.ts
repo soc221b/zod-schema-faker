@@ -39,3 +39,12 @@ test('ZodIntersectionFaker.fake should return the given type', () => {
   const faker = new ZodIntersectionFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
 })
+
+test('any + any', () => {
+  install()
+
+  const schema = z.intersection(z.any(), z.any())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
