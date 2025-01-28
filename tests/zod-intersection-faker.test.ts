@@ -42,6 +42,12 @@ describe('N/A', () => {
 
     expect(schema.safeParse(Promise.resolve(1)).success).toEqual(false)
   })
+
+  test('never + never', () => {
+    const schema = z.intersection(z.never(), z.never())
+
+    expect(schema.safeParse(undefined).success).toEqual(false)
+  })
 })
 
 test('ZodIntersectionFaker should assert parameters', () => {
