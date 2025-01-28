@@ -8,7 +8,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
 
-    const bothOf = [this.fakeIfBothAreDate]
+    const bothOf = [this.fakeIfBothAreDate, this.fakeIfBothAreArray]
     for (const fn of bothOf) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
@@ -73,6 +73,19 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, data: fake(z.date().min(new Date(min)).max(new Date(max))) }
+  }
+
+  private fakeIfBothAreArray = <L extends z.ZodType, R extends z.ZodType>(
+    left: L,
+    right: R,
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+    if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
+      return { success: false }
+    }
+
+    const leftData = fake(left)
+    const rightData = fake(right)
+    return { success: true, data: [...leftData, ...rightData] }
   }
 
   private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(
