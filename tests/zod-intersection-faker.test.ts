@@ -211,6 +211,15 @@ testMultipleTimes('nullable + nullish (same type)', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
+testMultipleTimes('nullish + nullish (different type)', () => {
+  install()
+
+  const schema = z.intersection(z.number().nullish(), z.string().nullish())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
 testMultipleTimes('object + object', () => {
   install()
 
