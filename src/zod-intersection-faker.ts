@@ -20,6 +20,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeString,
       this.fakeIfBothCanBeVoid,
       this.fakeIfBothCanBeSymbol,
+      this.fakeIfBothCanBeNativeEnum,
     ]
     for (const fn of bothCanBe) {
       const result = fn(leftSchema, rightSchema)
@@ -363,6 +364,19 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, data: Symbol() }
+  }
+
+  private fakeIfBothCanBeNativeEnum = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
+    if (left instanceof z.ZodNativeEnum === false || right instanceof z.ZodNativeEnum === false) {
+      return { success: false }
+    }
+
+    return { success: true, data: runFake(faker => faker.helpers.enumValue(left._def.values)) }
   }
 
   private fakeIfOneIsAny = (
