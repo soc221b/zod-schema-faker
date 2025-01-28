@@ -13,6 +13,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfOneIsUndefined,
       this.fakeIfOneIsOptional,
       this.fakeIfOneIsNull,
+      this.fakeIfOneIsNullable,
       this.fakeIfOneIsObject,
     ]
 
@@ -77,6 +78,17 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     right: R,
   ): [boolean, null | z.infer<L> | z.infer<R>] => {
     if (left instanceof z.ZodNull === false && right instanceof z.ZodNull === false) {
+      return [false, null]
+    }
+
+    return [true, null]
+  }
+
+  private fakeIfOneIsNullable = <L extends z.ZodType, R extends z.ZodType>(
+    left: L,
+    right: R,
+  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+    if (left instanceof z.ZodNullable === false && right instanceof z.ZodNullable === false) {
       return [false, null]
     }
 
