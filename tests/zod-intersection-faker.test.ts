@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodIntersectionFaker } from '../src/zod-intersection-faker'
 import { expectType, TypeEqual } from 'ts-expect'
@@ -436,6 +436,16 @@ testMultipleTimes('array optional + array', () => {
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('record + record', () => {
+  install()
+
+  const schema = z.intersection(z.record(z.date()), z.record(z.date()))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  console.log(data)
+  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
 })
 
 testMultipleTimes('number + number', () => {
