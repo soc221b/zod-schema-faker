@@ -749,3 +749,12 @@ testMultipleTimes('literal + literal', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('boolean + boolean', () => {
+  install()
+
+  const schema = z.intersection(z.boolean(), z.boolean())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
