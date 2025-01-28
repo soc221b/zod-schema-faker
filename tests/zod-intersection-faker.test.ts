@@ -40,7 +40,7 @@ test('ZodIntersectionFaker.fake should return the given type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
 })
 
-test('any + any', () => {
+testMultipleTimes('any + any', () => {
   install()
 
   const schema = z.intersection(z.any(), z.any())
@@ -49,7 +49,7 @@ test('any + any', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('any + the other', () => {
+testMultipleTimes('any + the other', () => {
   install()
 
   const schema = z.intersection(z.any(), z.number())
@@ -58,7 +58,7 @@ test('any + the other', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('the other + any', () => {
+testMultipleTimes('the other + any', () => {
   install()
 
   const schema = z.intersection(z.number(), z.any())
@@ -67,7 +67,7 @@ test('the other + any', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('unknown + unknown', () => {
+testMultipleTimes('unknown + unknown', () => {
   install()
 
   const schema = z.intersection(z.unknown(), z.unknown())
@@ -76,7 +76,7 @@ test('unknown + unknown', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('unknown + the other', () => {
+testMultipleTimes('unknown + the other', () => {
   install()
 
   const schema = z.intersection(z.unknown(), z.number())
@@ -85,7 +85,7 @@ test('unknown + the other', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('the other + unknown', () => {
+testMultipleTimes('the other + unknown', () => {
   install()
 
   const schema = z.intersection(z.number(), z.unknown())
@@ -94,7 +94,7 @@ test('the other + unknown', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('undefined + undefined', () => {
+testMultipleTimes('undefined + undefined', () => {
   install()
 
   const schema = z.intersection(z.undefined(), z.undefined())
@@ -103,7 +103,7 @@ test('undefined + undefined', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('undefined + optional', () => {
+testMultipleTimes('undefined + optional', () => {
   install()
 
   const schema = z.intersection(z.undefined(), z.number().optional())
@@ -112,7 +112,7 @@ test('undefined + optional', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('optional + undefined', () => {
+testMultipleTimes('optional + undefined', () => {
   install()
 
   const schema = z.intersection(z.number().optional(), z.undefined())
@@ -121,7 +121,7 @@ test('optional + undefined', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('optional + optional', () => {
+testMultipleTimes('optional + optional', () => {
   install()
 
   const schema = z.intersection(z.number().optional(), z.string().optional())
@@ -130,7 +130,7 @@ test('optional + optional', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('null + null', () => {
+testMultipleTimes('null + null', () => {
   install()
 
   const schema = z.intersection(z.null(), z.null())
@@ -139,7 +139,7 @@ test('null + null', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('null + nullable', () => {
+testMultipleTimes('null + nullable', () => {
   install()
 
   const schema = z.intersection(z.null(), z.string().nullable())
@@ -148,7 +148,7 @@ test('null + nullable', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('nullable + null', () => {
+testMultipleTimes('nullable + null', () => {
   install()
 
   const schema = z.intersection(z.string().nullable(), z.null())
@@ -157,7 +157,7 @@ test('nullable + null', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('nullable + nullable', () => {
+testMultipleTimes('nullable + nullable', () => {
   install()
 
   const schema = z.intersection(z.string().nullable(), z.number().nullable())
@@ -166,7 +166,7 @@ test('nullable + nullable', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('nullish + nullish', () => {
+testMultipleTimes('nullish + nullish', () => {
   install()
 
   const schema = z.intersection(z.string().nullish(), z.number().nullish())
@@ -175,7 +175,7 @@ test('nullish + nullish', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('nullish + optional', () => {
+testMultipleTimes('nullish + optional', () => {
   install()
 
   const schema = z.intersection(z.string().nullish(), z.number().optional())
@@ -184,7 +184,7 @@ test('nullish + optional', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('optional + nullish', () => {
+testMultipleTimes('optional + nullish', () => {
   install()
 
   const schema = z.intersection(z.string().optional(), z.number().nullish())
@@ -193,7 +193,7 @@ test('optional + nullish', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('object + object', () => {
+testMultipleTimes('object + object', () => {
   install()
 
   const schema = z.intersection(Person, Employee)
