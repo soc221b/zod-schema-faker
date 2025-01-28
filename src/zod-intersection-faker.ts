@@ -83,7 +83,19 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    return { success: true, data: [fake(z.intersection(left._def.type, right._def.type))] }
+    const length = (() => {
+      const minLength = Math.max(left._def.minLength?.value ?? 0, right._def.minLength?.value ?? 0)
+      const maxLength =
+        typeof left._def.maxLength?.value === 'number' || typeof right._def.maxLength?.value === 'number'
+          ? Math.min(left._def.maxLength?.value ?? Infinity, right._def.maxLength?.value ?? Infinity)
+          : minLength + 3
+      return fake(z.number().int().min(minLength).max(maxLength))
+    })()
+    const type = z.intersection(left._def.type, right._def.type)
+    const data = Array(length)
+      .fill(null)
+      .map(() => fake(type))
+    return { success: true, data }
   }
 
   private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(

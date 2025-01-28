@@ -300,3 +300,12 @@ testMultipleTimes('array + array (inner type)', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('array min + array max', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.date()).min(3), z.array(z.date()).max(3))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
