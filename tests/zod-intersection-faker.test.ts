@@ -722,3 +722,12 @@ testMultipleTimes('nativeEnum + nativeEnum', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('enum + enum', () => {
+  install()
+
+  const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['foo', 'baz']))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
