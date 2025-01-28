@@ -55,8 +55,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodDate === false || right instanceof z.ZodDate === false) {
       return { success: false }
     }
@@ -97,8 +97,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
       return { success: false }
     }
@@ -122,8 +122,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
       return { success: false }
     }
@@ -172,8 +172,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodRecord === false || right instanceof z.ZodRecord === false) {
       return { success: false }
     }
@@ -198,8 +198,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodTuple === false || right instanceof z.ZodTuple === false) {
       return { success: false }
     }
@@ -233,8 +233,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
       return { success: false }
     }
@@ -256,8 +256,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodNumber === false || right instanceof z.ZodNumber === false) {
       return { success: false }
     }
@@ -335,8 +335,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodString === false || right instanceof z.ZodString === false) {
       return { success: false }
     }
@@ -479,8 +479,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodVoid === false || right instanceof z.ZodVoid === false) {
       return { success: false }
     }
@@ -492,8 +492,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodSymbol === false || right instanceof z.ZodSymbol === false) {
       return { success: false }
     }
@@ -505,8 +505,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left)
-    right = this.getInnerTypeDespiteNullish(right)
+    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(left)
+    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonly(right)
     if (left instanceof z.ZodNativeEnum === false || right instanceof z.ZodNativeEnum === false) {
       return { success: false }
     }
@@ -689,12 +689,15 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: null }
   }
 
-  private getInnerTypeDespiteNullish = <T, U>(schema: T): U => {
+  private getInnerTypeDespiteOptionalAndNullableAndReadonly = <T, U>(schema: T): U => {
     if (schema instanceof z.ZodNullable) {
-      return this.getInnerTypeDespiteNullish(schema._def.innerType)
+      return this.getInnerTypeDespiteOptionalAndNullableAndReadonly(schema._def.innerType)
     }
     if (schema instanceof z.ZodOptional) {
-      return this.getInnerTypeDespiteNullish(schema._def.innerType)
+      return this.getInnerTypeDespiteOptionalAndNullableAndReadonly(schema._def.innerType)
+    }
+    if (schema instanceof z.ZodReadonly) {
+      return this.getInnerTypeDespiteOptionalAndNullableAndReadonly(schema._def.innerType)
     }
     return schema as any
   }

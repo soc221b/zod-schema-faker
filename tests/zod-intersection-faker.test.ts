@@ -839,3 +839,12 @@ test('bigint multipleOf + bigint', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+test('readonly', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
