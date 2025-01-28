@@ -569,7 +569,7 @@ testMultipleTimes('number + number', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('number (-Infinity)', () => {
+testMultipleTimes('number (-Infinity)', () => {
   install()
 
   const schema = z.intersection(z.number().max(0), z.number().max(0))
@@ -585,7 +585,7 @@ test('number (-Infinity)', () => {
   expect(false).toEqual(true)
 })
 
-test('number (Infinity)', () => {
+testMultipleTimes('number (Infinity)', () => {
   install()
 
   const schema = z.intersection(z.number().min(0), z.number().min(0))
@@ -822,7 +822,7 @@ testMultipleTimes('bigint max + bigint', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('bigint + bigint multipleOf', () => {
+testMultipleTimes('bigint + bigint multipleOf', () => {
   install()
 
   const schema = z.intersection(z.bigint(), z.bigint().multipleOf(31n))
@@ -831,7 +831,7 @@ test('bigint + bigint multipleOf', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('bigint multipleOf + bigint', () => {
+testMultipleTimes('bigint multipleOf + bigint', () => {
   install()
 
   const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint())
@@ -840,7 +840,7 @@ test('bigint multipleOf + bigint', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
-test('readonly', () => {
+testMultipleTimes('readonly', () => {
   install()
 
   const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
