@@ -419,3 +419,21 @@ testMultipleTimes('array min + array max', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('array + array optional', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.date()), z.array(z.date()).optional())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('array optional + array', () => {
+  install()
+
+  const schema = z.intersection(z.array(z.date()).optional(), z.array(z.date()))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
