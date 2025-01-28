@@ -7,8 +7,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   fake(): z.infer<T> {
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
-
-    const bothOf = [this.fakeIfBothAreDate, this.fakeIfBothAreArray, this.fakeIfBothAreObject]
+    const bothOf = [this.fakeIfBothCanBeDate, this.fakeIfBothAreArray, this.fakeIfBothAreObject]
     for (const fn of bothOf) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
@@ -34,10 +33,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
   }
 
-  private fakeIfBothAreDate = <L extends z.ZodType, R extends z.ZodType>(
+  private fakeIfBothCanBeDate = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
   ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left) as any
+    right = this.getInnerTypeDespiteNullish(right) as any
     if (left instanceof z.ZodDate === false || right instanceof z.ZodDate === false) {
       return { success: false }
     }
@@ -218,4 +219,23 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     return { success: true, data: null }
   }
+
+  private getInnerTypeDespiteNullish = <T extends z.ZodNullable<any> | z.ZodOptional<any> | z.ZodType>(
+    schema: T,
+  ): GetInnerTypeDespiteNullish<T> => {
+    if (schema instanceof z.ZodNullable) {
+      return this.getInnerTypeDespiteNullish(schema._def.innerType)
+    }
+    if (schema instanceof z.ZodOptional) {
+      return this.getInnerTypeDespiteNullish(schema._def.innerType)
+    }
+    return schema as any
+  }
 }
+
+type GetInnerTypeDespiteNullish<T extends z.ZodNullable<any> | z.ZodOptional<any> | z.ZodType> =
+  T extends z.ZodNullable<infer U>
+    ? GetInnerTypeDespiteNullish<U>
+    : T extends z.ZodOptional<infer U>
+      ? GetInnerTypeDespiteNullish<U>
+      : T
