@@ -711,12 +711,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     const sharedValues = left._def.values.filter((value: any) => right._def.values.includes(value))
-
-    if (sharedValues.length) {
-      return { success: true, schema: z.enum(sharedValues) }
-    } else {
+    if (sharedValues.length === 0) {
       return { success: false }
     }
+
+    return { success: true, schema: z.enum(sharedValues) }
   }
 
   private findIntersectedSchemaForLiteral = (
@@ -727,11 +726,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    if (left._def.value === right._def.value) {
-      return { success: true, schema: left }
+    if (left._def.value !== right._def.value) {
+      return { success: false }
     }
 
-    return { success: false }
+    return { success: true, schema: left }
   }
 
   private findIntersectedSchemaForBoolean = (
