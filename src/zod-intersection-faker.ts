@@ -163,7 +163,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
     while (true) {
       const data = fake(schema)
-      if (typeof data === 'number' && !Number.isNaN(data)) {
+      if (!Number.isNaN(data)) {
         return { success: true, data }
       }
     }
@@ -182,7 +182,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const schema = left instanceof z.ZodUnknown ? right : left
     while (true) {
       const data = fake(schema)
-      if (typeof data === 'number' && !Number.isNaN(data)) {
+      if (!Number.isNaN(data)) {
         return { success: true, data }
       }
     }

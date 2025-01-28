@@ -52,7 +52,7 @@ testMultipleTimes('any + any', () => {
 testMultipleTimes('any + the other', () => {
   install()
 
-  const schema = z.intersection(z.any(), z.number())
+  const schema = z.intersection(z.any(), z.date())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -61,7 +61,7 @@ testMultipleTimes('any + the other', () => {
 testMultipleTimes('the other + any', () => {
   install()
 
-  const schema = z.intersection(z.number(), z.any())
+  const schema = z.intersection(z.date(), z.any())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -79,7 +79,7 @@ testMultipleTimes('unknown + unknown', () => {
 testMultipleTimes('unknown + the other', () => {
   install()
 
-  const schema = z.intersection(z.unknown(), z.number())
+  const schema = z.intersection(z.unknown(), z.date())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -88,7 +88,7 @@ testMultipleTimes('unknown + the other', () => {
 testMultipleTimes('the other + unknown', () => {
   install()
 
-  const schema = z.intersection(z.number(), z.unknown())
+  const schema = z.intersection(z.date(), z.unknown())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -106,7 +106,7 @@ testMultipleTimes('undefined + undefined', () => {
 testMultipleTimes('undefined + optional', () => {
   install()
 
-  const schema = z.intersection(z.undefined(), z.number().optional())
+  const schema = z.intersection(z.undefined(), z.date().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -115,7 +115,7 @@ testMultipleTimes('undefined + optional', () => {
 testMultipleTimes('optional + undefined', () => {
   install()
 
-  const schema = z.intersection(z.number().optional(), z.undefined())
+  const schema = z.intersection(z.date().optional(), z.undefined())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -124,7 +124,7 @@ testMultipleTimes('optional + undefined', () => {
 testMultipleTimes('optional + optional', () => {
   install()
 
-  const schema = z.intersection(z.number().optional(), z.string().optional())
+  const schema = z.intersection(z.date().optional(), z.string().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -160,7 +160,7 @@ testMultipleTimes('nullable + null', () => {
 testMultipleTimes('nullable + nullable', () => {
   install()
 
-  const schema = z.intersection(z.string().nullable(), z.number().nullable())
+  const schema = z.intersection(z.string().nullable(), z.date().nullable())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -169,7 +169,7 @@ testMultipleTimes('nullable + nullable', () => {
 testMultipleTimes('nullish + nullish (same type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.number().nullish())
+  const schema = z.intersection(z.date().nullish(), z.date().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -178,7 +178,7 @@ testMultipleTimes('nullish + nullish (same type)', () => {
 testMultipleTimes('nullish + optional (same type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.number().optional())
+  const schema = z.intersection(z.date().nullish(), z.date().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -187,7 +187,7 @@ testMultipleTimes('nullish + optional (same type)', () => {
 testMultipleTimes('optional + nullish (same type)', () => {
   install()
 
-  const schema = z.intersection(z.number().optional(), z.number().nullish())
+  const schema = z.intersection(z.date().optional(), z.date().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -196,7 +196,7 @@ testMultipleTimes('optional + nullish (same type)', () => {
 testMultipleTimes('nullish + nullable (same type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.number().nullable())
+  const schema = z.intersection(z.date().nullish(), z.date().nullable())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -205,7 +205,7 @@ testMultipleTimes('nullish + nullable (same type)', () => {
 testMultipleTimes('nullable + nullish (same type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullable(), z.number().nullish())
+  const schema = z.intersection(z.date().nullable(), z.date().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -214,7 +214,7 @@ testMultipleTimes('nullable + nullish (same type)', () => {
 testMultipleTimes('nullish + nullish (different type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.string().nullish())
+  const schema = z.intersection(z.date().nullish(), z.string().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -223,7 +223,7 @@ testMultipleTimes('nullish + nullish (different type)', () => {
 testMultipleTimes('nullish + optional (different type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.string().optional())
+  const schema = z.intersection(z.date().nullish(), z.string().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -232,7 +232,7 @@ testMultipleTimes('nullish + optional (different type)', () => {
 testMultipleTimes('optional + nullish (different type)', () => {
   install()
 
-  const schema = z.intersection(z.number().optional(), z.string().nullish())
+  const schema = z.intersection(z.date().optional(), z.string().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -241,7 +241,7 @@ testMultipleTimes('optional + nullish (different type)', () => {
 testMultipleTimes('nullish + nullable (different type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullish(), z.string().nullable())
+  const schema = z.intersection(z.date().nullish(), z.string().nullable())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -250,7 +250,7 @@ testMultipleTimes('nullish + nullable (different type)', () => {
 testMultipleTimes('nullable + nullish (different type)', () => {
   install()
 
-  const schema = z.intersection(z.number().nullable(), z.string().nullish())
+  const schema = z.intersection(z.date().nullable(), z.string().nullish())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
