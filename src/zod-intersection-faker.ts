@@ -14,6 +14,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeArray,
       this.fakeIfBothCanBeObject,
       this.fakeIfBothCanBeRecord,
+      this.fakeIfBothCanBeTuple,
       this.fakeIfBothCanBeNumber,
       this.fakeIfBothCanBeString,
     ]
@@ -182,6 +183,41 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           ),
         ),
       ),
+    }
+  }
+
+  private fakeIfBothCanBeTuple = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
+    if (left instanceof z.ZodTuple === false || right instanceof z.ZodTuple === false) {
+      return { success: false }
+    }
+
+    if (left._def.items.length >= right._def.items.length) {
+      const rest = right._def.rest ?? z.any()
+      return {
+        success: true,
+        data: [
+          ...(left._def.items as z.ZodAny[]).slice(0, right._def.items.length).map(type => fake(type)),
+          ...(left._def.items as z.ZodAny[])
+            .slice(right._def.items.length)
+            .map(type => fake(z.intersection(type, rest))),
+        ],
+      }
+    } else {
+      const rest = left._def.rest ?? z.any()
+      return {
+        success: true,
+        data: [
+          ...(left._def.items as z.ZodAny[]).slice(0, left._def.items.length).map(type => fake(type)),
+          ...(right._def.items as z.ZodAny[])
+            .slice(left._def.items.length)
+            .map(type => fake(z.intersection(type, rest))),
+        ],
+      }
     }
   }
 
