@@ -264,3 +264,21 @@ testMultipleTimes('object + object', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('date + date', () => {
+  install()
+
+  const schema = z.intersection(z.date(), z.date())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('date min + date max', () => {
+  install()
+
+  const schema = z.intersection(z.date().min(new Date(0)), z.date().max(new Date(0)))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})

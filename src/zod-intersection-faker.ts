@@ -7,6 +7,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
 
+    const bothOf = [this.fakeIfBothAreDate]
+    for (const fn of bothOf) {
+      const result = fn(leftSchema, rightSchema)
+      if (result.success) {
+        return result.data
+      }
+    }
+
     const oneOf = [
       this.fakeIfOneIsAny,
       this.fakeIfOneIsUnknown,
@@ -24,6 +32,46 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
+  }
+
+  private fakeIfBothAreDate = <L extends z.ZodType, R extends z.ZodType>(
+    left: L,
+    right: R,
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+    if (left instanceof z.ZodDate === false || right instanceof z.ZodDate === false) {
+      return { success: false }
+    }
+
+    let min = -8640000000000000
+    let max = 8640000000000000
+    for (let check of left._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = Math.max(min, check.value)
+          break
+        case 'max':
+          max = Math.min(max, check.value)
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = Math.max(min, check.value)
+          break
+        case 'max':
+          max = Math.min(max, check.value)
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+
+    return { success: true, data: fake(z.date().min(new Date(min)).max(new Date(max))) }
   }
 
   private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(
