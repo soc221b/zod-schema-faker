@@ -8,7 +8,7 @@
 ## Supported APIs
 
 - methods
-  - ❌ .and: impossible to generate
+  - ✅ .and
   - ✅ .array
   - ✅ .brand
   - ✅ .catch
@@ -31,7 +31,7 @@
 - ✅ z.date
 - ✅ z.discriminatedUnion
 - ✅ z.enum
-- ❌ z.intersection: impossible to generate
+- ✅ z.intersection
 - ✅ z.function
 - ✅ z.lazy
 - ✅ z.literal
