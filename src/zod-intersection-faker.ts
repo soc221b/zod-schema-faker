@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { UnknownKeysParam, z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 import { maxDateValue, minDateValue } from './zod-date-faker'
@@ -106,14 +106,30 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     const data = {} as z.infer<L> & z.infer<R>
+    const leftUnknownKeys = left._def.unknownKeys as UnknownKeysParam
+    const rightUnknownKeys = right._def.unknownKeys as UnknownKeysParam
     const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
     for (const key of keys) {
       const leftValue = left.shape[key]
       const rightValue = right.shape[key]
       if (leftValue === undefined) {
-        data[key] = fake(rightValue)
+        switch (leftUnknownKeys) {
+          case 'strict':
+            break
+          default: {
+            const _: 'strip' | 'passthrough' = leftUnknownKeys
+            data[key] = fake(rightValue)
+          }
+        }
       } else if (rightValue === undefined) {
-        data[key] = fake(leftValue)
+        switch (rightUnknownKeys) {
+          case 'strict':
+            break
+          default: {
+            const _: 'strip' | 'passthrough' = rightUnknownKeys
+            data[key] = fake(leftValue)
+          }
+        }
       } else {
         data[key] = fake(z.intersection(leftValue, rightValue))
       }
