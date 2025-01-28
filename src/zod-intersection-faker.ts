@@ -11,9 +11,9 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfOneIsAny,
       this.fakeIfOneIsUnknown,
       this.fakeIfOneIsUndefined,
-      this.fakeIfOneIsOptional,
       this.fakeIfOneIsNull,
       this.fakeIfOneIsNullable,
+      this.fakeIfOneIsOptional,
       this.fakeIfOneIsObject,
     ]
 
