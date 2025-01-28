@@ -36,7 +36,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     const schema = left instanceof z.ZodAny ? right : left
-    return { success: true, data: fake(schema) }
+    // zod use `===` to compare the schema type, so we can't generate `NaN` here
+    // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
+    while (true) {
+      const data = fake(schema)
+      if (typeof data === 'number' && !Number.isNaN(data)) {
+        return { success: true, data }
+      }
+    }
   }
 
   private fakeIfOneIsUnknown = <L extends z.ZodType, R extends z.ZodType>(
@@ -47,8 +54,15 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
+    // zod use `===` to compare the schema type, so we can't generate `NaN` here
+    // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
     const schema = left instanceof z.ZodUnknown ? right : left
-    return { success: true, data: fake(schema) }
+    while (true) {
+      const data = fake(schema)
+      if (typeof data === 'number' && !Number.isNaN(data)) {
+        return { success: true, data }
+      }
+    }
   }
 
   private fakeIfOneIsUndefined = <L extends z.ZodType, R extends z.ZodType>(
