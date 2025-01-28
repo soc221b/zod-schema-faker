@@ -391,7 +391,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     const sharedValues = left._def.values.filter((value: any) => right._def.values.includes(value))
 
-    return { success: true, data: runFake(faker => faker.helpers.arrayElement(sharedValues)) }
+    if (sharedValues.length) {
+      return { success: true, data: runFake(faker => faker.helpers.arrayElement(sharedValues)) }
+    } else {
+      return { success: false }
+    }
   }
 
   private fakeIfBothCanBeLiteral = (
