@@ -2,12 +2,19 @@ import { UnknownKeysParam, z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 import { maxDateValue, minDateValue } from './zod-date-faker'
+import { runFake } from './random'
 
 export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
-    const bothCanBe = [this.fakeIfBothCanBeDate, this.fakeIfBothCanBeArray, this.fakeIfBothCanBeObject]
+
+    const bothCanBe = [
+      this.fakeIfBothCanBeDate,
+      this.fakeIfBothCanBeArray,
+      this.fakeIfBothCanBeObject,
+      this.fakeIfBothCanBeNumber,
+    ]
     for (const fn of bothCanBe) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
@@ -148,6 +155,85 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     }
     return { success: true, data }
+  }
+
+  private fakeIfBothCanBeNumber = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
+    if (left instanceof z.ZodNumber === false || right instanceof z.ZodNumber === false) {
+      return { success: false }
+    }
+
+    let min = -Infinity
+    let max = Infinity
+    let int = false
+    let finite = false
+    let multipleOf = undefined
+    for (let check of left._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = Math.max(min, check.value)
+          break
+        case 'max':
+          max = Math.min(max, check.value)
+          break
+        case 'int':
+          int = true
+          break
+        case 'finite':
+          finite = true
+          break
+        case 'multipleOf':
+          multipleOf = check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = Math.max(min, check.value)
+          break
+        case 'max':
+          max = Math.min(max, check.value)
+          break
+        case 'int':
+          int = true
+          break
+        case 'finite':
+          finite = true
+          break
+        case 'multipleOf':
+          multipleOf = check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+
+    if (min === -Infinity && int === false && finite === false && multipleOf === undefined) {
+      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+        return { success: true, data: -Infinity }
+      }
+    }
+    if (max === Infinity && int === false && finite === false && multipleOf === undefined) {
+      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+        return { success: true, data: Infinity }
+      }
+    }
+
+    min = Math.max(min, Number.MIN_SAFE_INTEGER)
+    max = Math.min(max, Number.MAX_SAFE_INTEGER)
+    let schema = z.number().min(min).max(max)
+    if (int) schema = schema.int()
+    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
+    return { success: true, data: fake(schema) }
   }
 
   private fakeIfOneIsAny = (
