@@ -84,3 +84,12 @@ test('unknown + the other', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('the other + unknown', () => {
+  install()
+
+  const schema = z.intersection(z.number(), z.unknown())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
