@@ -37,7 +37,19 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {
     const fns = [
+      this.findIntersectedSchemaForOptional,
+      this.findIntersectedSchemaForNullable,
+
       this.findIntersectedSchemaForIntersection,
+      this.findIntersectedSchemaForLazy,
+      this.findIntersectedSchemaForReadonly,
+
+      this.findIntersectedSchemaForUnknown,
+      this.findIntersectedSchemaForAny,
+
+      this.findIntersectedSchemaForUndefined,
+      this.findIntersectedSchemaForNull,
+
       this.findIntersectedSchemaForDate,
       this.findIntersectedSchemaForArray,
       this.findIntersectedSchemaForObject,
@@ -53,18 +65,74 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForLiteral,
       this.findIntersectedSchemaForBoolean,
       this.findIntersectedSchemaForBigInt,
-      this.findIntersectedSchemaForAny,
-      this.findIntersectedSchemaForUnknown,
-      this.findIntersectedSchemaForUndefined,
-      this.findIntersectedSchemaForNull,
-      this.findIntersectedSchemaForNullable,
-      this.findIntersectedSchemaForOptional,
     ]
     for (const fn of fns) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
         return result
       }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForOptional = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodOptional &&
+      right instanceof z.ZodOptional &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.undefined() }
+    }
+
+    if (left instanceof z.ZodOptional) {
+      const result = this.findIntersectedSchema(left._def.innerType, right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodOptional) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
+      if (result.success) {
+        return result
+      }
+    }
+
+    if (left instanceof z.ZodOptional && right instanceof z.ZodOptional) {
+      return { success: true, schema: z.undefined() }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNullable = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodNullable &&
+      right instanceof z.ZodNullable &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.null() }
+    }
+
+    if (left instanceof z.ZodNullable) {
+      const result = this.findIntersectedSchema(left._def.innerType, right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodNullable) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
+      if (result.success) {
+        return result
+      }
+    }
+
+    if (left instanceof z.ZodNullable && right instanceof z.ZodNullable) {
+      return { success: true, schema: z.null() }
     }
 
     return { success: false }
@@ -89,12 +157,128 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: false }
   }
 
+  private findIntersectedSchemaForLazy = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodLazy) {
+      const result = this.findIntersectedSchema(left._def.getter(), right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodLazy) {
+      const result = this.findIntersectedSchema(left, right._def.getter())
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForReadonly = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodReadonly) {
+      const result = this.findIntersectedSchema(left._def.innerType, right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodReadonly) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForUnknown = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodUnknown) {
+      return { success: true, schema: right }
+    } else if (right instanceof z.ZodUnknown) {
+      return { success: true, schema: left }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForAny = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodAny) {
+      return { success: true, schema: right }
+    } else if (right instanceof z.ZodAny) {
+      return { success: true, schema: left }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForUndefined = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodUndefined &&
+      right instanceof z.ZodUndefined &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.undefined() }
+    }
+
+    if (left instanceof z.ZodUndefined) {
+      const result = this.findIntersectedSchema(z.never().optional(), right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodUndefined) {
+      const result = this.findIntersectedSchema(left, z.never().optional())
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNull = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodNull &&
+      right instanceof z.ZodNull &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.null() }
+    }
+
+    if (left instanceof z.ZodNull) {
+      const result = this.findIntersectedSchema(z.never().nullable(), right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodNull) {
+      const result = this.findIntersectedSchema(left, z.never().nullable())
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
   private findIntersectedSchemaForDate = (
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodDate === false || right instanceof z.ZodDate === false) {
       return { success: false }
     }
@@ -135,8 +319,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
       return { success: false }
     }
@@ -157,8 +339,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
       return { success: false }
     }
@@ -211,8 +391,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodRecord === false || right instanceof z.ZodRecord === false) {
       return { success: false }
     }
@@ -227,8 +405,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodTuple === false || right instanceof z.ZodTuple === false) {
       return { success: false }
     }
@@ -258,8 +434,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
       return { success: false }
     }
@@ -282,8 +456,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodNumber === false || right instanceof z.ZodNumber === false) {
       return { success: false }
     }
@@ -361,8 +533,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodString === false || right instanceof z.ZodString === false) {
       return { success: false }
     }
@@ -503,8 +673,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodVoid === false || right instanceof z.ZodVoid === false) {
       return { success: false }
     }
@@ -516,8 +684,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodSymbol === false || right instanceof z.ZodSymbol === false) {
       return { success: false }
     }
@@ -529,8 +695,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    left = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(left)
-    right = this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(right)
     if (left instanceof z.ZodNativeEnum === false || right instanceof z.ZodNativeEnum === false) {
       return { success: false }
     }
@@ -629,74 +793,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (max !== undefined) schema = schema.max(max)
     if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
     return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForAny = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodAny === false && right instanceof z.ZodAny === false) {
-      return { success: false }
-    }
-
-    const schema = left instanceof z.ZodAny ? right : left
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForUnknown = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUnknown === false && right instanceof z.ZodUnknown === false) {
-      return { success: false }
-    }
-
-    const schema = left instanceof z.ZodUnknown ? right : left
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForUndefined = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUndefined === false && right instanceof z.ZodUndefined === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.undefined() }
-  }
-
-  private findIntersectedSchemaForOptional = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodOptional === false && right instanceof z.ZodOptional === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.undefined() }
-  }
-
-  private findIntersectedSchemaForNull = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodNull === false && right instanceof z.ZodNull === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.null() }
-  }
-
-  private findIntersectedSchemaForNullable = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodNullable === false && right instanceof z.ZodNullable === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.null() }
   }
 
   private getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy = <T, U>(schema: T): U => {

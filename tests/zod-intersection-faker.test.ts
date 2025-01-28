@@ -150,6 +150,14 @@ testMultipleTimes('undefined + optional', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
+testMultipleTimes('undefined + non-optional', () => {
+  install()
+
+  const schema = z.intersection(z.undefined(), z.date())
+  const faker = new ZodIntersectionFaker(schema)
+  expect(() => faker.fake()).toThrow()
+})
+
 testMultipleTimes('optional + undefined', () => {
   install()
 
@@ -184,6 +192,14 @@ testMultipleTimes('null + nullable', () => {
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('null + non-nullable', () => {
+  install()
+
+  const schema = z.intersection(z.null(), z.string())
+  const faker = new ZodIntersectionFaker(schema)
+  expect(() => faker.fake()).toThrow()
 })
 
 testMultipleTimes('nullable + null', () => {
