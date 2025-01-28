@@ -22,6 +22,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeSymbol,
       this.fakeIfBothCanBeNativeEnum,
       this.fakeIfBothCanBeEnum,
+      this.fakeIfBothCanBeLiteral,
     ]
     for (const fn of bothCanBe) {
       const result = fn(leftSchema, rightSchema)
@@ -391,6 +392,21 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const sharedValues = left._def.values.filter((value: any) => right._def.values.includes(value))
 
     return { success: true, data: runFake(faker => faker.helpers.arrayElement(sharedValues)) }
+  }
+
+  private fakeIfBothCanBeLiteral = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    if (left instanceof z.ZodLiteral === false || right instanceof z.ZodLiteral === false) {
+      return { success: false }
+    }
+
+    if (left._def.value === right._def.value) {
+      return { success: true, data: left._def.value }
+    }
+
+    return { success: false }
   }
 
   private fakeIfOneIsAny = (
