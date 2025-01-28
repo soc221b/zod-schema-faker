@@ -24,6 +24,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeEnum,
       this.fakeIfBothCanBeLiteral,
       this.fakeIfBothCanBeBoolean,
+      this.fakeIfBothCanBeBigInt,
     ]
     for (const fn of bothCanBe) {
       const result = fn(leftSchema, rightSchema)
@@ -423,6 +424,56 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, data: runFake(faker => faker.datatype.boolean()) }
+  }
+
+  private fakeIfBothCanBeBigInt = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    if (left instanceof z.ZodBigInt === false || right instanceof z.ZodBigInt === false) {
+      return { success: false }
+    }
+
+    let min: undefined | bigint = undefined
+    let max: undefined | bigint = undefined
+    let multipleOf: undefined | bigint = undefined
+    for (let check of left._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = check.value
+          break
+        case 'max':
+          max = check.value
+          break
+        case 'multipleOf':
+          multipleOf = check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = min === undefined ? check.value : min > check.value ? min : check.value
+          break
+        case 'max':
+          max = max === undefined ? check.value : max < check.value ? max : check.value
+          break
+        case 'multipleOf':
+          multipleOf = multipleOf === undefined ? check.value : multipleOf < check.value ? multipleOf : check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    let schema = z.bigint()
+    if (min !== undefined) schema = schema.min(min)
+    if (max !== undefined) schema = schema.max(max)
+    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
+    return { success: true, data: fake(schema) }
   }
 
   private fakeIfOneIsAny = (

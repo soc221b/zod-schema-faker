@@ -758,3 +758,66 @@ testMultipleTimes('boolean + boolean', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('bigint + bigint', () => {
+  install()
+
+  const schema = z.intersection(z.bigint(), z.bigint())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('bigint + bigint min', () => {
+  install()
+
+  const schema = z.intersection(z.bigint(), z.bigint().min(-100n))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('bigint min + bigint', () => {
+  install()
+
+  const schema = z.intersection(z.bigint().min(-100n), z.bigint())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('bigint + bigint max', () => {
+  install()
+
+  const schema = z.intersection(z.bigint(), z.bigint().max(-100n))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('bigint max + bigint', () => {
+  install()
+
+  const schema = z.intersection(z.bigint().max(-100n), z.bigint())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+test('bigint + bigint multipleOf', () => {
+  install()
+
+  const schema = z.intersection(z.bigint(), z.bigint().multipleOf(31n))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+test('bigint multipleOf + bigint', () => {
+  install()
+
+  const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
