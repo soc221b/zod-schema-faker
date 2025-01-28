@@ -48,3 +48,12 @@ test('any + any', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('any + the other', () => {
+  install()
+
+  const schema = z.intersection(z.any(), z.number())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
