@@ -510,6 +510,18 @@ testMultipleTimes('tuple + tuple rest (intersection)', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data: data })
 })
 
+testMultipleTimes('union + union', () => {
+  install()
+
+  const schema = z.intersection(
+    z.union([z.number(), z.date().min(new Date(0))]),
+    z.union([z.date().max(new Date(0)), z.string()]),
+  )
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+})
+
 testMultipleTimes('number + number', () => {
   install()
 

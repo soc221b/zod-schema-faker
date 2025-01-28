@@ -15,6 +15,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeObject,
       this.fakeIfBothCanBeRecord,
       this.fakeIfBothCanBeTuple,
+      this.fakeIfBothCanBeUnion,
       this.fakeIfBothCanBeNumber,
       this.fakeIfBothCanBeString,
     ]
@@ -219,6 +220,29 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         ],
       }
     }
+  }
+
+  private fakeIfBothCanBeUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
+    if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
+      return { success: false }
+    }
+
+    const leftTypes = left._def.options
+    const rightTypes = right._def.options
+    for (let leftType of leftTypes) {
+      for (let rightType of rightTypes) {
+        try {
+          return { success: true, data: fake(z.intersection(leftType, rightType)) }
+        } catch {}
+      }
+    }
+
+    return { success: false }
   }
 
   private fakeIfBothCanBeNumber = (
