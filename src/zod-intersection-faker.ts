@@ -33,12 +33,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
   }
 
-  private fakeIfBothCanBeDate = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left) as any
-    right = this.getInnerTypeDespiteNullish(right) as any
+  private fakeIfBothCanBeDate = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
     if (left instanceof z.ZodDate === false || right instanceof z.ZodDate === false) {
       return { success: false }
     }
@@ -75,12 +75,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: fake(z.date().min(new Date(min)).max(new Date(max))) }
   }
 
-  private fakeIfBothCanBeArray = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left) as any
-    right = this.getInnerTypeDespiteNullish(right) as any
+  private fakeIfBothCanBeArray = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
     if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
       return { success: false }
     }
@@ -100,17 +100,17 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data }
   }
 
-  private fakeIfBothCanBeObject = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
-    left = this.getInnerTypeDespiteNullish(left) as any
-    right = this.getInnerTypeDespiteNullish(right) as any
+  private fakeIfBothCanBeObject = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
     if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
       return { success: false }
     }
 
-    const data = {} as z.infer<L> & z.infer<R>
+    const data = {} as any
     const leftUnknownKeys = left._def.unknownKeys as UnknownKeysParam
     const rightUnknownKeys = right._def.unknownKeys as UnknownKeysParam
     const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
@@ -150,10 +150,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data }
   }
 
-  private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsAny = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodAny === false && right instanceof z.ZodAny === false) {
       return { success: false }
     }
@@ -169,10 +169,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
   }
 
-  private fakeIfOneIsUnknown = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsUnknown = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodUnknown === false && right instanceof z.ZodUnknown === false) {
       return { success: false }
     }
@@ -188,10 +188,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
   }
 
-  private fakeIfOneIsUndefined = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsUndefined = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodUndefined === false && right instanceof z.ZodUndefined === false) {
       return { success: false }
     }
@@ -199,10 +199,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: undefined }
   }
 
-  private fakeIfOneIsOptional = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsOptional = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodOptional === false && right instanceof z.ZodOptional === false) {
       return { success: false }
     }
@@ -210,10 +210,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: undefined }
   }
 
-  private fakeIfOneIsNull = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsNull = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodNull === false && right instanceof z.ZodNull === false) {
       return { success: false }
     }
@@ -221,10 +221,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: null }
   }
 
-  private fakeIfOneIsNullable = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+  private fakeIfOneIsNullable = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
     if (left instanceof z.ZodNullable === false && right instanceof z.ZodNullable === false) {
       return { success: false }
     }
@@ -232,9 +232,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, data: null }
   }
 
-  private getInnerTypeDespiteNullish = <T extends z.ZodNullable<any> | z.ZodOptional<any> | z.ZodType>(
-    schema: T,
-  ): GetInnerTypeDespiteNullish<T> => {
+  private getInnerTypeDespiteNullish = <T, U>(schema: T): U => {
     if (schema instanceof z.ZodNullable) {
       return this.getInnerTypeDespiteNullish(schema._def.innerType)
     }
@@ -244,10 +242,3 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return schema as any
   }
 }
-
-type GetInnerTypeDespiteNullish<T extends z.ZodNullable<any> | z.ZodOptional<any> | z.ZodType> =
-  T extends z.ZodNullable<infer U>
-    ? GetInnerTypeDespiteNullish<U>
-    : T extends z.ZodOptional<infer U>
-      ? GetInnerTypeDespiteNullish<U>
-      : T
