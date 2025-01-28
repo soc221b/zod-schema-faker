@@ -559,3 +559,12 @@ testMultipleTimes('number multipleOf + number', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('string + string', () => {
+  install()
+
+  const schema = z.intersection(z.string(), z.string())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
