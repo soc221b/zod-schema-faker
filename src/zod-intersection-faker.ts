@@ -51,8 +51,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return [false, null]
     }
 
-    const schema = left instanceof z.ZodUndefined ? right : left
-    return [true, fake(schema)]
+    return [true, fake(z.undefined())]
   }
 
   private fakeIfOneIsObject = <L extends z.ZodType, R extends z.ZodType>(

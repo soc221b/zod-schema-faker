@@ -103,6 +103,15 @@ test('undefined + undefined', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('undefined + optional', () => {
+  install()
+
+  const schema = z.intersection(z.undefined(), z.optional(z.number()))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('object + object', () => {
   install()
 
