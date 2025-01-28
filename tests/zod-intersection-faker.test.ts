@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodIntersectionFaker } from '../src/zod-intersection-faker'
 import { expectType, TypeEqual } from 'ts-expect'
@@ -10,6 +10,38 @@ const Person = z.object({
 })
 const Employee = z.object({
   role: z.string(),
+})
+
+describe('N/A', () => {
+  test('nan + nan', () => {
+    const schema = z.intersection(z.nan(), z.nan())
+
+    expect(schema.safeParse(NaN).success).toEqual(false)
+  })
+
+  test('map + map', () => {
+    const schema = z.intersection(z.map(z.string(), z.number()), z.map(z.string(), z.number()))
+
+    expect(schema.safeParse(new Map([['foo', 1]])).success).toEqual(false)
+  })
+
+  test('set + set', () => {
+    const schema = z.intersection(z.set(z.number()), z.set(z.number()))
+
+    expect(schema.safeParse(new Set([1])).success).toEqual(false)
+  })
+
+  test('function + function', () => {
+    const schema = z.intersection(z.function(), z.function())
+
+    expect(schema.safeParse(() => {}).success).toEqual(false)
+  })
+
+  test('promise + promise', () => {
+    const schema = z.intersection(z.promise(z.number()), z.promise(z.number()))
+
+    expect(schema.safeParse(Promise.resolve(1)).success).toEqual(false)
+  })
 })
 
 test('ZodIntersectionFaker should assert parameters', () => {
