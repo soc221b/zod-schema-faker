@@ -58,7 +58,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return [false, null]
     }
 
-    return [true, fake(z.undefined())]
+    return [true, undefined]
   }
 
   private fakeIfOneIsOptional = <L extends z.ZodType, R extends z.ZodType>(
@@ -69,7 +69,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return [false, null]
     }
 
-    return [true, fake(z.undefined())]
+    return [true, undefined]
   }
 
   private fakeIfOneIsNull = <L extends z.ZodType, R extends z.ZodType>(
