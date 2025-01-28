@@ -18,6 +18,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfBothCanBeUnion,
       this.fakeIfBothCanBeNumber,
       this.fakeIfBothCanBeString,
+      this.fakeIfBothCanBeVoid,
     ]
     for (const fn of bothCanBe) {
       const result = fn(leftSchema, rightSchema)
@@ -335,6 +336,19 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, data: fake(z.string()) }
+  }
+
+  private fakeIfBothCanBeVoid = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; data: z.infer<z.ZodType> } | { success: false } => {
+    left = this.getInnerTypeDespiteNullish(left)
+    right = this.getInnerTypeDespiteNullish(right)
+    if (left instanceof z.ZodVoid === false || right instanceof z.ZodVoid === false) {
+      return { success: false }
+    }
+
+    return { success: true, data: undefined }
   }
 
   private fakeIfOneIsAny = (
