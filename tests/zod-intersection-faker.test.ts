@@ -860,3 +860,15 @@ testMultipleTimes('lazy', () => {
   const data = faker.fake()
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
+
+testMultipleTimes('intersection/and', () => {
+  install()
+
+  const schema = z.intersection(
+    z.date().and(z.date().min(new Date(0))),
+    z.intersection(z.date().max(new Date(0)), z.date()),
+  )
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
