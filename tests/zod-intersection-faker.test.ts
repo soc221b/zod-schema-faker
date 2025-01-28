@@ -175,6 +175,15 @@ test('nullish + nullish', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('nullish + optional', () => {
+  install()
+
+  const schema = z.intersection(z.string().nullish(), z.number().optional())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 test('object + object', () => {
   install()
 
