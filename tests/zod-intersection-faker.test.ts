@@ -106,7 +106,7 @@ test('undefined + undefined', () => {
 test('undefined + optional', () => {
   install()
 
-  const schema = z.intersection(z.undefined(), z.optional(z.number()))
+  const schema = z.intersection(z.undefined(), z.number().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -115,7 +115,7 @@ test('undefined + optional', () => {
 test('optional + undefined', () => {
   install()
 
-  const schema = z.intersection(z.optional(z.number()), z.undefined())
+  const schema = z.intersection(z.number().optional(), z.undefined())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -124,7 +124,7 @@ test('optional + undefined', () => {
 test('optional + optional', () => {
   install()
 
-  const schema = z.intersection(z.optional(z.number()), z.optional(z.string()))
+  const schema = z.intersection(z.number().optional(), z.string().optional())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -142,7 +142,7 @@ test('null + null', () => {
 test('null + nullable', () => {
   install()
 
-  const schema = z.intersection(z.null(), z.nullable(z.string()))
+  const schema = z.intersection(z.null(), z.string().nullable())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -151,7 +151,7 @@ test('null + nullable', () => {
 test('nullable + null', () => {
   install()
 
-  const schema = z.intersection(z.nullable(z.string()), z.null())
+  const schema = z.intersection(z.string().nullable(), z.null())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -160,7 +160,7 @@ test('nullable + null', () => {
 test('nullable + nullable', () => {
   install()
 
-  const schema = z.intersection(z.nullable(z.string()), z.nullable(z.number()))
+  const schema = z.intersection(z.string().nullable(), z.number().nullable())
   const faker = new ZodIntersectionFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
