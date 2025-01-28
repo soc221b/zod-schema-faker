@@ -8,7 +8,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
 
-    const bothOf = [this.fakeIfBothAreDate, this.fakeIfBothAreArray]
+    const bothOf = [this.fakeIfBothAreDate, this.fakeIfBothAreArray, this.fakeIfBothAreObject]
     for (const fn of bothOf) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
@@ -23,7 +23,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.fakeIfOneIsNull,
       this.fakeIfOneIsNullable,
       this.fakeIfOneIsOptional,
-      this.fakeIfOneIsObject,
     ]
     for (const fn of oneOf) {
       const result = fn(leftSchema, rightSchema)
@@ -95,6 +94,30 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const data = Array(length)
       .fill(null)
       .map(() => fake(type))
+    return { success: true, data }
+  }
+
+  private fakeIfBothAreObject = <L extends z.ZodType, R extends z.ZodType>(
+    left: L,
+    right: R,
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
+    if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
+      return { success: false }
+    }
+
+    const data = {} as z.infer<L> & z.infer<R>
+    const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
+    for (const key of keys) {
+      const leftValue = left.shape[key]
+      const rightValue = right.shape[key]
+      if (leftValue === undefined) {
+        data[key] = fake(rightValue)
+      } else if (rightValue === undefined) {
+        data[key] = fake(leftValue)
+      } else {
+        data[key] = fake(z.intersection(leftValue, rightValue))
+      }
+    }
     return { success: true, data }
   }
 
@@ -178,18 +201,5 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, data: null }
-  }
-
-  private fakeIfOneIsObject = <L extends z.ZodType, R extends z.ZodType>(
-    left: L,
-    right: R,
-  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
-    if (left instanceof z.ZodObject === false && right instanceof z.ZodObject === false) {
-      return { success: false }
-    }
-
-    const leftData = fake(left)
-    const rightData = fake(right)
-    return { success: true, data: { ...leftData, ...rightData } }
   }
 }
