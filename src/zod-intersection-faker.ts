@@ -114,22 +114,30 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       const leftValue = left.shape[key]
       const rightValue = right.shape[key]
       if (leftValue === undefined) {
-        switch (leftUnknownKeys) {
-          case 'strict':
-            break
-          default: {
-            const _: 'strip' | 'passthrough' = leftUnknownKeys
-            data[key] = fake(rightValue)
+        if (left._def.catchall instanceof z.ZodNever) {
+          switch (leftUnknownKeys) {
+            case 'strict':
+              break
+            default: {
+              const _: 'strip' | 'passthrough' = leftUnknownKeys
+              data[key] = fake(rightValue)
+            }
           }
+        } else {
+          data[key] = fake(z.intersection(left._def.catchall, rightValue))
         }
       } else if (rightValue === undefined) {
-        switch (rightUnknownKeys) {
-          case 'strict':
-            break
-          default: {
-            const _: 'strip' | 'passthrough' = rightUnknownKeys
-            data[key] = fake(leftValue)
+        if (right._def.catchall instanceof z.ZodNever) {
+          switch (rightUnknownKeys) {
+            case 'strict':
+              break
+            default: {
+              const _: 'strip' | 'passthrough' = rightUnknownKeys
+              data[key] = fake(leftValue)
+            }
           }
+        } else {
+          data[key] = fake(z.intersection(leftValue, right._def.catchall))
         }
       } else {
         data[key] = fake(z.intersection(leftValue, rightValue))

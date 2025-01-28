@@ -311,6 +311,34 @@ testMultipleTimes('object strict + object', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
+testMultipleTimes('object catchall + object', () => {
+  install()
+
+  const schema = z.intersection(
+    z.object({}).catchall(z.date().min(new Date(0))),
+    z.object({
+      foo: z.date().max(new Date(0)),
+    }),
+  )
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('object + object catchall', () => {
+  install()
+
+  const schema = z.intersection(
+    z.object({
+      foo: z.date().max(new Date(0)),
+    }),
+    z.object({}).catchall(z.date().min(new Date(0))),
+  )
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
 testMultipleTimes('date + date', () => {
   install()
 
