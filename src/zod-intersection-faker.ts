@@ -677,7 +677,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    return { success: true, schema: z.undefined() }
+    return { success: true, schema: left }
   }
 
   private findIntersectedSchemaForSymbol = (
@@ -688,7 +688,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    return { success: true, schema: z.symbol() }
+    return { success: true, schema: left }
   }
 
   private findIntersectedSchemaForNativeEnum = (
