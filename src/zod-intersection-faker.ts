@@ -83,9 +83,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    const leftData = fake(left)
-    const rightData = fake(right)
-    return { success: true, data: [...leftData, ...rightData] }
+    return { success: true, data: [fake(z.intersection(left._def.type, right._def.type))] }
   }
 
   private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(
