@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
+import { maxDateValue, minDateValue } from './zod-date-faker'
 
 export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
@@ -42,8 +43,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    let min = -8640000000000000
-    let max = 8640000000000000
+    let min = minDateValue
+    let max = maxDateValue
     for (let check of left._def.checks) {
       switch (check.kind) {
         case 'min':
