@@ -341,7 +341,138 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    return { success: true, data: fake(z.string()) }
+    const dedicatedKinds = [
+      'email',
+      'url',
+      'uuid',
+      'nanoid',
+      'cuid',
+      'cuid2',
+      'ulid',
+      'regex',
+      'jwt',
+      'datetime',
+      'date',
+      'time',
+      'duration',
+      'ip',
+      'cidr',
+      'base64',
+      'base64url',
+    ] as const
+    for (let check of left._def.checks) {
+      for (let kind of dedicatedKinds) {
+        if (check.kind === kind) {
+          return { success: true, data: fake(left) }
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      for (let kind of dedicatedKinds) {
+        if (check.kind === kind) {
+          return { success: true, data: fake(right) }
+        }
+      }
+    }
+
+    let min: undefined | number = undefined
+    let max: undefined | number = undefined
+    let endsWith: undefined | string = undefined
+    let includes: undefined | string = undefined
+    let startsWith: undefined | string = undefined
+    let toLowercase = false
+    let toUppercase = false
+    let trim = false
+    let emoji = false
+    for (let check of left._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = check.value
+          break
+        case 'max':
+          max = check.value
+          break
+        case 'length':
+          min = check.value
+          max = check.value
+          break
+        case 'endsWith':
+          endsWith = check.value
+          break
+        case 'includes':
+          includes = check.value
+          break
+        case 'startsWith':
+          startsWith = check.value
+          break
+        case 'toLowerCase':
+          toLowercase = true
+          break
+        case 'toUpperCase':
+          toUppercase = true
+          break
+        case 'trim':
+          trim = true
+          break
+        case 'emoji':
+          emoji = true
+          break
+        default: {
+          const _: (typeof dedicatedKinds)[number] = check.kind
+          return { success: true, data: fake(left) }
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = Math.min(min ?? check.value, check.value)
+          break
+        case 'max':
+          max = Math.max(max ?? check.value, check.value)
+          break
+        case 'length':
+          min = Math.min(min ?? check.value, check.value)
+          max = Math.max(max ?? check.value, check.value)
+          break
+        case 'endsWith':
+          endsWith = check.value
+          break
+        case 'includes':
+          includes = check.value
+          break
+        case 'startsWith':
+          startsWith = check.value
+          break
+        case 'toLowerCase':
+          toLowercase = true
+          break
+        case 'toUpperCase':
+          toUppercase = true
+          break
+        case 'trim':
+          trim = true
+          break
+        case 'emoji':
+          emoji = true
+          break
+        default: {
+          const _: (typeof dedicatedKinds)[number] = check.kind
+          return { success: true, data: fake(right) }
+        }
+      }
+    }
+    let schema = z.string()
+    if (min !== undefined) schema = schema.min(min)
+    if (max !== undefined) schema = schema.max(max)
+    if (endsWith !== undefined) schema = schema.endsWith(endsWith)
+    if (includes !== undefined) schema = schema.includes(includes)
+    if (startsWith !== undefined) schema = schema.startsWith(startsWith)
+    if (toLowercase) schema = schema.toLowerCase()
+    if (toUppercase) schema = schema.toUpperCase()
+    if (trim) schema = schema.trim()
+    if (emoji) schema = schema.emoji()
+    return { success: true, data: fake(schema) }
   }
 
   private fakeIfBothCanBeVoid = (

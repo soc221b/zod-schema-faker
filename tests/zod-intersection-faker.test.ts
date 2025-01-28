@@ -691,6 +691,24 @@ testMultipleTimes('string + string', () => {
   expect(schema.safeParse(data)).toEqual({ success: true, data })
 })
 
+testMultipleTimes('string + string min', () => {
+  install()
+
+  const schema = z.intersection(z.string(), z.string().min(100))
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
+testMultipleTimes('string + string email', () => {
+  install()
+
+  const schema = z.intersection(z.string(), z.string().email())
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data)).toEqual({ success: true, data })
+})
+
 testMultipleTimes('void + void', () => {
   install()
 
