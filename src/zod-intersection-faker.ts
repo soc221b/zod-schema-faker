@@ -18,9 +18,9 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     ]
 
     for (const fakeFn of fakes) {
-      const [isSuccess, value] = fakeFn(leftSchema, rightSchema)
-      if (isSuccess) {
-        return value as z.infer<T>
+      const result = fakeFn(leftSchema, rightSchema)
+      if (result.success) {
+        return result.data
       }
     }
 
@@ -30,81 +30,81 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   private fakeIfOneIsAny = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodAny === false && right instanceof z.ZodAny === false) {
-      return [false, null]
+      return { success: false }
     }
 
     const schema = left instanceof z.ZodAny ? right : left
-    return [true, fake(schema)]
+    return { success: true, data: fake(schema) }
   }
 
   private fakeIfOneIsUnknown = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodUnknown === false && right instanceof z.ZodUnknown === false) {
-      return [false, null]
+      return { success: false }
     }
 
     const schema = left instanceof z.ZodUnknown ? right : left
-    return [true, fake(schema)]
+    return { success: true, data: fake(schema) }
   }
 
   private fakeIfOneIsUndefined = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodUndefined === false && right instanceof z.ZodUndefined === false) {
-      return [false, null]
+      return { success: false }
     }
 
-    return [true, undefined]
+    return { success: true, data: undefined }
   }
 
   private fakeIfOneIsOptional = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodOptional === false && right instanceof z.ZodOptional === false) {
-      return [false, null]
+      return { success: false }
     }
 
-    return [true, undefined]
+    return { success: true, data: undefined }
   }
 
   private fakeIfOneIsNull = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodNull === false && right instanceof z.ZodNull === false) {
-      return [false, null]
+      return { success: false }
     }
 
-    return [true, null]
+    return { success: true, data: null }
   }
 
   private fakeIfOneIsNullable = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodNullable === false && right instanceof z.ZodNullable === false) {
-      return [false, null]
+      return { success: false }
     }
 
-    return [true, null]
+    return { success: true, data: null }
   }
 
   private fakeIfOneIsObject = <L extends z.ZodType, R extends z.ZodType>(
     left: L,
     right: R,
-  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+  ): { success: true; data: z.infer<L> | z.infer<R> } | { success: false } => {
     if (left instanceof z.ZodObject === false && right instanceof z.ZodObject === false) {
-      return [false, null]
+      return { success: false }
     }
 
     const leftData = fake(left)
     const rightData = fake(right)
-    return [true, { ...leftData, ...rightData }]
+    return { success: true, data: { ...leftData, ...rightData } }
   }
 }
