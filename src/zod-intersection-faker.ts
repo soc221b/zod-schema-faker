@@ -7,7 +7,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
 
-    const fakes = [this.fakeIfOneIsAny, this.fakeIfOneIsUnknown]
+    const fakes = [this.fakeIfOneIsAny, this.fakeIfOneIsUnknown, this.fakeIfOneIsObject]
 
     for (const fakeFn of fakes) {
       const [isSuccess, value] = fakeFn(leftSchema, rightSchema)
@@ -41,5 +41,18 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     const schema = left instanceof z.ZodUnknown ? right : left
     return [true, fake(schema)]
+  }
+
+  private fakeIfOneIsObject = <L extends z.ZodType, R extends z.ZodType>(
+    left: L,
+    right: R,
+  ): [boolean, null | z.infer<L> | z.infer<R>] => {
+    if (left instanceof z.ZodObject === false && right instanceof z.ZodObject === false) {
+      return [false, null]
+    }
+
+    const leftData = fake(left)
+    const rightData = fake(right)
+    return [true, { ...leftData, ...rightData }]
   }
 }

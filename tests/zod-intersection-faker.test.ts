@@ -93,3 +93,12 @@ test('the other + unknown', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('object + object', () => {
+  install()
+
+  const schema = z.intersection(Person, Employee)
+  const faker = new ZodIntersectionFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
