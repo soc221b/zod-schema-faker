@@ -337,7 +337,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (right._def.exactLength !== null) {
       exactLength = right._def.exactLength.value
     }
-    let schema = z.array(z.intersection(left._def.type, right._def.type))
+    const result = this.findIntersectedSchema(left._def.type, right._def.type)
+    if (result.success === false) {
+      return { success: false }
+    }
+    let schema = z.array(result.schema)
     if (minLength !== null) schema = schema.min(minLength)
     if (maxLength !== null) schema = schema.max(maxLength)
     if (exactLength !== null) schema = schema.length(exactLength)
@@ -370,7 +374,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
             }
           }
         } else {
-          schema = schema.merge(z.object({ [key]: z.intersection(left._def.catchall, rightValue) }))
+          const result = this.findIntersectedSchema(left._def.catchall, rightValue)
+          if (result.success) {
+            schema = schema.merge(z.object({ [key]: result.schema }))
+          } else {
+            return { success: false }
+          }
         }
       } else if (rightValue === undefined) {
         if (right._def.catchall instanceof z.ZodNever) {
@@ -383,14 +392,20 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
             }
           }
         } else {
-          schema = schema.merge(z.object({ [key]: z.intersection(leftValue, right._def.catchall) }))
+          const result = this.findIntersectedSchema(leftValue, right._def.catchall)
+          if (result.success) {
+            schema = schema.merge(z.object({ [key]: result.schema }))
+          } else {
+            return { success: false }
+          }
         }
       } else {
-        schema = schema.merge(
-          z.object({
-            [key]: z.intersection(leftValue, rightValue),
-          }),
-        )
+        const result = this.findIntersectedSchema(leftValue, rightValue)
+        if (result.success) {
+          schema = schema.merge(z.object({ [key]: result.schema }))
+        } else {
+          return { success: false }
+        }
       }
     }
     return { success: true, schema }
@@ -404,10 +419,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    return {
-      success: true,
-      schema: z.record(z.intersection(left._def.valueType, right._def.valueType)),
+    const result = this.findIntersectedSchema(left._def.valueType, right._def.valueType)
+    if (result.success === false) {
+      return { success: false }
     }
+
+    return { success: true, schema: z.record(result.schema) }
   }
 
   private findIntersectedSchemaForTuple = (
