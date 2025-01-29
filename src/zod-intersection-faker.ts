@@ -453,22 +453,32 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodUnion || right instanceof z.ZodUnion) {
+      if (left instanceof z.ZodUnion === false) {
+        left = z.union([left, z.never()])
+      }
+      if (right instanceof z.ZodUnion === false) {
+        right = z.union([right, z.never()])
+      }
+    }
     if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
       return { success: false }
     }
 
-    const leftTypes = left._def.options
-    const rightTypes = right._def.options
-    for (let leftType of leftTypes) {
-      for (let rightType of rightTypes) {
-        const result = this.findIntersectedSchema(leftType, rightType)
+    let schema: z.ZodType | undefined = undefined
+    for (let leftOption of left._def.options) {
+      for (let rightOption of right._def.options) {
+        const result = this.findIntersectedSchema(leftOption, rightOption)
         if (result.success) {
-          return result
+          schema = schema === undefined ? result.schema : z.union([schema, result.schema])
         }
       }
     }
+    if (schema === undefined) {
+      return { success: false }
+    }
 
-    return { success: false }
+    return { success: true, schema }
   }
 
   private findIntersectedSchemaForNumber = (

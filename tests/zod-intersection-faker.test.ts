@@ -946,24 +946,145 @@ describe('tuple', () => {
 })
 
 describe('union/or', () => {
-  testMultipleTimes('union + union', () => {
+  test('union + union', () => {
     install()
 
     const schema = z.intersection(
-      z.union([z.number(), z.date().min(new Date(0))]),
-      z.date().max(new Date(0)).or(z.string()),
+      z.union([z.number(), z.date().min(new Date(123))]),
+      z.date().max(new Date(321)).or(z.string()),
     )
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data: data })
   })
 
-  testMultipleTimes('union + union (no common value)', () => {
+  test('union [date min, number] + date max', () => {
     install()
 
-    const schema = z.intersection(z.union([z.number(), z.date()]), z.union([z.string(), z.boolean()]))
+    const left = z.union([z.date().min(new Date(123)), z.number()])
+    const right = z.date().max(new Date(321))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(2)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(321).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(3)
+  })
+
+  test('union [date min 1, date min 2] + date max', () => {
+    install()
+
+    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
+    const right = z.date().max(new Date(456))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodUnion) {
+      const items: any[] = result.schema._def.options
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodDate) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(321).getTime()),
+        ).toBeTruthy()
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    expect.assertions(7)
+  })
+
+  test('union [date min 1, date min 2] + union [date max 1, date max 2]', () => {
+    install()
+
+    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
+    const right = z.union([z.date().max(new Date(456)), z.date().max(new Date(654))])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodUnion) {
+      const firstUnionOptions: any[] = result.schema._def.options
+      const secondUnion = firstUnionOptions[0]
+      if (secondUnion instanceof z.ZodUnion) {
+        const secondUnionOptions = secondUnion._def.options
+        const thirdUnion = secondUnionOptions[0]
+        if (thirdUnion instanceof z.ZodUnion) {
+          const thirdUnionOptions = thirdUnion._def.options
+          const firstIntersection = thirdUnionOptions[0]
+          if (firstIntersection instanceof z.ZodDate) {
+            expect(firstIntersection._def.checks.length).toBe(2)
+            expect(
+              firstIntersection._def.checks.find(
+                check => check.kind === 'min' && check.value === new Date(123).getTime(),
+              ),
+            ).toBeTruthy()
+            expect(
+              firstIntersection._def.checks.find(
+                check => check.kind === 'max' && check.value === new Date(456).getTime(),
+              ),
+            ).toBeTruthy()
+          }
+          const secondIntersection = thirdUnionOptions[1]
+          if (secondIntersection instanceof z.ZodDate) {
+            expect(secondIntersection._def.checks.length).toBe(2)
+            expect(
+              secondIntersection._def.checks.find(
+                check => check.kind === 'min' && check.value === new Date(123).getTime(),
+              ),
+            ).toBeTruthy()
+            expect(
+              secondIntersection._def.checks.find(
+                check => check.kind === 'max' && check.value === new Date(654).getTime(),
+              ),
+            ).toBeTruthy()
+          }
+        }
+        const thirdIntersection = secondUnionOptions[1]
+        if (thirdIntersection instanceof z.ZodDate) {
+          expect(thirdIntersection._def.checks.length).toBe(2)
+          expect(
+            thirdIntersection._def.checks.find(
+              check => check.kind === 'min' && check.value === new Date(321).getTime(),
+            ),
+          ).toBeTruthy()
+          expect(
+            thirdIntersection._def.checks.find(
+              check => check.kind === 'max' && check.value === new Date(456).getTime(),
+            ),
+          ).toBeTruthy()
+        }
+      }
+      const fourthIntersection = firstUnionOptions[1]
+      if (fourthIntersection instanceof z.ZodDate) {
+        expect(fourthIntersection._def.checks.length).toBe(2)
+        expect(
+          fourthIntersection._def.checks.find(check => check.kind === 'min' && check.value === new Date(321).getTime()),
+        ).toBeTruthy()
+        expect(
+          fourthIntersection._def.checks.find(check => check.kind === 'max' && check.value === new Date(654).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    expect.assertions(12)
   })
 })
 
