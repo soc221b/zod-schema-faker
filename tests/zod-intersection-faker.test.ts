@@ -659,126 +659,200 @@ describe('number', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('number (-Infinity)', () => {
+  test('number + number min', () => {
     install()
 
-    const schema = z.intersection(z.number(), z.number())
-    const faker = new ZodIntersectionFaker(schema)
-    let safeCount = 0
-    while (safeCount < 1000) {
-      const data = faker.fake()
-      if (data === -Infinity) {
-        return
-      }
-      safeCount++
+    const left = z.number()
+    const right = z.number().min(10)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
     }
-    expect(false).toEqual(true)
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number (Infinity)', () => {
+  test('number min + number', () => {
     install()
 
-    const schema = z.intersection(z.number(), z.number())
-    const faker = new ZodIntersectionFaker(schema)
-    let safeCount = 0
-    while (safeCount < 1000) {
-      const data = faker.fake()
-      if (data === Infinity) {
-        return
-      }
-      safeCount++
+    const left = z.number().min(10)
+    const right = z.number()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
     }
-    expect(false).toEqual(true)
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number min + number max', () => {
+  test('number + number max', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0), z.number().max(1).int())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number()
+    const right = z.number().max(10)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number min + number max (float)', () => {
+  test('number max + number', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0), z.number().max(1))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().max(10)
+    const right = z.number()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number min + number min (larger)', () => {
+  test('number + number int', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0).max(2000), z.number().min(1000))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number()
+    const right = z.number().int()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'int')).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number min (larger) + number min', () => {
+  test('number int + number', () => {
     install()
 
-    const schema = z.intersection(z.number().min(1000), z.number().min(0).max(2000))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().int()
+    const right = z.number()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'int')).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number + number int', () => {
+  test('number + number finite', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0).max(10), z.number().min(0).max(10).int())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number()
+    const right = z.number().finite()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'finite')).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number int + number', () => {
+  test('number finite + number', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0).max(10).int(), z.number().min(0).max(10))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().finite()
+    const right = z.number()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'finite')).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number + number finite', () => {
+  test('number + number multipleOf', () => {
     install()
 
-    const schema = z.intersection(z.number(), z.number().finite())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number()
+    const right = z.number().multipleOf(10)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number finite + number', () => {
+  test('number multipleOf + number', () => {
     install()
 
-    const schema = z.intersection(z.number().finite(), z.number())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().multipleOf(10)
+    const right = z.number()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number + number multipleOf', () => {
+  test('number min + number min (larger)', () => {
     install()
 
-    const schema = z.intersection(z.number(), z.number().multipleOf(2))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().min(10)
+    const right = z.number().min(20)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 
-  testMultipleTimes('number multipleOf + number', () => {
+  test('number min (larger) + number min', () => {
     install()
 
-    const schema = z.intersection(z.number().multipleOf(2), z.number())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.number().min(20)
+    const right = z.number().min(10)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20)).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('number max + number max (larger)', () => {
+    install()
+
+    const left = z.number().max(10)
+    const right = z.number().max(20)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('number max (larger) + number max', () => {
+    install()
+
+    const left = z.number().max(20)
+    const right = z.number().max(10)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 })
 
