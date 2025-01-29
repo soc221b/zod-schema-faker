@@ -1088,6 +1088,152 @@ describe('union/or', () => {
   })
 })
 
+describe('discriminatedUnion', () => {
+  test('discriminated union + discriminated union (different discriminator)', () => {
+    install()
+
+    const schema = z.intersection(
+      z.discriminatedUnion('foo', [z.object({ foo: z.literal('a'), a: z.date() })]),
+      z.discriminatedUnion('bar', [z.object({ bar: z.literal('a'), a: z.date() })]),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  test('discriminated union + discriminated union (different discriminator value)', () => {
+    install()
+
+    const schema = z.intersection(
+      z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })]),
+      z.discriminatedUnion('type', [z.object({ type: z.literal('b'), b: z.date() })]),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  test('discriminated union + discriminated union', () => {
+    install()
+
+    const left = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date().min(new Date(123)) })])
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date().max(new Date(987)) })])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
+      const options = result.schema._def.options
+      expect(options.length).toBe(1)
+      const option = options[0]
+      if (option instanceof z.ZodObject) {
+        const a = option.shape.a
+        if (a instanceof z.ZodDate) {
+          expect(a._def.checks.length).toBe(2)
+          expect(
+            a._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+          ).toBeTruthy()
+          expect(
+            a._def.checks.find(check => check.kind === 'max' && check.value === new Date(987).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(5)
+  })
+
+  test('object + discriminated union', () => {
+    install()
+
+    const left = z.object({ type: z.string(), a: z.date().min(new Date(123)) })
+    const right = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('a'), a: z.date().max(new Date(456)) }),
+      z.object({ type: z.literal('b'), a: z.date().max(new Date(789)) }),
+    ])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
+      const options = result.schema._def.options
+      expect(options.length).toBe(2)
+      const firstOption = options[0]
+      if (firstOption instanceof z.ZodObject) {
+        const a = firstOption.shape.a
+        if (a instanceof z.ZodDate) {
+          expect(a._def.checks.length).toBe(2)
+          expect(
+            a._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+          ).toBeTruthy()
+          expect(
+            a._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+          ).toBeTruthy()
+        }
+      }
+      const secondOption = options[1]
+      if (secondOption instanceof z.ZodObject) {
+        const a = secondOption.shape.a
+        if (a instanceof z.ZodDate) {
+          expect(a._def.checks.length).toBe(2)
+          expect(
+            a._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+          ).toBeTruthy()
+          expect(
+            a._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(8)
+  })
+
+  test('discriminated union + object', () => {
+    install()
+
+    const left = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('a'), a: z.date().min(new Date(123)) }),
+      z.object({ type: z.literal('b'), a: z.date().min(new Date(456)) }),
+    ])
+    const right = z.object({ type: z.string(), a: z.date().max(new Date(789)) })
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
+      const options = result.schema._def.options
+      expect(options.length).toBe(2)
+      const firstOption = options[0]
+      if (firstOption instanceof z.ZodObject) {
+        const a = firstOption.shape.a
+        if (a instanceof z.ZodDate) {
+          expect(a._def.checks.length).toBe(2)
+          expect(
+            a._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+          ).toBeTruthy()
+          expect(
+            a._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+          ).toBeTruthy()
+        }
+      }
+      const secondOption = options[1]
+      if (secondOption instanceof z.ZodObject) {
+        const a = secondOption.shape.a
+        if (a instanceof z.ZodDate) {
+          expect(a._def.checks.length).toBe(2)
+          expect(
+            a._def.checks.find(check => check.kind === 'min' && check.value === new Date(456).getTime()),
+          ).toBeTruthy()
+          expect(
+            a._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(8)
+  })
+})
+
 describe('number', () => {
   testMultipleTimes('number + number', () => {
     install()

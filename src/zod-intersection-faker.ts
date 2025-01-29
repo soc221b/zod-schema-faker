@@ -56,6 +56,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForRecord,
       this.findIntersectedSchemaForTuple,
       this.findIntersectedSchemaForUnion,
+      this.findIntersectedSchemaForDiscriminatedUnion,
       this.findIntersectedSchemaForNumber,
       this.findIntersectedSchemaForString,
       this.findIntersectedSchemaForVoid,
@@ -522,6 +523,85 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForDiscriminatedUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodDiscriminatedUnion || right instanceof z.ZodDiscriminatedUnion) {
+      if (left instanceof z.ZodObject && right instanceof z.ZodDiscriminatedUnion) {
+        const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
+        for (let rightOption of right._def.options) {
+          const result = left.shape[right._def.discriminator].safeParse(
+            fake(rightOption.shape[right._def.discriminator]),
+          )
+          if (result.success) {
+            leftDiscriminatedUnionOptions.push(
+              left.merge(
+                z.object({
+                  [right._def.discriminator]: rightOption.shape[right._def.discriminator],
+                }),
+              ),
+            )
+          }
+        }
+        if (leftDiscriminatedUnionOptions.length === 0) {
+          return { success: false }
+        }
+        left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
+      }
+      if (right instanceof z.ZodObject && left instanceof z.ZodDiscriminatedUnion) {
+        const rightDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
+        for (let leftOption of left._def.options) {
+          const result = right.shape[left._def.discriminator].safeParse(fake(leftOption.shape[left._def.discriminator]))
+          if (result.success) {
+            rightDiscriminatedUnionOptions.push(
+              right.merge(
+                z.object({
+                  [left._def.discriminator]: leftOption.shape[left._def.discriminator],
+                }),
+              ),
+            )
+          }
+        }
+        if (rightDiscriminatedUnionOptions.length === 0) {
+          return { success: false }
+        }
+        right = z.discriminatedUnion(left._def.discriminator, rightDiscriminatedUnionOptions as any)
+      }
+    }
+    if (left instanceof z.ZodDiscriminatedUnion === false || right instanceof z.ZodDiscriminatedUnion === false) {
+      return { success: false }
+    }
+
+    if (left._def.discriminator !== right._def.discriminator) {
+      return { success: false }
+    }
+
+    const leftOptions = left._def.options as z.ZodObject<any, any>[]
+    const rightOptions = right._def.options as z.ZodObject<any, any>[]
+    const options = [] as z.ZodObject<any, any>[]
+    for (let leftOption of leftOptions) {
+      const leftDiscriminatorSchema = leftOption.shape[left._def.discriminator] as z.ZodLiteral<any>
+      for (let rightOption of rightOptions) {
+        const rightDiscriminatorSchema = rightOption.shape[right._def.discriminator] as z.ZodLiteral<any>
+
+        if (leftDiscriminatorSchema._def.value === rightDiscriminatorSchema._def.value) {
+          const result = this.findIntersectedSchema(leftOption, rightOption)
+          if (result.success) {
+            if (result.schema instanceof z.ZodObject) {
+              options.push(result.schema)
+            }
+          }
+        }
+      }
+    }
+    if (options.length === 0) {
+      return { success: false }
+    }
+
+    return { success: true, schema: z.discriminatedUnion(left._def.discriminator, options as any) }
   }
 
   private findIntersectedSchemaForNumber = (
