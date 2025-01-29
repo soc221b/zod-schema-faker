@@ -144,12 +144,18 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (left instanceof z.ZodIntersection) {
       const result = this.findIntersectedSchema(left._def.left, left._def.right)
       if (result.success) {
-        return { success: true, schema: z.intersection(result.schema, right) }
+        const result2 = this.findIntersectedSchema(result.schema, right)
+        if (result2.success) {
+          return { success: true, schema: result2.schema }
+        }
       }
     } else if (right instanceof z.ZodIntersection) {
       const result = this.findIntersectedSchema(right._def.left, right._def.right)
       if (result.success) {
-        return { success: true, schema: z.intersection(left, result.schema) }
+        const result2 = this.findIntersectedSchema(left, result.schema)
+        if (result2.success) {
+          return { success: true, schema: result2.schema }
+        }
       }
     }
 
