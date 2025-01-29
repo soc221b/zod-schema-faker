@@ -324,6 +324,12 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     const length = (() => {
+      if (left._def.exactLength !== null) {
+        return left._def.exactLength.value
+      }
+      if (right._def.exactLength !== null) {
+        return right._def.exactLength.value
+      }
       const minLength = Math.max(left._def.minLength?.value ?? 0, right._def.minLength?.value ?? 0)
       const maxLength =
         typeof left._def.maxLength?.value === 'number' || typeof right._def.maxLength?.value === 'number'

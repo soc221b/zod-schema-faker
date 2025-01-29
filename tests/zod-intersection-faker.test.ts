@@ -550,19 +550,19 @@ describe('array', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('array + array optional', () => {
+  testMultipleTimes('array + array length', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()), z.array(z.date()).optional())
+    const schema = z.intersection(z.array(z.date()), z.array(z.date()).length(3))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('array optional + array', () => {
+  testMultipleTimes('array length + array', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()).optional(), z.array(z.date()))
+    const schema = z.intersection(z.array(z.date()).length(3), z.array(z.date()))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
