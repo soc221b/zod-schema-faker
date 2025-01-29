@@ -639,6 +639,14 @@ describe('union', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data: data })
   })
+
+  testMultipleTimes('union + union (no common value)', () => {
+    install()
+
+    const schema = z.intersection(z.union([z.number(), z.date()]), z.union([z.string(), z.boolean()]))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
 })
 
 describe('number', () => {
@@ -806,7 +814,6 @@ describe('nativeEnum', () => {
       A,
       B,
     }
-
     const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Foo))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
