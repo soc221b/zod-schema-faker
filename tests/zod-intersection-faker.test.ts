@@ -694,7 +694,34 @@ describe('number', () => {
   testMultipleTimes('number min + number max', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0), z.number().max(0))
+    const schema = z.intersection(z.number().min(0), z.number().max(1).int())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number min + number max (float)', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0), z.number().max(1))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number min + number min (larger)', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0).max(2000), z.number().min(1000))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number min (larger) + number min', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(1000), z.number().min(0).max(2000))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
