@@ -1110,7 +1110,7 @@ describe('bigint', () => {
   testMultipleTimes('bigint + bigint min', () => {
     install()
 
-    const schema = z.intersection(z.bigint(), z.bigint().min(-100n))
+    const schema = z.intersection(z.bigint(), z.bigint().min(10000n))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -1119,7 +1119,7 @@ describe('bigint', () => {
   testMultipleTimes('bigint min + bigint', () => {
     install()
 
-    const schema = z.intersection(z.bigint().min(-100n), z.bigint())
+    const schema = z.intersection(z.bigint().min(10000n), z.bigint())
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -1128,7 +1128,7 @@ describe('bigint', () => {
   testMultipleTimes('bigint + bigint max', () => {
     install()
 
-    const schema = z.intersection(z.bigint(), z.bigint().max(-100n))
+    const schema = z.intersection(z.bigint(), z.bigint().max(-10000n))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -1137,7 +1137,7 @@ describe('bigint', () => {
   testMultipleTimes('bigint max + bigint', () => {
     install()
 
-    const schema = z.intersection(z.bigint().max(-100n), z.bigint())
+    const schema = z.intersection(z.bigint().max(-10000n), z.bigint())
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -1156,6 +1156,96 @@ describe('bigint', () => {
     install()
 
     const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint min + bigint max', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().min(10000n), z.bigint().max(10000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint max + bigint min', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().max(10000n), z.bigint().min(10000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint min + bigint multipleOf', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().min(10000n), z.bigint().multipleOf(31n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint multipleOf + bigint min', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint().min(10000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint max + bigint multipleOf', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().max(10000n), z.bigint().multipleOf(31n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint multipleOf + bigint max', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint().max(10000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint min (larger)+ bigint min', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().min(20000n), z.bigint().min(10000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint min + bigint min (larger)', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().min(10000n), z.bigint().min(20000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint max (larger) + bigint max', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().max(-10000n), z.bigint().max(-20000n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint max + bigint max (larger)', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().max(-20000n), z.bigint().max(-10000n))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })

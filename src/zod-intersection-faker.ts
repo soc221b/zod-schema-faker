@@ -64,7 +64,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForEnum,
       this.findIntersectedSchemaForLiteral,
       this.findIntersectedSchemaForBoolean,
-      this.findIntersectedSchemaForBigInt,
+      this.findIntersectedSchemaForBigint,
     ]
     for (const fn of fns) {
       const result = fn(leftSchema, rightSchema)
@@ -750,7 +750,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, schema: left }
   }
 
-  private findIntersectedSchemaForBigInt = (
+  private findIntersectedSchemaForBigint = (
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
