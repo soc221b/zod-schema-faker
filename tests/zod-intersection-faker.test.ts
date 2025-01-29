@@ -962,6 +962,60 @@ describe('string', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
+
+  testMultipleTimes('string min + string min', () => {
+    install()
+
+    const schema = z.intersection(z.string().min(100), z.string().min(200))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string max + string max', () => {
+    install()
+
+    const schema = z.intersection(z.string().max(100), z.string().max(200))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string min + string length', () => {
+    install()
+
+    const schema = z.intersection(z.string().min(100), z.string().length(200))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string length + string min', () => {
+    install()
+
+    const schema = z.intersection(z.string().length(200), z.string().min(100))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string max + string length', () => {
+    install()
+
+    const schema = z.intersection(z.string().max(200), z.string().length(100))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string length + string max', () => {
+    install()
+
+    const schema = z.intersection(z.string().length(100), z.string().max(200))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
 describe('void', () => {

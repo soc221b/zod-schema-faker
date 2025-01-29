@@ -627,14 +627,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     for (let check of right._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = Math.min(min ?? check.value, check.value)
+          min = Math.max(min ?? check.value, check.value)
           break
         case 'max':
-          max = Math.max(max ?? check.value, check.value)
+          max = Math.min(max ?? check.value, check.value)
           break
         case 'length':
-          min = Math.min(min ?? check.value, check.value)
-          max = Math.max(max ?? check.value, check.value)
+          min = Math.max(min ?? check.value, check.value)
+          max = Math.min(max ?? check.value, check.value)
           break
         case 'endsWith':
           endsWith = check.value
