@@ -662,7 +662,7 @@ describe('number', () => {
   testMultipleTimes('number (-Infinity)', () => {
     install()
 
-    const schema = z.intersection(z.number().max(0), z.number().max(0))
+    const schema = z.intersection(z.number(), z.number())
     const faker = new ZodIntersectionFaker(schema)
     let safeCount = 0
     while (safeCount < 1000) {
@@ -678,7 +678,7 @@ describe('number', () => {
   testMultipleTimes('number (Infinity)', () => {
     install()
 
-    const schema = z.intersection(z.number().min(0), z.number().min(0))
+    const schema = z.intersection(z.number(), z.number())
     const faker = new ZodIntersectionFaker(schema)
     let safeCount = 0
     while (safeCount < 1000) {
