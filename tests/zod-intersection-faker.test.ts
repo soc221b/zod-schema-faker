@@ -1641,6 +1641,15 @@ describe('literal', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
+
+  test('literal + literal (no common value)', () => {
+    install()
+
+    const schema = z.intersection(z.literal('foo'), z.literal('bar'))
+    const faker = new ZodIntersectionFaker(schema)
+
+    expect(() => faker.fake()).toThrow()
+  })
 })
 
 describe('boolean', () => {
