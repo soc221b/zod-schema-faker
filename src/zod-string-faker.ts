@@ -174,6 +174,14 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     if (trim) {
       result = result.replace(/\s$/, 'a')
     }
+    if (toLowercase) {
+      result = result.toLowerCase()
+    } else {
+      result = result.replace(/./g, c => (runFake(faker => faker.datatype.boolean()) ? c.toUpperCase() : c))
+    }
+    if (toUppercase) {
+      result = result.toUpperCase()
+    }
     if (includes) {
       result = runFake(faker => faker.datatype.boolean())
         ? includes + result.slice(includes.length)
@@ -184,12 +192,6 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     }
     if (endsWith) {
       result = result.slice(-1 * endsWith.length) + endsWith
-    }
-    if (toLowercase) {
-      result = result.toLowerCase()
-    }
-    if (toUppercase) {
-      result = result.toUpperCase()
     }
     if (emoji) {
       result = Array(result.length - (result.length % 2))
