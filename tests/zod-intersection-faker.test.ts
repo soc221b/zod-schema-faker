@@ -973,11 +973,23 @@ describe('readonly', () => {
 })
 
 describe('lazy', () => {
-  testMultipleTimes('lazy', () => {
+  testMultipleTimes('lazy + non-lazy', () => {
     install()
 
     const schema = z.intersection(
       z.lazy(() => z.date()),
+      z.date(),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('non-lazy + lazy', () => {
+    install()
+
+    const schema = z.intersection(
+      z.date(),
       z.lazy(() => z.date()),
     )
     const faker = new ZodIntersectionFaker(schema)
