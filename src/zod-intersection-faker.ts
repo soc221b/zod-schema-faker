@@ -418,25 +418,35 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    if (left._def.items.length >= right._def.items.length) {
-      const rest = right._def.rest ?? z.any()
-      return {
-        success: true,
-        schema: z.tuple([
-          ...(left._def.items as z.ZodAny[]).slice(0, right._def.items.length),
-          ...(left._def.items as z.ZodAny[]).slice(right._def.items.length).map(type => z.intersection(type, rest)),
-        ] as any),
-      }
-    } else {
-      const rest = left._def.rest ?? z.any()
-      return {
-        success: true,
-        schema: z.tuple([
-          ...(left._def.items as z.ZodAny[]).slice(0, left._def.items.length),
-          ...(right._def.items as z.ZodAny[]).slice(left._def.items.length).map(type => z.intersection(type, rest)),
-        ] as any),
+    const items: z.ZodType[] = []
+    let rest: z.ZodType | undefined = undefined
+    for (let i = 0; i < Math.min(left._def.items.length, right._def.items.length); ++i) {
+      const result = this.findIntersectedSchema(left._def.items[i], right._def.items[i])
+      if (result.success) {
+        items.push(result.schema)
       }
     }
+    for (let i = left._def.items.length; i < right._def.items.length; ++i) {
+      const result = this.findIntersectedSchema(left._def.rest, right._def.items[i])
+      if (result.success) {
+        items.push(result.schema)
+      }
+    }
+    for (let i = right._def.items.length; i < left._def.items.length; ++i) {
+      const result = this.findIntersectedSchema(left._def.items[i], right._def.rest)
+      if (result.success) {
+        items.push(result.schema)
+      }
+    }
+    if (left._def.rest !== undefined && right._def.rest !== undefined) {
+      const result = this.findIntersectedSchema(left._def.rest, right._def.rest)
+      if (result.success) {
+        rest = result.schema
+      }
+    }
+    let schema: z.ZodTuple<any, any> = z.tuple(items as any)
+    if (rest !== undefined) schema = schema.rest(rest)
+    return { success: true, schema }
   }
 
   private findIntersectedSchemaForUnion = (

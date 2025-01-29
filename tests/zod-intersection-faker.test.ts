@@ -824,40 +824,124 @@ describe('tuple', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data: data })
   })
 
-  testMultipleTimes('tuple + tuple rest any', () => {
+  test('tuple [date] + tuple [date]', () => {
     install()
 
-    const schema = z.intersection(z.tuple([z.date(), z.number(), z.string()]), z.tuple([z.date()]).rest(z.any()))
+    const left = z.tuple([z.date().min(new Date(123))])
+    const right = z.tuple([z.date().max(new Date(456))])
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(1)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      expect(result.schema._def.rest).toBeNull()
+    }
+    expect.assertions(5)
   })
 
-  testMultipleTimes('tuple rest any + tuple', () => {
+  test('tuple [date, number] + tuple [date, ...number]', () => {
     install()
 
-    const schema = z.intersection(z.tuple([z.date()]).rest(z.any()), z.tuple([z.date(), z.number(), z.string()]))
+    const left = z.tuple([z.date().min(new Date(123)), z.number().min(321)])
+    const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodNumber) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(secondItem._def.checks.find(check => check.kind === 'min' && check.value === 321)).toBeTruthy()
+        expect(secondItem._def.checks.find(check => check.kind === 'max' && check.value === 654)).toBeTruthy()
+      }
+      expect(result.schema._def.rest).toBeNull()
+    }
+    expect.assertions(8)
   })
 
-  testMultipleTimes('tuple rest + tuple (intersection)', () => {
+  test('tuple [date, ...number] + tuple [date, number]', () => {
     install()
 
-    const schema = z.intersection(z.tuple([z.date()]).rest(z.number().min(0)), z.tuple([z.date(), z.number().max(0)]))
+    const left = z.tuple([z.date().min(new Date(123))]).rest(z.number().min(321))
+    const right = z.tuple([z.date().max(new Date(456)), z.number().max(654)])
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodNumber) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(secondItem._def.checks.find(check => check.kind === 'min' && check.value === 321)).toBeTruthy()
+        expect(secondItem._def.checks.find(check => check.kind === 'max' && check.value === 654)).toBeTruthy()
+      }
+      expect(result.schema._def.rest).toBeNull()
+    }
+    expect.assertions(8)
   })
 
-  testMultipleTimes('tuple + tuple rest (intersection)', () => {
+  test('tuple [date, ...number] + tuple [date, ...number]', () => {
     install()
 
-    const schema = z.intersection(z.tuple([z.date(), z.number().max(0)]), z.tuple([z.date()]).rest(z.number().min(0)))
+    const left = z.tuple([z.date().min(new Date(123))]).rest(z.number().min(321))
+    const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(1)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      expect(result.schema._def.rest).toBeInstanceOf(z.ZodNumber)
+      const rest = result.schema._def.rest as z.ZodNumber
+      expect(rest._def.checks.length).toBe(2)
+      expect(rest._def.checks.find(check => check.kind === 'min' && check.value === 321)).toBeTruthy()
+      expect(rest._def.checks.find(check => check.kind === 'max' && check.value === 654)).toBeTruthy()
+    }
+    expect.assertions(8)
   })
 })
 
