@@ -171,6 +171,9 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       result += runFake(faker => faker.lorem.word()) + ' '
     }
     result = result.slice(0, max)
+    if (trim) {
+      result = result.replace(/\s$/, 'a')
+    }
     if (includes) {
       result = runFake(faker => faker.datatype.boolean())
         ? includes + result.slice(includes.length)
