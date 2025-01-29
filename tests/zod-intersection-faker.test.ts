@@ -774,7 +774,7 @@ describe('string', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('string + string email', () => {
+  testMultipleTimes('string (dedicated)', () => {
     install()
 
     const schema = z.intersection(z.string(), z.string().email())
