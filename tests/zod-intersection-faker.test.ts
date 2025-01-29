@@ -929,13 +929,46 @@ describe('bigint', () => {
 })
 
 describe('readonly', () => {
-  testMultipleTimes('readonly', () => {
+  testMultipleTimes('readonly array', () => {
     install()
 
     const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('readonly object', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({ foo: z.date().min(new Date(0)) }).readonly(),
+      z.object({ foo: z.date().max(new Date(0)) }).readonly(),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('readonly tuple', () => {
+    install()
+
+    const schema = z.intersection(
+      z.tuple([z.date(), z.number()]).readonly(),
+      z.tuple([z.date(), z.number()]).readonly(),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('readonly record', () => {
+    install()
+
+    const schema = z.intersection(z.record(z.date()).readonly(), z.record(z.date()).readonly())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
   })
 })
 
