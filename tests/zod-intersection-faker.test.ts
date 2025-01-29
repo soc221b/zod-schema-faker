@@ -1897,3 +1897,59 @@ describe('intersection/and', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 })
+
+describe('pipe', () => {
+  test('pipe + number', () => {
+    install()
+
+    const schema = z.intersection(
+      z
+        .string()
+        .transform(value => value.length)
+        .pipe(z.number().min(10)),
+      z.number().max(20),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForPipe'](
+      z
+        .string()
+        .transform(value => value.length)
+        .pipe(z.number().min(10)),
+      z.number().max(20),
+    )
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      const schema = result.schema as z.ZodNumber
+      expect(schema._def.checks.length).toBe(2)
+      expect(schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
+      expect(schema._def.checks.find(check => check.kind === 'max' && check.value === 20)).toBeTruthy()
+    }
+    expect.assertions(3)
+  })
+
+  test('number + pipe', () => {
+    install()
+
+    const schema = z.intersection(
+      z.number().min(10),
+      z
+        .string()
+        .transform(value => value.length)
+        .pipe(z.number().max(20)),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForPipe'](
+      z.number().min(10),
+      z
+        .string()
+        .transform(value => value.length)
+        .pipe(z.number().max(20)),
+    )
+    if (result.success && result.schema instanceof z.ZodNumber) {
+      const schema = result.schema as z.ZodNumber
+      expect(schema._def.checks.length).toBe(2)
+      expect(schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
+      expect(schema._def.checks.find(check => check.kind === 'max' && check.value === 20)).toBeTruthy()
+    }
+    expect.assertions(3)
+  })
+})
