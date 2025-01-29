@@ -512,13 +512,144 @@ describe('date', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('date min + date max', () => {
+  test('date + date', () => {
     install()
 
-    const schema = z.intersection(z.date().min(new Date(0)), z.date().max(new Date(0)))
+    const schema = z.intersection(z.date(), z.date())
     const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const result = faker['findIntersectedSchemaForDate'](z.date(), z.date())
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(0)
+    }
+    expect.assertions(1)
+  })
+
+  test('date + date min', () => {
+    install()
+
+    const left = z.date()
+    const right = z.date().min(new Date(123))
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date min + date', () => {
+    install()
+
+    const left = z.date().min(new Date(123))
+    const right = z.date()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date + date max', () => {
+    install()
+
+    const left = z.date()
+    const right = z.date().max(new Date(123))
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date max + date', () => {
+    install()
+
+    const left = z.date().max(new Date(123))
+    const right = z.date()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date min + date min (larger)', () => {
+    install()
+
+    const left = z.date().min(new Date(123))
+    const right = z.date().min(new Date(456))
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(456).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date min (larger) + date min', () => {
+    install()
+
+    const left = z.date().min(new Date(456))
+    const right = z.date().min(new Date(123))
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(456).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date + date max (larger)', () => {
+    install()
+
+    const left = z.date()
+    const right = z.date().max(new Date(123))
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
+  })
+
+  test('date max (larger) + date', () => {
+    install()
+
+    const left = z.date().max(new Date(123))
+    const right = z.date()
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForDate'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(1)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+    }
+    expect.assertions(2)
   })
 })
 

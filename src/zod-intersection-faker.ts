@@ -1,7 +1,6 @@
 import { UnknownKeysParam, z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
-import { maxDateValue, minDateValue } from './zod-date-faker'
 import { runFake } from './random'
 
 export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends ZodTypeFaker<T> {
@@ -283,15 +282,15 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    let min = minDateValue
-    let max = maxDateValue
+    let min = undefined
+    let max = undefined
     for (let check of left._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = Math.max(min, check.value)
+          min = check.value
           break
         case 'max':
-          max = Math.min(max, check.value)
+          max = check.value
           break
         default: {
           const _: never = check
@@ -301,10 +300,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     for (let check of right._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = Math.max(min, check.value)
+          min = min === undefined ? check.value : min > check.value ? min : check.value
           break
         case 'max':
-          max = Math.min(max, check.value)
+          max = max === undefined ? check.value : max < check.value ? max : check.value
           break
         default: {
           const _: never = check
@@ -312,7 +311,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     }
 
-    return { success: true, schema: z.date().min(new Date(min)).max(new Date(max)) }
+    let schema = z.date()
+    if (min !== undefined) schema = schema.min(new Date(min))
+    if (max !== undefined) schema = schema.max(new Date(max))
+    return { success: true, schema }
   }
 
   private findIntersectedSchemaForArray = (
