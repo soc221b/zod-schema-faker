@@ -516,20 +516,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     }
 
-    if (min === -Infinity && int === false && finite === false && multipleOf === undefined) {
-      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
-        return { success: true, schema: z.literal(-Infinity) }
-      }
-    }
-    if (max === Infinity && int === false && finite === false && multipleOf === undefined) {
-      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
-        return { success: true, schema: z.literal(Infinity) }
-      }
-    }
-
-    min = Math.max(min, Number.MIN_SAFE_INTEGER)
-    max = Math.min(max, Number.MAX_SAFE_INTEGER)
-    let schema = z.number().min(min).max(max)
+    let schema = z.number()
+    if (min !== -Infinity) schema = schema.min(min)
+    if (max !== Infinity) schema = schema.max(max)
+    if (finite) schema = schema.finite()
     if (int) schema = schema.int()
     if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
     return { success: true, schema }
