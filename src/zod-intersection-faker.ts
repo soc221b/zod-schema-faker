@@ -714,7 +714,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodNativeEnum === false || right instanceof z.ZodNativeEnum === false) {
+    if (
+      left instanceof z.ZodNativeEnum === false ||
+      right instanceof z.ZodNativeEnum === false ||
+      left._def.values !== right._def.values
+    ) {
       return { success: false }
     }
 

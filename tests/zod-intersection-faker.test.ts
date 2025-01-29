@@ -1593,6 +1593,23 @@ describe('nativeEnum', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
+
+  test('nativeEnum + nativeEnum (no common value)', () => {
+    install()
+
+    enum Foo {
+      A,
+      B,
+    }
+    enum Bar {
+      C,
+      D,
+    }
+    const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Bar))
+    const faker = new ZodIntersectionFaker(schema)
+
+    expect(() => faker.fake()).toThrow()
+  })
 })
 
 describe('enum', () => {
