@@ -323,22 +323,23 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    const length = (() => {
-      if (left._def.exactLength !== null) {
-        return left._def.exactLength.value
-      }
-      if (right._def.exactLength !== null) {
-        return right._def.exactLength.value
-      }
-      const minLength = Math.max(left._def.minLength?.value ?? 0, right._def.minLength?.value ?? 0)
-      const maxLength =
-        typeof left._def.maxLength?.value === 'number' || typeof right._def.maxLength?.value === 'number'
-          ? Math.min(left._def.maxLength?.value ?? Infinity, right._def.maxLength?.value ?? Infinity)
-          : minLength + 3
-      return fake(z.number().int().min(minLength).max(maxLength))
-    })()
-    const type = z.intersection(left._def.type, right._def.type)
-    return { success: true, schema: z.array(type).length(length) }
+    let minLength = left._def.minLength?.value ?? null
+    let maxLength = left._def.maxLength?.value ?? null
+    let exactLength = left._def.exactLength?.value ?? null
+    if (right._def.minLength !== null) {
+      minLength = Math.max(minLength ?? 0, right._def.minLength.value)
+    }
+    if (right._def.maxLength !== null) {
+      maxLength = Math.min(maxLength ?? Infinity, right._def.maxLength.value)
+    }
+    if (right._def.exactLength !== null) {
+      exactLength = right._def.exactLength.value
+    }
+    let schema = z.array(z.intersection(left._def.type, right._def.type))
+    if (minLength !== null) schema = schema.min(minLength)
+    if (maxLength !== null) schema = schema.max(maxLength)
+    if (exactLength !== null) schema = schema.length(exactLength)
+    return { success: true, schema }
   }
 
   private findIntersectedSchemaForObject = (

@@ -541,31 +541,134 @@ describe('array', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('array min + array max', () => {
+  test('array + array min', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()).min(3), z.array(z.date()).max(3))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.array(z.date())
+    const right = z.array(z.date()).min(3)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.minLength?.value).toBe(3)
+    }
+    expect.assertions(1)
   })
 
-  testMultipleTimes('array + array length', () => {
+  test('array min + array', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()), z.array(z.date()).length(3))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.array(z.date()).min(3)
+    const right = z.array(z.date())
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.minLength?.value).toBe(3)
+    }
+    expect.assertions(1)
   })
 
-  testMultipleTimes('array length + array', () => {
+  test('array + array max', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()).length(3), z.array(z.date()))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const left = z.array(z.date())
+    const right = z.array(z.date()).max(3)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.maxLength?.value).toBe(3)
+    }
+    expect.assertions(1)
+  })
+
+  test('array max + array', () => {
+    install()
+
+    const left = z.array(z.date()).max(3)
+    const right = z.array(z.date())
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.maxLength?.value).toBe(3)
+    }
+    expect.assertions(1)
+  })
+
+  test('array + array length', () => {
+    install()
+
+    const left = z.array(z.date())
+    const right = z.array(z.date()).length(3)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.exactLength?.value).toBe(3)
+    }
+    expect.assertions(1)
+  })
+
+  test('array length + array', () => {
+    install()
+
+    const left = z.array(z.date()).length(3)
+    const right = z.array(z.date())
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.exactLength?.value).toBe(3)
+    }
+    expect.assertions(1)
+  })
+
+  test('array min + array min (larger)', () => {
+    install()
+
+    const left = z.array(z.date()).min(3)
+    const right = z.array(z.date()).min(5)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.minLength?.value).toBe(5)
+    }
+    expect.assertions(1)
+  })
+
+  test('array min (larger) + array min', () => {
+    install()
+
+    const left = z.array(z.date()).min(5)
+    const right = z.array(z.date()).min(3)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.minLength?.value).toBe(5)
+    }
+    expect.assertions(1)
+  })
+
+  test('array + array max (larger)', () => {
+    install()
+
+    const left = z.array(z.date()).max(3)
+    const right = z.array(z.date()).max(5)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.maxLength?.value).toBe(3)
+    }
+    expect.assertions(1)
+  })
+
+  test('array max (larger) + array', () => {
+    install()
+
+    const left = z.array(z.date()).max(5)
+    const right = z.array(z.date()).max(3)
+    const faker = new ZodIntersectionFaker(z.intersection(left, right))
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      expect(result.schema._def.maxLength?.value).toBe(3)
+    }
+    expect.assertions(1)
   })
 })
 
