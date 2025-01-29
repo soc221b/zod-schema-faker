@@ -78,813 +78,855 @@ test('ZodIntersectionFaker.fake should return the given type', () => {
   expectType<TypeEqual<ReturnType<typeof faker.fake>, { name: string } & { role: string }>>(true)
 })
 
-testMultipleTimes('any + any', () => {
-  install()
-
-  const schema = z.intersection(z.any(), z.any())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('any + the other', () => {
-  install()
-
-  const schema = z.intersection(z.any(), z.date())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('the other + any', () => {
-  install()
-
-  const schema = z.intersection(z.date(), z.any())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('unknown + unknown', () => {
-  install()
-
-  const schema = z.intersection(z.unknown(), z.unknown())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('unknown + the other', () => {
-  install()
-
-  const schema = z.intersection(z.unknown(), z.date())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('the other + unknown', () => {
-  install()
-
-  const schema = z.intersection(z.date(), z.unknown())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('undefined + undefined', () => {
-  install()
-
-  const schema = z.intersection(z.undefined(), z.undefined())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('undefined + optional', () => {
-  install()
-
-  const schema = z.intersection(z.undefined(), z.date().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('undefined + non-optional', () => {
-  install()
-
-  const schema = z.intersection(z.undefined(), z.date())
-  const faker = new ZodIntersectionFaker(schema)
-  expect(() => faker.fake()).toThrow()
-})
-
-testMultipleTimes('optional + undefined', () => {
-  install()
-
-  const schema = z.intersection(z.date().optional(), z.undefined())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('optional + optional', () => {
-  install()
-
-  const schema = z.intersection(z.date().optional(), z.string().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('null + null', () => {
-  install()
-
-  const schema = z.intersection(z.null(), z.null())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('null + nullable', () => {
-  install()
-
-  const schema = z.intersection(z.null(), z.string().nullable())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('null + non-nullable', () => {
-  install()
-
-  const schema = z.intersection(z.null(), z.string())
-  const faker = new ZodIntersectionFaker(schema)
-  expect(() => faker.fake()).toThrow()
-})
-
-testMultipleTimes('nullable + null', () => {
-  install()
-
-  const schema = z.intersection(z.string().nullable(), z.null())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullable + nullable', () => {
-  install()
-
-  const schema = z.intersection(z.string().nullable(), z.date().nullable())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + nullish (same type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.date().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + optional (same type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.date().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('optional + nullish (same type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().optional(), z.date().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + nullable (same type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.date().nullable())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullable + nullish (same type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullable(), z.date().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + nullish (different type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.string().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + optional (different type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.string().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('optional + nullish (different type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().optional(), z.string().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullish + nullable (different type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullish(), z.string().nullable())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nullable + nullish (different type)', () => {
-  install()
-
-  const schema = z.intersection(z.date().nullable(), z.string().nullish())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object + object', () => {
-  install()
-
-  const schema = z.intersection(Person, Employee)
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object + object (inner type)', () => {
-  install()
-
-  const schema = z.intersection(
-    z.object({
-      foo: z.string(),
-      date: z.date().min(new Date(0)),
-    }),
-    z.object({
-      bar: z.string(),
-      date: z.date().max(new Date(0)),
-    }),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object + object strict', () => {
-  install()
-
-  const schema = z.intersection(
-    z.object({
-      foo: z.string().optional(),
-    }),
-    z.object({}).strict(),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object strict + object', () => {
-  install()
-
-  const schema = z.intersection(
-    z.object({}).strict(),
-    z.object({
-      foo: z.string().optional(),
-    }),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object catchall + object', () => {
-  install()
-
-  const schema = z.intersection(
-    z.object({}).catchall(z.date().min(new Date(0))),
-    z.object({
-      foo: z.date().max(new Date(0)),
-    }),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object + object catchall', () => {
-  install()
-
-  const schema = z.intersection(
-    z.object({
-      foo: z.date().max(new Date(0)),
-    }),
-    z.object({}).catchall(z.date().min(new Date(0))),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object optional + object', () => {
-  install()
-
-  const schema = z.intersection(z.object({}).optional(), z.object({}))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('object + object optional', () => {
-  install()
-
-  const schema = z.intersection(z.object({}), z.object({}).optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('date + date', () => {
-  install()
-
-  const schema = z.intersection(z.date(), z.date())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('date min + date max', () => {
-  install()
-
-  const schema = z.intersection(z.date().min(new Date(0)), z.date().max(new Date(0)))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('date + date optional', () => {
-  install()
-
-  const schema = z.intersection(z.date(), z.date().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('date optional + date', () => {
-  install()
-
-  const schema = z.intersection(z.date().optional(), z.date())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('array + array', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date()), z.array(z.date()))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('array + array (inner type)', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date().min(new Date(0))), z.array(z.date().max(new Date(0))))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('array min + array max', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date()).min(3), z.array(z.date()).max(3))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('array + array optional', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date()), z.array(z.date()).optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('array optional + array', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date()).optional(), z.array(z.date()))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('record + record', () => {
-  install()
-
-  const schema = z.intersection(z.record(z.date()), z.record(z.date()))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple + tuple', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date(), z.number()]), z.tuple([z.date(), z.number()]))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple + tuple optional', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date(), z.number()]), z.tuple([z.date(), z.number()]).optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple optional + tuple', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date(), z.number()]).optional(), z.tuple([z.date(), z.number()]))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple + tuple rest any', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date(), z.number(), z.string()]), z.tuple([z.date()]).rest(z.any()))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple rest any + tuple', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date()]).rest(z.any()), z.tuple([z.date(), z.number(), z.string()]))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple rest + tuple (intersection)', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date()]).rest(z.number().min(0)), z.tuple([z.date(), z.number().max(0)]))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('tuple + tuple rest (intersection)', () => {
-  install()
-
-  const schema = z.intersection(z.tuple([z.date(), z.number().max(0)]), z.tuple([z.date()]).rest(z.number().min(0)))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('union + union', () => {
-  install()
-
-  const schema = z.intersection(
-    z.union([z.number(), z.date().min(new Date(0))]),
-    z.union([z.date().max(new Date(0)), z.string()]),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-})
-
-testMultipleTimes('number + number', () => {
-  install()
-
-  const schema = z.intersection(z.number(), z.number())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('number (-Infinity)', () => {
-  install()
-
-  const schema = z.intersection(z.number().max(0), z.number().max(0))
-  const faker = new ZodIntersectionFaker(schema)
-  let safeCount = 0
-  while (safeCount < 1000) {
+describe('any', () => {
+  testMultipleTimes('any + any', () => {
+    install()
+
+    const schema = z.intersection(z.any(), z.any())
+    const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
-    if (data === -Infinity) {
-      return
-    }
-    safeCount++
-  }
-  expect(false).toEqual(true)
-})
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 
-testMultipleTimes('number (Infinity)', () => {
-  install()
+  testMultipleTimes('any + the other', () => {
+    install()
 
-  const schema = z.intersection(z.number().min(0), z.number().min(0))
-  const faker = new ZodIntersectionFaker(schema)
-  let safeCount = 0
-  while (safeCount < 1000) {
+    const schema = z.intersection(z.any(), z.date())
+    const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
-    if (data === Infinity) {
-      return
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('the other + any', () => {
+    install()
+
+    const schema = z.intersection(z.date(), z.any())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('unknown', () => {
+  testMultipleTimes('unknown + unknown', () => {
+    install()
+
+    const schema = z.intersection(z.unknown(), z.unknown())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('unknown + the other', () => {
+    install()
+
+    const schema = z.intersection(z.unknown(), z.date())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('the other + unknown', () => {
+    install()
+
+    const schema = z.intersection(z.date(), z.unknown())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('undefined/optional/null/nullable/nullish', () => {
+  testMultipleTimes('undefined + undefined', () => {
+    install()
+
+    const schema = z.intersection(z.undefined(), z.undefined())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('undefined + optional', () => {
+    install()
+
+    const schema = z.intersection(z.undefined(), z.date().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('undefined + non-optional', () => {
+    install()
+
+    const schema = z.intersection(z.undefined(), z.date())
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  testMultipleTimes('optional + undefined', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.undefined())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('optional + optional', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.string().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('null + null', () => {
+    install()
+
+    const schema = z.intersection(z.null(), z.null())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('null + nullable', () => {
+    install()
+
+    const schema = z.intersection(z.null(), z.string().nullable())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('null + non-nullable', () => {
+    install()
+
+    const schema = z.intersection(z.null(), z.string())
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  testMultipleTimes('nullable + null', () => {
+    install()
+
+    const schema = z.intersection(z.string().nullable(), z.null())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullable + nullable', () => {
+    install()
+
+    const schema = z.intersection(z.string().nullable(), z.date().nullable())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + nullish (same type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.date().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + optional (same type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.date().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('optional + nullish (same type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.date().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + nullable (same type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.date().nullable())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullable + nullish (same type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullable(), z.date().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + nullish (different type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.string().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + optional (different type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.string().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('optional + nullish (different type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.string().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullish + nullable (different type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.string().nullable())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('nullable + nullish (different type)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullable(), z.string().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('object', () => {
+  testMultipleTimes('object + object', () => {
+    install()
+
+    const schema = z.intersection(Person, Employee)
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object + object (inner type)', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({
+        foo: z.string(),
+        date: z.date().min(new Date(0)),
+      }),
+      z.object({
+        bar: z.string(),
+        date: z.date().max(new Date(0)),
+      }),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object + object strict', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({
+        foo: z.string().optional(),
+      }),
+      z.object({}).strict(),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object strict + object', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({}).strict(),
+      z.object({
+        foo: z.string().optional(),
+      }),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object catchall + object', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({}).catchall(z.date().min(new Date(0))),
+      z.object({
+        foo: z.date().max(new Date(0)),
+      }),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object + object catchall', () => {
+    install()
+
+    const schema = z.intersection(
+      z.object({
+        foo: z.date().max(new Date(0)),
+      }),
+      z.object({}).catchall(z.date().min(new Date(0))),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object optional + object', () => {
+    install()
+
+    const schema = z.intersection(z.object({}).optional(), z.object({}))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('object + object optional', () => {
+    install()
+
+    const schema = z.intersection(z.object({}), z.object({}).optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('date', () => {
+  testMultipleTimes('date + date', () => {
+    install()
+
+    const schema = z.intersection(z.date(), z.date())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('date min + date max', () => {
+    install()
+
+    const schema = z.intersection(z.date().min(new Date(0)), z.date().max(new Date(0)))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('date + date optional', () => {
+    install()
+
+    const schema = z.intersection(z.date(), z.date().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('date optional + date', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.date())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('array', () => {
+  testMultipleTimes('array + array', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.date()), z.array(z.date()))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('array + array (inner type)', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.date().min(new Date(0))), z.array(z.date().max(new Date(0))))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('array min + array max', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.date()).min(3), z.array(z.date()).max(3))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('array + array optional', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.date()), z.array(z.date()).optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('array optional + array', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.date()).optional(), z.array(z.date()))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
+describe('record', () => {
+  testMultipleTimes('record + record', () => {
+    install()
+
+    const schema = z.intersection(z.record(z.date()), z.record(z.date()))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+})
+
+describe('tuple', () => {
+  testMultipleTimes('tuple + tuple', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date(), z.number()]), z.tuple([z.date(), z.number()]))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple + tuple optional', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date(), z.number()]), z.tuple([z.date(), z.number()]).optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple optional + tuple', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date(), z.number()]).optional(), z.tuple([z.date(), z.number()]))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple + tuple rest any', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date(), z.number(), z.string()]), z.tuple([z.date()]).rest(z.any()))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple rest any + tuple', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date()]).rest(z.any()), z.tuple([z.date(), z.number(), z.string()]))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple rest + tuple (intersection)', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date()]).rest(z.number().min(0)), z.tuple([z.date(), z.number().max(0)]))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+
+  testMultipleTimes('tuple + tuple rest (intersection)', () => {
+    install()
+
+    const schema = z.intersection(z.tuple([z.date(), z.number().max(0)]), z.tuple([z.date()]).rest(z.number().min(0)))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+})
+
+describe('union', () => {
+  testMultipleTimes('union + union', () => {
+    install()
+
+    const schema = z.intersection(
+      z.union([z.number(), z.date().min(new Date(0))]),
+      z.union([z.date().max(new Date(0)), z.string()]),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+  })
+})
+
+describe('number', () => {
+  testMultipleTimes('number + number', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.number())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number (-Infinity)', () => {
+    install()
+
+    const schema = z.intersection(z.number().max(0), z.number().max(0))
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (safeCount < 1000) {
+      const data = faker.fake()
+      if (data === -Infinity) {
+        return
+      }
+      safeCount++
     }
-    safeCount++
-  }
-  expect(false).toEqual(true)
+    expect(false).toEqual(true)
+  })
+
+  testMultipleTimes('number (Infinity)', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0), z.number().min(0))
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (safeCount < 1000) {
+      const data = faker.fake()
+      if (data === Infinity) {
+        return
+      }
+      safeCount++
+    }
+    expect(false).toEqual(true)
+  })
+
+  testMultipleTimes('number min + number max', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0), z.number().max(0))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number + number optional', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.number().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number optional + number', () => {
+    install()
+
+    const schema = z.intersection(z.number().optional(), z.number())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number + number int', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0).max(10), z.number().min(0).max(10).int())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number int + number', () => {
+    install()
+
+    const schema = z.intersection(z.number().min(0).max(10).int(), z.number().min(0).max(10))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number + number finite', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.number().finite())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number finite + number', () => {
+    install()
+
+    const schema = z.intersection(z.number().finite(), z.number())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number + number multipleOf', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.number().multipleOf(2))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('number multipleOf + number', () => {
+    install()
+
+    const schema = z.intersection(z.number().multipleOf(2), z.number())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number min + number max', () => {
-  install()
+describe('string', () => {
+  testMultipleTimes('string + string', () => {
+    install()
 
-  const schema = z.intersection(z.number().min(0), z.number().max(0))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.string(), z.string())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string + string min', () => {
+    install()
+
+    const schema = z.intersection(z.string(), z.string().min(100))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('string + string email', () => {
+    install()
+
+    const schema = z.intersection(z.string(), z.string().email())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number + number optional', () => {
-  install()
+describe('void', () => {
+  testMultipleTimes('void + void', () => {
+    install()
 
-  const schema = z.intersection(z.number(), z.number().optional())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.void(), z.void())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number optional + number', () => {
-  install()
+describe('symbol', () => {
+  testMultipleTimes('symbol + symbol', () => {
+    install()
 
-  const schema = z.intersection(z.number().optional(), z.number())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.symbol(), z.symbol())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number + number int', () => {
-  install()
+describe('nativeEnum', () => {
+  testMultipleTimes('nativeEnum + nativeEnum', () => {
+    install()
 
-  const schema = z.intersection(z.number().min(0).max(10), z.number().min(0).max(10).int())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    enum Foo {
+      A,
+      B,
+    }
+
+    const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Foo))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number int + number', () => {
-  install()
+describe('enum', () => {
+  testMultipleTimes('enum + enum', () => {
+    install()
 
-  const schema = z.intersection(z.number().min(0).max(10).int(), z.number().min(0).max(10))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['foo', 'baz']))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('enum + enum (no common value)', () => {
+    install()
+
+    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['baz', 'qux']))
+    const faker = new ZodIntersectionFaker(schema)
+
+    expect(() => faker.fake()).toThrow()
+  })
 })
 
-testMultipleTimes('number + number finite', () => {
-  install()
+describe('literal', () => {
+  testMultipleTimes('literal + literal', () => {
+    install()
 
-  const schema = z.intersection(z.number(), z.number().finite())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.literal('foo'), z.literal('foo'))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number finite + number', () => {
-  install()
+describe('boolean', () => {
+  testMultipleTimes('boolean + boolean', () => {
+    install()
 
-  const schema = z.intersection(z.number().finite(), z.number())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.boolean(), z.boolean())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number + number multipleOf', () => {
-  install()
+describe('bigint', () => {
+  testMultipleTimes('bigint + bigint', () => {
+    install()
 
-  const schema = z.intersection(z.number(), z.number().multipleOf(2))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.bigint(), z.bigint())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint + bigint min', () => {
+    install()
+
+    const schema = z.intersection(z.bigint(), z.bigint().min(-100n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint min + bigint', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().min(-100n), z.bigint())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint + bigint max', () => {
+    install()
+
+    const schema = z.intersection(z.bigint(), z.bigint().max(-100n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint max + bigint', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().max(-100n), z.bigint())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint + bigint multipleOf', () => {
+    install()
+
+    const schema = z.intersection(z.bigint(), z.bigint().multipleOf(31n))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  testMultipleTimes('bigint multipleOf + bigint', () => {
+    install()
+
+    const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('number multipleOf + number', () => {
-  install()
+describe('readonly', () => {
+  testMultipleTimes('readonly', () => {
+    install()
 
-  const schema = z.intersection(z.number().multipleOf(2), z.number())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('string + string', () => {
-  install()
+describe('lazy', () => {
+  testMultipleTimes('lazy', () => {
+    install()
 
-  const schema = z.intersection(z.string(), z.string())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(
+      z.lazy(() => z.date()),
+      z.lazy(() => z.date()),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
 
-testMultipleTimes('string + string min', () => {
-  install()
+describe('intersection/and', () => {
+  testMultipleTimes('intersection/and', () => {
+    install()
 
-  const schema = z.intersection(z.string(), z.string().min(100))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('string + string email', () => {
-  install()
-
-  const schema = z.intersection(z.string(), z.string().email())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('void + void', () => {
-  install()
-
-  const schema = z.intersection(z.void(), z.void())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('symbol + symbol', () => {
-  install()
-
-  const schema = z.intersection(z.symbol(), z.symbol())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('nativeEnum + nativeEnum', () => {
-  install()
-
-  enum Foo {
-    A,
-    B,
-  }
-
-  const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Foo))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('enum + enum', () => {
-  install()
-
-  const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['foo', 'baz']))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('enum + enum (no common value)', () => {
-  install()
-
-  const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['baz', 'qux']))
-  const faker = new ZodIntersectionFaker(schema)
-
-  expect(() => faker.fake()).toThrow()
-})
-
-testMultipleTimes('literal + literal', () => {
-  install()
-
-  const schema = z.intersection(z.literal('foo'), z.literal('foo'))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('boolean + boolean', () => {
-  install()
-
-  const schema = z.intersection(z.boolean(), z.boolean())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint + bigint', () => {
-  install()
-
-  const schema = z.intersection(z.bigint(), z.bigint())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint + bigint min', () => {
-  install()
-
-  const schema = z.intersection(z.bigint(), z.bigint().min(-100n))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint min + bigint', () => {
-  install()
-
-  const schema = z.intersection(z.bigint().min(-100n), z.bigint())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint + bigint max', () => {
-  install()
-
-  const schema = z.intersection(z.bigint(), z.bigint().max(-100n))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint max + bigint', () => {
-  install()
-
-  const schema = z.intersection(z.bigint().max(-100n), z.bigint())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint + bigint multipleOf', () => {
-  install()
-
-  const schema = z.intersection(z.bigint(), z.bigint().multipleOf(31n))
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('bigint multipleOf + bigint', () => {
-  install()
-
-  const schema = z.intersection(z.bigint().multipleOf(31n), z.bigint())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('readonly', () => {
-  install()
-
-  const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('lazy', () => {
-  install()
-
-  const schema = z.intersection(
-    z.lazy(() => z.date()),
-    z.lazy(() => z.date()),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
-})
-
-testMultipleTimes('intersection/and', () => {
-  install()
-
-  const schema = z.intersection(
-    z.date().and(z.date().min(new Date(0))),
-    z.intersection(z.date().max(new Date(0)), z.date()),
-  )
-  const faker = new ZodIntersectionFaker(schema)
-  const data = faker.fake()
-  expect(schema.safeParse(data)).toEqual({ success: true, data })
+    const schema = z.intersection(
+      z.date().and(z.date().min(new Date(0))),
+      z.intersection(z.date().max(new Date(0)), z.date()),
+    )
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
 })
