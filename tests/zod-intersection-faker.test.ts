@@ -79,31 +79,38 @@ test('ZodIntersectionFaker.fake should return the given type', () => {
 })
 
 describe('any', () => {
-  testMultipleTimes('any + any', () => {
+  test('any + the other', () => {
     install()
 
-    const schema = z.intersection(z.any(), z.any())
+    const left = z.any()
+    const right = z.date()
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForAny'](left, right)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.schema).toBeInstanceOf(z.ZodDate)
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(3)
   })
 
-  testMultipleTimes('any + the other', () => {
+  test('the other + any', () => {
     install()
 
-    const schema = z.intersection(z.any(), z.date())
+    const left = z.date()
+    const right = z.any()
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForAny'](left, right)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.schema).toBeInstanceOf(z.ZodDate)
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('the other + any', () => {
-    install()
-
-    const schema = z.intersection(z.date(), z.any())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(3)
   })
 })
 
