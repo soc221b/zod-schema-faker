@@ -1043,6 +1043,102 @@ describe('tuple', () => {
   })
 })
 
+describe('array and tuple', () => {
+  test('tuple [date, date] + array [date]', () => {
+    install()
+
+    const left = z.tuple([z.date().min(new Date(123)), z.date().min(new Date(456))]).rest(z.date().min(new Date(789)))
+    const right = z.array(z.date().max(new Date(789)))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodDate) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+      const rest = result.schema._def.rest
+      if (rest instanceof z.ZodDate) {
+        expect(rest._def.checks.length).toBe(2)
+        expect(
+          rest._def.checks.find(check => check.kind === 'min' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+        expect(
+          rest._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(11)
+  })
+
+  test('array [date] + tuple [date, date]', () => {
+    install()
+
+    const left = z.array(z.date().max(new Date(789)))
+    const right = z.tuple([z.date().min(new Date(123)), z.date().min(new Date(456))]).rest(z.date().min(new Date(789)))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodTuple) {
+      const items: any[] = result.schema._def.items
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodDate) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+      const rest = result.schema._def.rest
+      if (rest instanceof z.ZodDate) {
+        expect(rest._def.checks.length).toBe(2)
+        expect(
+          rest._def.checks.find(check => check.kind === 'min' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+        expect(
+          rest._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(11)
+  })
+})
+
 describe('union/or', () => {
   test('union + union', () => {
     install()

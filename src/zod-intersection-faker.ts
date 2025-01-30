@@ -36,6 +36,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {
     const fns = [
+      this.findIntersectedSchemaForArrayAndTuple,
+
       this.findIntersectedSchemaForUndefined,
       this.findIntersectedSchemaForOptional,
 
@@ -72,6 +74,37 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForArrayAndTuple = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodTuple && right instanceof z.ZodArray) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodArray && right instanceof z.ZodTuple) {
+      const items: z.ZodType[] = []
+      for (let i = 0; i < right._def.items.length; ++i) {
+        const result = this.findIntersectedSchema(left._def.type, right._def.items[i])
+        if (result.success) {
+          items.push(result.schema)
+        }
+      }
+      let rest: z.ZodType | undefined = undefined
+      if (right._def.rest !== undefined) {
+        const result = this.findIntersectedSchema(left._def.type, right._def.rest)
+        if (result.success) {
+          rest = result.schema
+        }
+      }
+      let schema: z.ZodTuple<any, any> = z.tuple(items as any)
+      if (rest !== undefined) schema = schema.rest(rest)
+      return this.findIntersectedSchema(schema, right)
     }
 
     return { success: false }
