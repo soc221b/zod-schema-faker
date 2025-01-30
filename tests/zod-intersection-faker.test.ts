@@ -1263,11 +1263,11 @@ describe('non-union and union', () => {
     expect.assertions(4)
   })
 
-  test('union [date min 1, date min 2] + date max', () => {
+  test('date max + union [date min 1, date min 2]', () => {
     install()
 
-    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
-    const right = z.date().max(new Date(456))
+    const left = z.date().max(new Date(456))
+    const right = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker['findIntersectedSchema'](left, right)
