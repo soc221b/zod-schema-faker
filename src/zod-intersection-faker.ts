@@ -213,11 +213,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodUndefined) {
-      const result = this.findIntersectedSchema(left, z.never().optional())
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodUndefined) {
+      return this.findIntersectedSchemaForUndefined(right, left)
     }
 
     return { success: false }
@@ -240,11 +239,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodOptional) {
-      const result = this.findIntersectedSchema(left, right._def.innerType)
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodOptional) {
+      return this.findIntersectedSchemaForOptional(right, left)
     }
 
     if (left instanceof z.ZodOptional && right instanceof z.ZodOptional) {
@@ -292,11 +290,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodNull) {
-      const result = this.findIntersectedSchema(left, z.never().nullable())
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodNull) {
+      return this.findIntersectedSchemaForNull(right, left)
     }
 
     return { success: false }
@@ -319,11 +316,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodNullable) {
-      const result = this.findIntersectedSchema(left, right._def.innerType)
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodNullable) {
+      return this.findIntersectedSchemaForNullable(right, left)
     }
 
     if (left instanceof z.ZodNullable && right instanceof z.ZodNullable) {
@@ -345,14 +341,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           return { success: true, schema: result2.schema }
         }
       }
-    } else if (right instanceof z.ZodIntersection) {
-      const result = this.findIntersectedSchema(right._def.left, right._def.right)
-      if (result.success) {
-        const result2 = this.findIntersectedSchema(left, result.schema)
-        if (result2.success) {
-          return { success: true, schema: result2.schema }
-        }
-      }
+    }
+
+    if (right instanceof z.ZodIntersection) {
+      return this.findIntersectedSchemaForIntersection(right, left)
     }
 
     return { success: false }
@@ -367,11 +359,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodLazy) {
-      const result = this.findIntersectedSchema(left, right._def.getter())
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodLazy) {
+      return this.findIntersectedSchemaForLazy(right, left)
     }
 
     return { success: false }
@@ -386,11 +377,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodReadonly) {
-      const result = this.findIntersectedSchema(left, right._def.innerType)
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodReadonly) {
+      return this.findIntersectedSchemaForReadonly(right, left)
     }
 
     return { success: false }
@@ -405,11 +395,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodPipeline) {
-      const result = this.findIntersectedSchema(left, right._def.out)
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodPipeline) {
+      return this.findIntersectedSchemaForPipe(right, left)
     }
 
     return { success: false }
@@ -424,11 +413,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
-    } else if (right instanceof z.ZodBranded) {
-      const result = this.findIntersectedSchema(left, right._def.type)
-      if (result.success) {
-        return result
-      }
+    }
+
+    if (right instanceof z.ZodBranded) {
+      return this.findIntersectedSchemaForBrand(right, left)
     }
 
     return { success: false }
@@ -440,8 +428,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   ): { success: true; schema: z.ZodType } | { success: false } => {
     if (left instanceof z.ZodUnknown) {
       return { success: true, schema: right }
-    } else if (right instanceof z.ZodUnknown) {
-      return { success: true, schema: left }
+    }
+
+    if (right instanceof z.ZodUnknown) {
+      return this.findIntersectedSchemaForUnknown(right, left)
     }
 
     return { success: false }
@@ -453,8 +443,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   ): { success: true; schema: z.ZodType } | { success: false } => {
     if (left instanceof z.ZodAny) {
       return { success: true, schema: right }
-    } else if (right instanceof z.ZodAny) {
-      return { success: true, schema: left }
+    }
+
+    if (right instanceof z.ZodAny) {
+      return this.findIntersectedSchemaForAny(right, left)
     }
 
     return { success: false }
