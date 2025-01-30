@@ -1153,65 +1153,6 @@ describe('union/or', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data: data })
   })
 
-  test('union [date min, number] + date max', () => {
-    install()
-
-    const left = z.union([z.date().min(new Date(123)), z.number()])
-    const right = z.date().max(new Date(321))
-    const schema = z.intersection(left, right)
-    const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
-    if (result.success && result.schema instanceof z.ZodDate) {
-      expect(result.schema._def.checks.length).toBe(2)
-      expect(
-        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
-      ).toBeTruthy()
-      expect(
-        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(321).getTime()),
-      ).toBeTruthy()
-    }
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(4)
-  })
-
-  test('union [date min 1, date min 2] + date max', () => {
-    install()
-
-    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
-    const right = z.date().max(new Date(456))
-    const schema = z.intersection(left, right)
-    const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
-    if (result.success && result.schema instanceof z.ZodUnion) {
-      const items: any[] = result.schema._def.options
-      expect(items.length).toBe(2)
-      const firstItem = items[0]
-      if (firstItem instanceof z.ZodDate) {
-        expect(firstItem._def.checks.length).toBe(2)
-        expect(
-          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
-        ).toBeTruthy()
-        expect(
-          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
-        ).toBeTruthy()
-      }
-      const secondItem = items[1]
-      if (secondItem instanceof z.ZodDate) {
-        expect(secondItem._def.checks.length).toBe(2)
-        expect(
-          secondItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(321).getTime()),
-        ).toBeTruthy()
-        expect(
-          secondItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
-        ).toBeTruthy()
-      }
-    }
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(8)
-  })
-
   test('union [date min 1, date min 2] + union [date max 1, date max 2]', () => {
     install()
 
@@ -1286,6 +1227,67 @@ describe('union/or', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
     expect.assertions(13)
+  })
+})
+
+describe('non-union and union', () => {
+  test('union [date min, number] + date max', () => {
+    install()
+
+    const left = z.union([z.date().min(new Date(123)), z.number()])
+    const right = z.date().max(new Date(321))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(2)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+      ).toBeTruthy()
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(321).getTime()),
+      ).toBeTruthy()
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
+  })
+
+  test('union [date min 1, date min 2] + date max', () => {
+    install()
+
+    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
+    const right = z.date().max(new Date(456))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodUnion) {
+      const items: any[] = result.schema._def.options
+      expect(items.length).toBe(2)
+      const firstItem = items[0]
+      if (firstItem instanceof z.ZodDate) {
+        expect(firstItem._def.checks.length).toBe(2)
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+        ).toBeTruthy()
+        expect(
+          firstItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+      const secondItem = items[1]
+      if (secondItem instanceof z.ZodDate) {
+        expect(secondItem._def.checks.length).toBe(2)
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'min' && check.value === new Date(321).getTime()),
+        ).toBeTruthy()
+        expect(
+          secondItem._def.checks.find(check => check.kind === 'max' && check.value === new Date(456).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(8)
   })
 })
 
