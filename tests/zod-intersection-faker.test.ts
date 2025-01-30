@@ -1340,7 +1340,9 @@ describe('discriminatedUnion', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
     expect.assertions(5)
   })
+})
 
+describe('object and discriminated union', () => {
   test('object + discriminated union', () => {
     install()
 
@@ -1351,7 +1353,7 @@ describe('discriminatedUnion', () => {
     ])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    const result = faker['findIntersectedSchema'](left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
@@ -1397,7 +1399,7 @@ describe('discriminatedUnion', () => {
     const right = z.object({ type: z.string(), a: z.date().max(new Date(789)) })
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    const result = faker['findIntersectedSchema'](left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
