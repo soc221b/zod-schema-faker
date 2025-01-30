@@ -40,6 +40,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForNonEnumAndEnum,
       this.findIntersectedSchemaForNonUnionAndUnion,
       this.findIntersectedSchemaForArrayAndTuple,
+      this.findIntersectedSchemaForRecordAndObject,
       this.findIntersectedSchemaForObjectAndDiscriminatedUnion,
 
       this.findIntersectedSchemaForUndefined,
@@ -166,6 +167,26 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
       let schema: z.ZodTuple<any, any> = z.tuple(items as any)
       if (rest !== undefined) schema = schema.rest(rest)
+      return this.findIntersectedSchema(schema, right)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForRecordAndObject = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodObject && right instanceof z.ZodRecord) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodRecord && right instanceof z.ZodObject) {
+      const shape = {} as Record<string, z.ZodType>
+      for (const key in right.shape) {
+        shape[key] = left._def.valueType
+      }
+      const schema = z.object(shape)
       return this.findIntersectedSchema(schema, right)
     }
 

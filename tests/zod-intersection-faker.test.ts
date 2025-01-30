@@ -904,6 +904,49 @@ describe('record', () => {
   })
 })
 
+describe('record and object', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.object({ foo: z.string() })
+    const right = z.record(z.date())
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  test('record + object', () => {
+    install()
+
+    const left = z.record(z.string().max(9))
+    const right = z.object({ foo: z.string().min(3), bar: z.string().min(6) })
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForRecordAndObject'](left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const shape = schema.shape
+        const foo = shape['foo']
+        if (foo instanceof z.ZodString) {
+          expect(foo._def.checks.length).toBe(2)
+          expect(foo._def.checks.find(check => check.kind === 'min' && check.value === 3)).toBeTruthy()
+          expect(foo._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+        const bar = shape['bar']
+        if (bar instanceof z.ZodString) {
+          expect(bar._def.checks.length).toBe(2)
+          expect(bar._def.checks.find(check => check.kind === 'min' && check.value === 6)).toBeTruthy()
+          expect(bar._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    expect.assertions(7)
+  })
+})
+
 describe('tuple', () => {
   test('tuple [date] + tuple [date]', () => {
     install()
