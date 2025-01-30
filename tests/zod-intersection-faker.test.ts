@@ -2193,30 +2193,13 @@ describe('intersection/and', () => {
 })
 
 describe('pipe', () => {
-  test('pipe + number', () => {
+  test('pipe ', () => {
     install()
 
     const left = z
       .string()
       .transform(value => value.length)
       .pipe(z.number().min(10))
-    const right = z.number().max(20)
-    const schema = z.intersection(left, right)
-    const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForPipe'](left, right)
-    if (result.success && result.schema instanceof z.ZodNumber) {
-      const schema = result.schema as z.ZodNumber
-      expect(schema._def.checks.length).toBe(2)
-      expect(schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
-      expect(schema._def.checks.find(check => check.kind === 'max' && check.value === 20)).toBeTruthy()
-    }
-    expect.assertions(3)
-  })
-
-  test('number + pipe', () => {
-    install()
-
-    const left = z.number().min(10)
     const right = z
       .string()
       .transform(value => value.length)
@@ -2224,11 +2207,13 @@ describe('pipe', () => {
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker['findIntersectedSchemaForPipe'](left, right)
-    if (result.success && result.schema instanceof z.ZodNumber) {
-      const schema = result.schema as z.ZodNumber
-      expect(schema._def.checks.length).toBe(2)
-      expect(schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
-      expect(schema._def.checks.find(check => check.kind === 'max' && check.value === 20)).toBeTruthy()
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodNumber) {
+        expect(schema._def.checks.length).toBe(2)
+        expect(schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
+        expect(schema._def.checks.find(check => check.kind === 'max' && check.value === 20)).toBeTruthy()
+      }
     }
     expect.assertions(3)
   })
