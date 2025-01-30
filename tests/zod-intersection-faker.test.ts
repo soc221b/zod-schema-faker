@@ -884,13 +884,32 @@ describe('array', () => {
 })
 
 describe('record', () => {
-  testMultipleTimes('record + record', () => {
+  test('record', () => {
     install()
 
-    const schema = z.intersection(z.record(z.date()), z.record(z.date()))
+    const left = z.record(z.date().min(new Date(0)))
+    const right = z.record(z.date().max(new Date(0)))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForRecord'](left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodRecord) {
+        const valueType = schema._def.valueType
+        if (valueType instanceof z.ZodDate) {
+          expect(valueType._def.checks.length).toBe(2)
+          expect(
+            valueType._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            valueType._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    expect.assertions(4)
   })
 })
 
