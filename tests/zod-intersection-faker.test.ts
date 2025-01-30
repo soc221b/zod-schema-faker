@@ -1035,6 +1035,16 @@ describe('tuple', () => {
 })
 
 describe('array and tuple', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.array(z.string())
+    const right = z.tuple([z.literal(1), z.literal(2), z.literal(3)])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
   test('tuple [date, date] + array [date]', () => {
     install()
 
@@ -2014,6 +2024,14 @@ describe('enum', () => {
 })
 
 describe('non-enum and enum', () => {
+  test('unrelated', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.enum(['foo', 'bar']))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
   test('enum + string', () => {
     install()
 
@@ -2054,6 +2072,14 @@ describe('literal', () => {
 })
 
 describe('non-literal and literal', () => {
+  test('unrelated', () => {
+    install()
+
+    const schema = z.intersection(z.string(), z.literal(42))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
   test('literal + string', () => {
     install()
 
