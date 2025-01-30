@@ -1356,6 +1356,16 @@ describe('discriminatedUnion', () => {
 })
 
 describe('object and discriminated union', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.object({ a: z.date() })
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
   test('object + discriminated union', () => {
     install()
 
