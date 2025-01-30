@@ -694,22 +694,32 @@ describe('date', () => {
 })
 
 describe('array', () => {
-  testMultipleTimes('array + array', () => {
+  test('array (inner type)', () => {
     install()
 
-    const schema = z.intersection(z.array(z.date()), z.array(z.date()))
+    const left = z.array(z.date().min(new Date(0)))
+    const right = z.array(z.date().max(new Date(0)))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForArray'](left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodArray) {
+        const type = schema._def.type
+        if (type instanceof z.ZodDate) {
+          expect(type._def.checks.length).toBe(2)
+          expect(
+            type._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            type._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('array + array (inner type)', () => {
-    install()
-
-    const schema = z.intersection(z.array(z.date().min(new Date(0))), z.array(z.date().max(new Date(0))))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
   })
 
   test('array + array min', () => {
