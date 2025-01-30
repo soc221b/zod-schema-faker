@@ -2173,16 +2173,30 @@ describe('lazy', () => {
 })
 
 describe('intersection/and', () => {
-  testMultipleTimes('intersection/and', () => {
+  test('intersection/and', () => {
     install()
 
-    const schema = z.intersection(
-      z.date().and(z.date().min(new Date(0))),
-      z.intersection(z.date().max(new Date(0)), z.date()),
-    )
+    const left = z.date().and(z.date().min(new Date(0)))
+    const right = z.intersection(z.date().max(new Date(0)), z.date())
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForIntersection'](left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodDate) {
+        expect(schema._def.checks.length).toBe(2)
+        expect(
+          schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+        ).toBeTruthy()
+        expect(
+          schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+        ).toBeTruthy()
+      }
+    }
+
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
   })
 })
 
