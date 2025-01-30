@@ -36,7 +36,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {
     const fns = [
+      this.findIntersectedSchemaForUndefined,
       this.findIntersectedSchemaForOptional,
+
+      this.findIntersectedSchemaForNull,
       this.findIntersectedSchemaForNullable,
 
       this.findIntersectedSchemaForIntersection,
@@ -46,9 +49,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
       this.findIntersectedSchemaForUnknown,
       this.findIntersectedSchemaForAny,
-
-      this.findIntersectedSchemaForUndefined,
-      this.findIntersectedSchemaForNull,
 
       this.findIntersectedSchemaForDate,
       this.findIntersectedSchemaForArray,
@@ -69,6 +69,33 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     ]
     for (const fn of fns) {
       const result = fn(leftSchema, rightSchema)
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForUndefined = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodUndefined &&
+      right instanceof z.ZodUndefined &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.undefined() }
+    }
+
+    if (left instanceof z.ZodUndefined) {
+      const result = this.findIntersectedSchema(z.never().optional(), right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodUndefined) {
+      const result = this.findIntersectedSchema(left, z.never().optional())
       if (result.success) {
         return result
       }
@@ -103,6 +130,33 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     if (left instanceof z.ZodOptional && right instanceof z.ZodOptional) {
       return { success: true, schema: z.undefined() }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNull = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodNull &&
+      right instanceof z.ZodNull &&
+      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+    ) {
+      return { success: true, schema: z.null() }
+    }
+
+    if (left instanceof z.ZodNull) {
+      const result = this.findIntersectedSchema(z.never().nullable(), right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodNull) {
+      const result = this.findIntersectedSchema(left, z.never().nullable())
+      if (result.success) {
+        return result
+      }
     }
 
     return { success: false }
@@ -242,60 +296,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: true, schema: right }
     } else if (right instanceof z.ZodAny) {
       return { success: true, schema: left }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForUndefined = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodUndefined &&
-      right instanceof z.ZodUndefined &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
-    ) {
-      return { success: true, schema: z.undefined() }
-    }
-
-    if (left instanceof z.ZodUndefined) {
-      const result = this.findIntersectedSchema(z.never().optional(), right)
-      if (result.success) {
-        return result
-      }
-    } else if (right instanceof z.ZodUndefined) {
-      const result = this.findIntersectedSchema(left, z.never().optional())
-      if (result.success) {
-        return result
-      }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForNull = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodNull &&
-      right instanceof z.ZodNull &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
-    ) {
-      return { success: true, schema: z.null() }
-    }
-
-    if (left instanceof z.ZodNull) {
-      const result = this.findIntersectedSchema(z.never().nullable(), right)
-      if (result.success) {
-        return result
-      }
-    } else if (right instanceof z.ZodNull) {
-      const result = this.findIntersectedSchema(left, z.never().nullable())
-      if (result.success) {
-        return result
-      }
     }
 
     return { success: false }
