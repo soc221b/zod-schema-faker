@@ -2103,6 +2103,31 @@ describe('bigint', () => {
 })
 
 describe('readonly', () => {
+  test('readonly', () => {
+    install()
+
+    const left = z.array(z.date().min(new Date(0))).readonly()
+    const right = z.array(z.date().max(new Date(0))).readonly()
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForReadonly'](left, right)
+    if (result.success && result.schema instanceof z.ZodArray) {
+      const type = result.schema._def.type
+      if (type instanceof z.ZodDate) {
+        expect(type._def.checks.length).toBe(2)
+        expect(
+          type._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+        ).toBeTruthy()
+        expect(
+          type._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+        ).toBeTruthy()
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
+  })
+
   testMultipleTimes('readonly array', () => {
     install()
 
