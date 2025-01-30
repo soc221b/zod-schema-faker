@@ -1502,6 +1502,94 @@ describe('object and discriminated union', () => {
   })
 })
 
+describe('record and discriminated union', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.record(z.date())
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
+  test('record + discriminated union', () => {
+    install()
+
+    const left = z.record(z.string().max(9))
+    const right = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('a'), a: z.string().min(3) }),
+      z.object({ type: z.literal('b'), b: z.string().min(6) }),
+    ])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
+      const options = result.schema._def.options
+      expect(options.length).toBe(2)
+      const firstOption = options[0]
+      if (firstOption instanceof z.ZodObject) {
+        const a = firstOption.shape.a
+        if (a instanceof z.ZodString) {
+          expect(a._def.checks.length).toBe(2)
+          expect(a._def.checks.find(check => check.kind === 'min' && check.value === 3)).toBeTruthy()
+          expect(a._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+      }
+      const secondOption = options[1]
+      if (secondOption instanceof z.ZodObject) {
+        const b = secondOption.shape.b
+        if (b instanceof z.ZodString) {
+          expect(b._def.checks.length).toBe(2)
+          expect(b._def.checks.find(check => check.kind === 'min' && check.value === 6)).toBeTruthy()
+          expect(b._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(8)
+  })
+
+  test('discriminated union + record', () => {
+    install()
+
+    const left = z.discriminatedUnion('type', [
+      z.object({ type: z.literal('a'), a: z.string().min(3) }),
+      z.object({ type: z.literal('b'), b: z.string().min(6) }),
+    ])
+    const right = z.record(z.string().max(9))
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchema'](left, right)
+    if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
+      const options = result.schema._def.options
+      expect(options.length).toBe(2)
+      const firstOption = options[0]
+      if (firstOption instanceof z.ZodObject) {
+        const a = firstOption.shape.a
+        if (a instanceof z.ZodString) {
+          expect(a._def.checks.length).toBe(2)
+          expect(a._def.checks.find(check => check.kind === 'min' && check.value === 3)).toBeTruthy()
+          expect(a._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+      }
+      const secondOption = options[1]
+      if (secondOption instanceof z.ZodObject) {
+        const b = secondOption.shape.b
+        if (b instanceof z.ZodString) {
+          expect(b._def.checks.length).toBe(2)
+          expect(b._def.checks.find(check => check.kind === 'min' && check.value === 6)).toBeTruthy()
+          expect(b._def.checks.find(check => check.kind === 'max' && check.value === 9)).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(8)
+  })
+})
+
 describe('number', () => {
   test('number + number', () => {
     install()

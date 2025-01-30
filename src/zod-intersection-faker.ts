@@ -42,6 +42,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForArrayAndTuple,
       this.findIntersectedSchemaForRecordAndObject,
       this.findIntersectedSchemaForObjectAndDiscriminatedUnion,
+      this.findIntersectedSchemaForRecordAndDiscriminatedUnion,
 
       this.findIntersectedSchemaForUndefined,
       this.findIntersectedSchemaForOptional,
@@ -653,6 +654,36 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
               }),
             ),
           )
+        }
+      }
+      if (leftDiscriminatedUnionOptions.length) {
+        const left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
+        const result = this.findIntersectedSchema(left, right)
+        if (result.success) {
+          return { success: true, schema: result.schema }
+        }
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForRecordAndDiscriminatedUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodRecord) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodRecord && right instanceof z.ZodDiscriminatedUnion) {
+      const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
+      for (let rightOption of right._def.options) {
+        const result = this.findIntersectedSchema(left, rightOption)
+        if (result.success) {
+          if (result.schema instanceof z.ZodObject) {
+            leftDiscriminatedUnionOptions.push(result.schema)
+          }
         }
       }
       if (leftDiscriminatedUnionOptions.length) {
