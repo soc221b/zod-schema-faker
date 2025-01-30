@@ -1150,7 +1150,7 @@ describe('union/or', () => {
     const right = z.date().max(new Date(321))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    const result = faker['findIntersectedSchema'](left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(2)
       expect(
@@ -1172,7 +1172,7 @@ describe('union/or', () => {
     const right = z.date().max(new Date(456))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    const result = faker['findIntersectedSchema'](left, right)
     if (result.success && result.schema instanceof z.ZodUnion) {
       const items: any[] = result.schema._def.options
       expect(items.length).toBe(2)

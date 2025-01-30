@@ -38,6 +38,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const fns = [
       this.findIntersectedSchemaForNonLiteralAndLiteral,
       this.findIntersectedSchemaForNonEnumAndEnum,
+      this.findIntersectedSchemaForNonUnionAndUnion,
       this.findIntersectedSchemaForArrayAndTuple,
       this.findIntersectedSchemaForObjectAndDiscriminatedUnion,
 
@@ -116,6 +117,24 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
       if (values.length) {
         return { success: true, schema: z.enum(values as any) }
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNonUnionAndUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (right instanceof z.ZodUnion === false && left instanceof z.ZodUnion) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodUnion === false && right instanceof z.ZodUnion) {
+      const result = this.findIntersectedSchema(z.union([left, z.never()]), right)
+      if (result.success) {
+        return { success: true, schema: result.schema }
       }
     }
 
@@ -573,14 +592,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUnion || right instanceof z.ZodUnion) {
-      if (left instanceof z.ZodUnion === false) {
-        left = z.union([left, z.never()])
-      }
-      if (right instanceof z.ZodUnion === false) {
-        right = z.union([right, z.never()])
-      }
-    }
     if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
       return { success: false }
     }
