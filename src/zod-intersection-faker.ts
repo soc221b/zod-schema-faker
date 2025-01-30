@@ -54,6 +54,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForLazy,
       this.findIntersectedSchemaForReadonly,
       this.findIntersectedSchemaForPipe,
+      this.findIntersectedSchemaForBrand,
 
       this.findIntersectedSchemaForUnknown,
       this.findIntersectedSchemaForAny,
@@ -384,6 +385,25 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     } else if (right instanceof z.ZodPipeline) {
       const result = this.findIntersectedSchema(left, right._def.out)
+      if (result.success) {
+        return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForBrand = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodBranded) {
+      const result = this.findIntersectedSchema(left._def.type, right)
+      if (result.success) {
+        return result
+      }
+    } else if (right instanceof z.ZodBranded) {
+      const result = this.findIntersectedSchema(left, right._def.type)
       if (result.success) {
         return result
       }

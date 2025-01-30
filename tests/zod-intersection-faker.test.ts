@@ -2560,3 +2560,47 @@ describe('pipe', () => {
     expect.assertions(3)
   })
 })
+
+describe('brand', () => {
+  test('brand ', () => {
+    install()
+
+    const cat = z
+      .object({
+        name: z.string().min(1),
+      })
+      .brand('cat')
+    const dog = z
+      .object({
+        name: z.string().max(5),
+      })
+      .brand('dog')
+    const schema = z.intersection(cat, dog)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForBrand'](cat, dog)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const name = schema.shape.name
+        if (name instanceof z.ZodString) {
+          expect(name._def.checks.length).toBe(2)
+          expect(name._def.checks.find(check => check.kind === 'min' && check.value === 1)).toBeTruthy()
+          expect(name._def.checks.find(check => check.kind === 'max' && check.value === 5)).toBeTruthy()
+        }
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+
+    function acceptCat(_: z.infer<typeof cat>) {}
+    function acceptDog(_: z.infer<typeof dog>) {}
+    acceptCat(data)
+    // @ts-expect-error
+    acceptCat({ name: 'cat' })
+    acceptDog(data)
+    // @ts-expect-error
+    acceptDog({ name: 'dog' })
+
+    expect.assertions(4)
+  })
+})
