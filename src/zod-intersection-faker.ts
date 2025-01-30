@@ -36,6 +36,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {
     const fns = [
+      this.findIntersectedSchemaForNonLiteralAndLiteral,
       this.findIntersectedSchemaForArrayAndTuple,
       this.findIntersectedSchemaForObjectAndDiscriminatedUnion,
 
@@ -74,6 +75,23 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
         return result
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNonLiteralAndLiteral(
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } {
+    if (right instanceof z.ZodLiteral === false && left instanceof z.ZodLiteral) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodLiteral === false && right instanceof z.ZodLiteral) {
+      if (left.safeParse(right._def.value).success) {
+        return { success: true, schema: right }
       }
     }
 

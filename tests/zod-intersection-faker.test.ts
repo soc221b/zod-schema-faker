@@ -2042,6 +2042,26 @@ describe('literal', () => {
   })
 })
 
+describe('non-literal and literal', () => {
+  test('literal + string', () => {
+    install()
+
+    const schema = z.intersection(z.literal('foo'), z.string())
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  test('number + literal', () => {
+    install()
+
+    const schema = z.intersection(z.number(), z.literal(42))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
 describe('boolean', () => {
   testMultipleTimes('boolean + boolean', () => {
     install()
