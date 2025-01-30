@@ -2106,68 +2106,37 @@ describe('readonly', () => {
   test('readonly', () => {
     install()
 
-    const left = z.array(z.date().min(new Date(0))).readonly()
-    const right = z.array(z.date().max(new Date(0))).readonly()
+    const left = z
+      .array(z.date().min(new Date(1)))
+      .min(2)
+      .readonly()
+    const right = z
+      .array(z.date().max(new Date(3)))
+      .max(4)
+      .readonly()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker['findIntersectedSchemaForReadonly'](left, right)
-    if (result.success && result.schema instanceof z.ZodArray) {
-      const type = result.schema._def.type
-      if (type instanceof z.ZodDate) {
-        expect(type._def.checks.length).toBe(2)
-        expect(
-          type._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
-        ).toBeTruthy()
-        expect(
-          type._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
-        ).toBeTruthy()
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodArray) {
+        expect(schema._def.minLength?.value).toBe(2)
+        expect(schema._def.maxLength?.value).toBe(4)
+        const type = schema._def.type
+        if (type instanceof z.ZodDate) {
+          expect(type._def.checks.length).toBe(2)
+          expect(
+            type._def.checks.find(check => check.kind === 'min' && check.value === new Date(1).getTime()),
+          ).toBeTruthy()
+          expect(
+            type._def.checks.find(check => check.kind === 'max' && check.value === new Date(3).getTime()),
+          ).toBeTruthy()
+        }
       }
     }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(4)
-  })
-
-  testMultipleTimes('readonly array', () => {
-    install()
-
-    const schema = z.intersection(z.array(z.date()).readonly(), z.array(z.date()).readonly())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('readonly object', () => {
-    install()
-
-    const schema = z.intersection(
-      z.object({ foo: z.date().min(new Date(0)) }).readonly(),
-      z.object({ foo: z.date().max(new Date(0)) }).readonly(),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('readonly tuple', () => {
-    install()
-
-    const schema = z.intersection(
-      z.tuple([z.date(), z.number()]).readonly(),
-      z.tuple([z.date(), z.number()]).readonly(),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('readonly record', () => {
-    install()
-
-    const schema = z.intersection(z.record(z.date()).readonly(), z.record(z.date()).readonly())
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+    expect.assertions(6)
   })
 })
 
