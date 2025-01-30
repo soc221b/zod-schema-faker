@@ -1231,6 +1231,16 @@ describe('union/or', () => {
 })
 
 describe('non-union and union', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.string()
+    const right = z.union([z.number(), z.date()])
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow()
+  })
+
   test('union [date min, number] + date max', () => {
     install()
 
