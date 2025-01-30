@@ -2147,28 +2147,26 @@ describe('readonly', () => {
 })
 
 describe('lazy', () => {
-  testMultipleTimes('lazy + non-lazy', () => {
+  test('lazy', () => {
     install()
 
-    const schema = z.intersection(
-      z.lazy(() => z.date()),
-      z.date(),
-    )
+    const left = z.lazy(() => z.date().min(new Date(0)))
+    const right = z.lazy(() => z.date().max(new Date(0)))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker['findIntersectedSchemaForLazy'](left, right)
+    if (result.success && result.schema instanceof z.ZodDate) {
+      expect(result.schema._def.checks.length).toBe(2)
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+      ).toBeTruthy()
+      expect(
+        result.schema._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+      ).toBeTruthy()
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('non-lazy + lazy', () => {
-    install()
-
-    const schema = z.intersection(
-      z.date(),
-      z.lazy(() => z.date()),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
   })
 })
 
