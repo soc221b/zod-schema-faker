@@ -2013,6 +2013,26 @@ describe('enum', () => {
   })
 })
 
+describe('non-enum and enum', () => {
+  test('enum + string', () => {
+    install()
+
+    const schema = z.intersection(z.enum(['foo', 'barbaz', 'qux']), z.string().max(3))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  test('string + enum', () => {
+    install()
+
+    const schema = z.intersection(z.string().min(6), z.enum(['foo', 'barbaz', 'qux']))
+    const faker = new ZodIntersectionFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+})
+
 describe('literal', () => {
   test('literal + literal', () => {
     install()
