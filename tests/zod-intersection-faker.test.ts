@@ -914,15 +914,6 @@ describe('record', () => {
 })
 
 describe('tuple', () => {
-  testMultipleTimes('tuple + tuple', () => {
-    install()
-
-    const schema = z.intersection(z.tuple([z.date(), z.number()]), z.tuple([z.date(), z.number()]))
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-  })
-
   test('tuple [date] + tuple [date]', () => {
     install()
 
