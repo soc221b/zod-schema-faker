@@ -39,6 +39,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForUndefined,
       this.findIntersectedSchemaForOptional,
       this.findIntersectedSchemaForDefault,
+      this.findIntersectedSchemaForCatch,
 
       this.findIntersectedSchemaForNull,
       this.findIntersectedSchemaForNullable,
@@ -158,6 +159,34 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     if (left instanceof z.ZodDefault) {
       return this.findIntersectedSchemaForDefault(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForCatch = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (right instanceof z.ZodCatch) {
+      return {
+        success: true,
+        schema: z.union([
+          z.lazy(() =>
+            z.literal(
+              right._def.catchValue({
+                error: new z.ZodError([]),
+                input: undefined,
+              }),
+            ),
+          ),
+          z.intersection(left, right._def.innerType),
+        ]),
+      }
+    }
+
+    if (left instanceof z.ZodCatch) {
+      return this.findIntersectedSchemaForCatch(right, left)
     }
 
     return { success: false }
