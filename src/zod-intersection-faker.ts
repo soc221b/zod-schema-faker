@@ -36,14 +36,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {
     const fns = [
-      this.findIntersectedSchemaForNonLiteralAndLiteral,
-      this.findIntersectedSchemaForNonEnumAndEnum,
-      this.findIntersectedSchemaForNonUnionAndUnion,
-      this.findIntersectedSchemaForArrayAndTuple,
-      this.findIntersectedSchemaForRecordAndObject,
-      this.findIntersectedSchemaForObjectAndDiscriminatedUnion,
-      this.findIntersectedSchemaForRecordAndDiscriminatedUnion,
-
       this.findIntersectedSchemaForUndefined,
       this.findIntersectedSchemaForOptional,
       this.findIntersectedSchemaForDefault,
@@ -60,137 +52,35 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForUnknown,
       this.findIntersectedSchemaForAny,
 
-      this.findIntersectedSchemaForDate,
       this.findIntersectedSchemaForArray,
-      this.findIntersectedSchemaForObject,
-      this.findIntersectedSchemaForRecord,
-      this.findIntersectedSchemaForTuple,
-      this.findIntersectedSchemaForUnion,
-      this.findIntersectedSchemaForDiscriminatedUnion,
-      this.findIntersectedSchemaForNumber,
-      this.findIntersectedSchemaForString,
-      this.findIntersectedSchemaForVoid,
-      this.findIntersectedSchemaForSymbol,
-      this.findIntersectedSchemaForNativeEnum,
-      this.findIntersectedSchemaForEnum,
-      this.findIntersectedSchemaForLiteral,
-      this.findIntersectedSchemaForBoolean,
       this.findIntersectedSchemaForBigint,
+      this.findIntersectedSchemaForBoolean,
+      this.findIntersectedSchemaForDate,
+      this.findIntersectedSchemaForDiscriminatedUnion,
+      this.findIntersectedSchemaForDiscriminatedUnionAndObject,
+      this.findIntersectedSchemaForDiscriminatedUnionAndRecord,
+      this.findIntersectedSchemaForEnum,
+      this.findIntersectedSchemaForEnumAndNonEnum,
+      this.findIntersectedSchemaForLiteral,
+      this.findIntersectedSchemaForLiteralAndNonLiteral,
+      this.findIntersectedSchemaForNativeEnum,
+      this.findIntersectedSchemaForNumber,
+      this.findIntersectedSchemaForObject,
+      this.findIntersectedSchemaForObjectAndRecord,
+      this.findIntersectedSchemaForRecord,
+      this.findIntersectedSchemaForString,
+      this.findIntersectedSchemaForSymbol,
+      this.findIntersectedSchemaForTuple,
+      this.findIntersectedSchemaForTupleAndArray,
+      this.findIntersectedSchemaForUnion,
+      this.findIntersectedSchemaForUnionAndNonUnion,
+      this.findIntersectedSchemaForVoid,
     ]
     for (const fn of fns) {
       const result = fn(leftSchema, rightSchema)
       if (result.success) {
         return result
       }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForNonLiteralAndLiteral(
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } {
-    if (left instanceof z.ZodLiteral && right instanceof z.ZodLiteral === false) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodLiteral === false && right instanceof z.ZodLiteral) {
-      if (left.safeParse(right._def.value).success) {
-        return { success: true, schema: right }
-      }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForNonEnumAndEnum(
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } {
-    if (left instanceof z.ZodEnum && right instanceof z.ZodEnum === false) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodEnum === false && right instanceof z.ZodEnum) {
-      const values = [] as string[]
-      for (let value of right._def.values) {
-        if (left.safeParse(value).success) {
-          values.push(value)
-        }
-      }
-      if (values.length) {
-        return { success: true, schema: z.enum(values as any) }
-      }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForNonUnionAndUnion = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUnion && right instanceof z.ZodUnion === false) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodUnion === false && right instanceof z.ZodUnion) {
-      const result = this.findIntersectedSchema(z.union([left, z.never()]), right)
-      if (result.success) {
-        return { success: true, schema: result.schema }
-      }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForArrayAndTuple = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodTuple && right instanceof z.ZodArray) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodArray && right instanceof z.ZodTuple) {
-      const items: z.ZodType[] = []
-      for (let i = 0; i < right._def.items.length; ++i) {
-        const result = this.findIntersectedSchema(left._def.type, right._def.items[i])
-        if (result.success) {
-          items.push(result.schema)
-        }
-      }
-      let rest: z.ZodType | undefined = undefined
-      if (right._def.rest !== undefined) {
-        const result = this.findIntersectedSchema(left._def.type, right._def.rest)
-        if (result.success) {
-          rest = result.schema
-        }
-      }
-      let schema: z.ZodTuple<any, any> = z.tuple(items as any)
-      if (rest !== undefined) schema = schema.rest(rest)
-      return this.findIntersectedSchema(schema, right)
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForRecordAndObject = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodObject && right instanceof z.ZodRecord) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodRecord && right instanceof z.ZodObject) {
-      const shape = {} as Record<string, z.ZodType>
-      for (const key in right.shape) {
-        shape[key] = left._def.valueType
-      }
-      const schema = z.object(shape)
-      return this.findIntersectedSchema(schema, right)
     }
 
     return { success: false }
@@ -208,14 +98,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: true, schema: z.undefined() }
     }
 
-    if (left instanceof z.ZodUndefined) {
-      const result = this.findIntersectedSchema(z.never().optional(), right)
+    if (right instanceof z.ZodUndefined) {
+      const result = this.findIntersectedSchema(z.never().optional(), left)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodUndefined) {
+    if (left instanceof z.ZodUndefined) {
       return this.findIntersectedSchemaForUndefined(right, left)
     }
 
@@ -234,14 +124,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: true, schema: z.undefined() }
     }
 
-    if (left instanceof z.ZodOptional) {
-      const result = this.findIntersectedSchema(left._def.innerType, right)
+    if (right instanceof z.ZodOptional) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodOptional) {
+    if (left instanceof z.ZodOptional) {
       return this.findIntersectedSchemaForOptional(right, left)
     }
 
@@ -256,17 +146,17 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodDefault) {
+    if (right instanceof z.ZodDefault) {
       return {
         success: true,
         schema: z.union([
-          z.lazy(() => z.literal(left._def.defaultValue())),
-          z.intersection(left._def.innerType, right),
+          z.lazy(() => z.literal(right._def.defaultValue())),
+          z.intersection(left, right._def.innerType),
         ]),
       }
     }
 
-    if (right instanceof z.ZodDefault) {
+    if (left instanceof z.ZodDefault) {
       return this.findIntersectedSchemaForDefault(right, left)
     }
 
@@ -285,14 +175,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: true, schema: z.null() }
     }
 
-    if (left instanceof z.ZodNull) {
-      const result = this.findIntersectedSchema(z.never().nullable(), right)
+    if (right instanceof z.ZodNull) {
+      const result = this.findIntersectedSchema(left, z.never().nullable())
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodNull) {
+    if (left instanceof z.ZodNull) {
       return this.findIntersectedSchemaForNull(right, left)
     }
 
@@ -311,14 +201,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: true, schema: z.null() }
     }
 
-    if (left instanceof z.ZodNullable) {
-      const result = this.findIntersectedSchema(left._def.innerType, right)
+    if (right instanceof z.ZodNullable) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodNullable) {
+    if (left instanceof z.ZodNullable) {
       return this.findIntersectedSchemaForNullable(right, left)
     }
 
@@ -333,17 +223,17 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodIntersection) {
-      const result = this.findIntersectedSchema(left._def.left, left._def.right)
+    if (right instanceof z.ZodIntersection) {
+      const result = this.findIntersectedSchema(left, right._def.left)
       if (result.success) {
-        const result2 = this.findIntersectedSchema(result.schema, right)
+        const result2 = this.findIntersectedSchema(result.schema, right._def.right)
         if (result2.success) {
           return { success: true, schema: result2.schema }
         }
       }
     }
 
-    if (right instanceof z.ZodIntersection) {
+    if (left instanceof z.ZodIntersection) {
       return this.findIntersectedSchemaForIntersection(right, left)
     }
 
@@ -354,14 +244,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodLazy) {
-      const result = this.findIntersectedSchema(left._def.getter(), right)
+    if (right instanceof z.ZodLazy) {
+      const result = this.findIntersectedSchema(left, right._def.getter())
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodLazy) {
+    if (left instanceof z.ZodLazy) {
       return this.findIntersectedSchemaForLazy(right, left)
     }
 
@@ -372,14 +262,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodReadonly) {
-      const result = this.findIntersectedSchema(left._def.innerType, right)
+    if (right instanceof z.ZodReadonly) {
+      const result = this.findIntersectedSchema(left, right._def.innerType)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodReadonly) {
+    if (left instanceof z.ZodReadonly) {
       return this.findIntersectedSchemaForReadonly(right, left)
     }
 
@@ -390,14 +280,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodPipeline) {
-      const result = this.findIntersectedSchema(left._def.out, right)
+    if (right instanceof z.ZodPipeline) {
+      const result = this.findIntersectedSchema(left, right._def.out)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodPipeline) {
+    if (left instanceof z.ZodPipeline) {
       return this.findIntersectedSchemaForPipe(right, left)
     }
 
@@ -408,14 +298,14 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodBranded) {
-      const result = this.findIntersectedSchema(left._def.type, right)
+    if (right instanceof z.ZodBranded) {
+      const result = this.findIntersectedSchema(left, right._def.type)
       if (result.success) {
         return result
       }
     }
 
-    if (right instanceof z.ZodBranded) {
+    if (left instanceof z.ZodBranded) {
       return this.findIntersectedSchemaForBrand(right, left)
     }
 
@@ -426,11 +316,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUnknown) {
-      return { success: true, schema: right }
+    if (right instanceof z.ZodUnknown) {
+      return { success: true, schema: left }
     }
 
-    if (right instanceof z.ZodUnknown) {
+    if (left instanceof z.ZodUnknown) {
       return this.findIntersectedSchemaForUnknown(right, left)
     }
 
@@ -441,15 +331,107 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodAny) {
-      return { success: true, schema: right }
+    if (right instanceof z.ZodAny) {
+      return { success: true, schema: left }
     }
 
-    if (right instanceof z.ZodAny) {
+    if (left instanceof z.ZodAny) {
       return this.findIntersectedSchemaForAny(right, left)
     }
 
     return { success: false }
+  }
+
+  private findIntersectedSchemaForArray = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
+      return { success: false }
+    }
+
+    let minLength = left._def.minLength?.value ?? null
+    let maxLength = left._def.maxLength?.value ?? null
+    let exactLength = left._def.exactLength?.value ?? null
+    if (right._def.minLength !== null) {
+      minLength = Math.max(minLength ?? 0, right._def.minLength.value)
+    }
+    if (right._def.maxLength !== null) {
+      maxLength = Math.min(maxLength ?? Infinity, right._def.maxLength.value)
+    }
+    if (right._def.exactLength !== null) {
+      exactLength = right._def.exactLength.value
+    }
+    const result = this.findIntersectedSchema(left._def.type, right._def.type)
+    if (result.success === false) {
+      return { success: false }
+    }
+    let schema = z.array(result.schema)
+    if (minLength !== null) schema = schema.min(minLength)
+    if (maxLength !== null) schema = schema.max(maxLength)
+    if (exactLength !== null) schema = schema.length(exactLength)
+    return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForBigint = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodBigInt === false || right instanceof z.ZodBigInt === false) {
+      return { success: false }
+    }
+
+    let min: undefined | bigint = undefined
+    let max: undefined | bigint = undefined
+    let multipleOf: undefined | bigint = undefined
+    for (let check of left._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = check.value
+          break
+        case 'max':
+          max = check.value
+          break
+        case 'multipleOf':
+          multipleOf = check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    for (let check of right._def.checks) {
+      switch (check.kind) {
+        case 'min':
+          min = min === undefined ? check.value : min > check.value ? min : check.value
+          break
+        case 'max':
+          max = max === undefined ? check.value : max < check.value ? max : check.value
+          break
+        case 'multipleOf':
+          multipleOf = multipleOf === undefined ? check.value : multipleOf < check.value ? multipleOf : check.value
+          break
+        default: {
+          const _: never = check
+        }
+      }
+    }
+    let schema = z.bigint()
+    if (min !== undefined) schema = schema.min(min)
+    if (max !== undefined) schema = schema.max(max)
+    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
+    return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForBoolean = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodBoolean === false || right instanceof z.ZodBoolean === false) {
+      return { success: false }
+    }
+
+    return { success: true, schema: left }
   }
 
   private findIntersectedSchemaForDate = (
@@ -495,243 +477,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, schema }
   }
 
-  private findIntersectedSchemaForArray = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodArray === false || right instanceof z.ZodArray === false) {
-      return { success: false }
-    }
-
-    let minLength = left._def.minLength?.value ?? null
-    let maxLength = left._def.maxLength?.value ?? null
-    let exactLength = left._def.exactLength?.value ?? null
-    if (right._def.minLength !== null) {
-      minLength = Math.max(minLength ?? 0, right._def.minLength.value)
-    }
-    if (right._def.maxLength !== null) {
-      maxLength = Math.min(maxLength ?? Infinity, right._def.maxLength.value)
-    }
-    if (right._def.exactLength !== null) {
-      exactLength = right._def.exactLength.value
-    }
-    const result = this.findIntersectedSchema(left._def.type, right._def.type)
-    if (result.success === false) {
-      return { success: false }
-    }
-    let schema = z.array(result.schema)
-    if (minLength !== null) schema = schema.min(minLength)
-    if (maxLength !== null) schema = schema.max(maxLength)
-    if (exactLength !== null) schema = schema.length(exactLength)
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForObject = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
-      return { success: false }
-    }
-
-    let schema = z.object({})
-    const leftUnknownKeys = left._def.unknownKeys as UnknownKeysParam
-    const rightUnknownKeys = right._def.unknownKeys as UnknownKeysParam
-    const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
-    for (const key of keys) {
-      const leftValue = left.shape[key]
-      const rightValue = right.shape[key]
-      if (leftValue === undefined) {
-        if (left._def.catchall instanceof z.ZodNever) {
-          switch (leftUnknownKeys) {
-            case 'strict':
-              break
-            default: {
-              const _: 'strip' | 'passthrough' = leftUnknownKeys
-              schema = schema.merge(z.object({ [key]: rightValue }))
-            }
-          }
-        } else {
-          const result = this.findIntersectedSchema(left._def.catchall, rightValue)
-          if (result.success) {
-            schema = schema.merge(z.object({ [key]: result.schema }))
-          } else {
-            return { success: false }
-          }
-        }
-      } else if (rightValue === undefined) {
-        if (right._def.catchall instanceof z.ZodNever) {
-          switch (rightUnknownKeys) {
-            case 'strict':
-              break
-            default: {
-              const _: 'strip' | 'passthrough' = rightUnknownKeys
-              schema = schema.merge(z.object({ [key]: leftValue }))
-            }
-          }
-        } else {
-          const result = this.findIntersectedSchema(leftValue, right._def.catchall)
-          if (result.success) {
-            schema = schema.merge(z.object({ [key]: result.schema }))
-          } else {
-            return { success: false }
-          }
-        }
-      } else {
-        const result = this.findIntersectedSchema(leftValue, rightValue)
-        if (result.success) {
-          schema = schema.merge(z.object({ [key]: result.schema }))
-        } else {
-          return { success: false }
-        }
-      }
-    }
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForRecord = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodRecord === false || right instanceof z.ZodRecord === false) {
-      return { success: false }
-    }
-
-    const result = this.findIntersectedSchema(left._def.valueType, right._def.valueType)
-    if (result.success === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.record(result.schema) }
-  }
-
-  private findIntersectedSchemaForTuple = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodTuple === false || right instanceof z.ZodTuple === false) {
-      return { success: false }
-    }
-
-    const items: z.ZodType[] = []
-    let rest: z.ZodType | undefined = undefined
-    for (let i = 0; i < Math.min(left._def.items.length, right._def.items.length); ++i) {
-      const result = this.findIntersectedSchema(left._def.items[i], right._def.items[i])
-      if (result.success) {
-        items.push(result.schema)
-      }
-    }
-    for (let i = left._def.items.length; i < right._def.items.length; ++i) {
-      const result = this.findIntersectedSchema(left._def.rest, right._def.items[i])
-      if (result.success) {
-        items.push(result.schema)
-      }
-    }
-    for (let i = right._def.items.length; i < left._def.items.length; ++i) {
-      const result = this.findIntersectedSchema(left._def.items[i], right._def.rest)
-      if (result.success) {
-        items.push(result.schema)
-      }
-    }
-    if (left._def.rest !== undefined && right._def.rest !== undefined) {
-      const result = this.findIntersectedSchema(left._def.rest, right._def.rest)
-      if (result.success) {
-        rest = result.schema
-      }
-    }
-    let schema: z.ZodTuple<any, any> = z.tuple(items as any)
-    if (rest !== undefined) schema = schema.rest(rest)
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForUnion = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
-      return { success: false }
-    }
-
-    let schema: z.ZodType | undefined = undefined
-    for (let leftOption of left._def.options) {
-      for (let rightOption of right._def.options) {
-        const result = this.findIntersectedSchema(leftOption, rightOption)
-        if (result.success) {
-          schema = schema === undefined ? result.schema : z.union([schema, result.schema])
-        }
-      }
-    }
-    if (schema === undefined) {
-      return { success: false }
-    }
-
-    return { success: true, schema }
-  }
-
-  private findIntersectedSchemaForObjectAndDiscriminatedUnion = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodObject) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodObject && right instanceof z.ZodDiscriminatedUnion) {
-      const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
-      for (let rightOption of right._def.options) {
-        const result = left.shape[right._def.discriminator].safeParse(fake(rightOption.shape[right._def.discriminator]))
-        if (result.success) {
-          leftDiscriminatedUnionOptions.push(
-            left.merge(
-              z.object({
-                [right._def.discriminator]: rightOption.shape[right._def.discriminator],
-              }),
-            ),
-          )
-        }
-      }
-      if (leftDiscriminatedUnionOptions.length) {
-        const left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
-        const result = this.findIntersectedSchema(left, right)
-        if (result.success) {
-          return { success: true, schema: result.schema }
-        }
-      }
-    }
-
-    return { success: false }
-  }
-
-  private findIntersectedSchemaForRecordAndDiscriminatedUnion = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodRecord) {
-      ;[left, right] = [right, left]
-    }
-
-    if (left instanceof z.ZodRecord && right instanceof z.ZodDiscriminatedUnion) {
-      const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
-      for (let rightOption of right._def.options) {
-        const result = this.findIntersectedSchema(left, rightOption)
-        if (result.success) {
-          if (result.schema instanceof z.ZodObject) {
-            leftDiscriminatedUnionOptions.push(result.schema)
-          }
-        }
-      }
-      if (leftDiscriminatedUnionOptions.length) {
-        const left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
-        const result = this.findIntersectedSchema(left, right)
-        if (result.success) {
-          return { success: true, schema: result.schema }
-        }
-      }
-    }
-
-    return { success: false }
-  }
-
   private findIntersectedSchemaForDiscriminatedUnion = (
     left: z.ZodType,
     right: z.ZodType,
@@ -767,6 +512,156 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, schema: z.discriminatedUnion(left._def.discriminator, options as any) }
+  }
+
+  private findIntersectedSchemaForDiscriminatedUnionAndObject = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodObject) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodObject && right instanceof z.ZodDiscriminatedUnion) {
+      const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
+      for (let rightOption of right._def.options) {
+        const result = left.shape[right._def.discriminator].safeParse(fake(rightOption.shape[right._def.discriminator]))
+        if (result.success) {
+          leftDiscriminatedUnionOptions.push(
+            left.merge(
+              z.object({
+                [right._def.discriminator]: rightOption.shape[right._def.discriminator],
+              }),
+            ),
+          )
+        }
+      }
+      if (leftDiscriminatedUnionOptions.length) {
+        const left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
+        const result = this.findIntersectedSchema(left, right)
+        if (result.success) {
+          return { success: true, schema: result.schema }
+        }
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForDiscriminatedUnionAndRecord = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodRecord) {
+      ;[left, right] = [right, left]
+    }
+
+    if (left instanceof z.ZodRecord && right instanceof z.ZodDiscriminatedUnion) {
+      const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
+      for (let rightOption of right._def.options) {
+        const result = this.findIntersectedSchema(left, rightOption)
+        if (result.success) {
+          if (result.schema instanceof z.ZodObject) {
+            leftDiscriminatedUnionOptions.push(result.schema)
+          }
+        }
+      }
+      if (leftDiscriminatedUnionOptions.length) {
+        const left = z.discriminatedUnion(right._def.discriminator, leftDiscriminatedUnionOptions as any)
+        const result = this.findIntersectedSchema(left, right)
+        if (result.success) {
+          return { success: true, schema: result.schema }
+        }
+      }
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForEnum = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodEnum === false || right instanceof z.ZodEnum === false) {
+      return { success: false }
+    }
+
+    const sharedValues = left._def.values.filter((value: any) => right._def.values.includes(value))
+    if (sharedValues.length === 0) {
+      return { success: false }
+    }
+
+    return { success: true, schema: z.enum(sharedValues) }
+  }
+
+  private findIntersectedSchemaForEnumAndNonEnum = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (right instanceof z.ZodEnum) {
+      const values = [] as string[]
+      for (let value of right._def.values) {
+        if (left.safeParse(value).success) {
+          values.push(value)
+        }
+      }
+      if (values.length) {
+        return { success: true, schema: z.enum(values as any) }
+      }
+    }
+
+    if (left instanceof z.ZodEnum) {
+      return this.findIntersectedSchemaForEnumAndNonEnum(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForLiteral = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodLiteral === false ||
+      right instanceof z.ZodLiteral === false ||
+      left._def.value !== right._def.value
+    ) {
+      return { success: false }
+    }
+
+    return { success: true, schema: left }
+  }
+
+  private findIntersectedSchemaForLiteralAndNonLiteral = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (right instanceof z.ZodLiteral) {
+      if (left.safeParse(right._def.value).success) {
+        return { success: true, schema: right }
+      }
+    }
+
+    if (left instanceof z.ZodLiteral) {
+      return this.findIntersectedSchemaForLiteralAndNonLiteral(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForNativeEnum = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (
+      left instanceof z.ZodNativeEnum === false ||
+      right instanceof z.ZodNativeEnum === false ||
+      left._def.values !== right._def.values
+    ) {
+      return { success: false }
+    }
+
+    return { success: true, schema: left }
   }
 
   private findIntersectedSchemaForNumber = (
@@ -834,6 +729,105 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (int) schema = schema.int()
     if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
     return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForObject = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodObject === false || right instanceof z.ZodObject === false) {
+      return { success: false }
+    }
+
+    let schema = z.object({})
+    const leftUnknownKeys = left._def.unknownKeys as UnknownKeysParam
+    const rightUnknownKeys = right._def.unknownKeys as UnknownKeysParam
+    const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
+    for (const key of keys) {
+      const leftValue = left.shape[key]
+      const rightValue = right.shape[key]
+      if (leftValue === undefined) {
+        if (left._def.catchall instanceof z.ZodNever) {
+          switch (leftUnknownKeys) {
+            case 'strict':
+              break
+            default: {
+              const _: 'strip' | 'passthrough' = leftUnknownKeys
+              schema = schema.merge(z.object({ [key]: rightValue }))
+            }
+          }
+        } else {
+          const result = this.findIntersectedSchema(left._def.catchall, rightValue)
+          if (result.success) {
+            schema = schema.merge(z.object({ [key]: result.schema }))
+          } else {
+            return { success: false }
+          }
+        }
+      } else if (rightValue === undefined) {
+        if (right._def.catchall instanceof z.ZodNever) {
+          switch (rightUnknownKeys) {
+            case 'strict':
+              break
+            default: {
+              const _: 'strip' | 'passthrough' = rightUnknownKeys
+              schema = schema.merge(z.object({ [key]: leftValue }))
+            }
+          }
+        } else {
+          const result = this.findIntersectedSchema(leftValue, right._def.catchall)
+          if (result.success) {
+            schema = schema.merge(z.object({ [key]: result.schema }))
+          } else {
+            return { success: false }
+          }
+        }
+      } else {
+        const result = this.findIntersectedSchema(leftValue, rightValue)
+        if (result.success) {
+          schema = schema.merge(z.object({ [key]: result.schema }))
+        } else {
+          return { success: false }
+        }
+      }
+    }
+    return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForObjectAndRecord = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodRecord && right instanceof z.ZodObject) {
+      const shape = {} as Record<string, z.ZodType>
+      for (const key in right.shape) {
+        shape[key] = left._def.valueType
+      }
+      const schema = z.object(shape)
+      return this.findIntersectedSchema(schema, right)
+    }
+
+    if (left instanceof z.ZodObject && right instanceof z.ZodRecord) {
+      return this.findIntersectedSchemaForObjectAndRecord(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForRecord = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodRecord === false || right instanceof z.ZodRecord === false) {
+      return { success: false }
+    }
+
+    const result = this.findIntersectedSchema(left._def.valueType, right._def.valueType)
+    if (result.success === false) {
+      return { success: false }
+    }
+
+    return { success: true, schema: z.record(result.schema) }
   }
 
   private findIntersectedSchemaForString = (
@@ -976,17 +970,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, schema }
   }
 
-  private findIntersectedSchemaForVoid = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodVoid === false || right instanceof z.ZodVoid === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: left }
-  }
-
   private findIntersectedSchemaForSymbol = (
     left: z.ZodType,
     right: z.ZodType,
@@ -998,111 +981,127 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: true, schema: left }
   }
 
-  private findIntersectedSchemaForNativeEnum = (
+  private findIntersectedSchemaForTuple = (
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodNativeEnum === false ||
-      right instanceof z.ZodNativeEnum === false ||
-      left._def.values !== right._def.values
-    ) {
+    if (left instanceof z.ZodTuple === false || right instanceof z.ZodTuple === false) {
       return { success: false }
     }
 
-    return { success: true, schema: left }
-  }
-
-  private findIntersectedSchemaForEnum = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodEnum === false || right instanceof z.ZodEnum === false) {
-      return { success: false }
-    }
-
-    const sharedValues = left._def.values.filter((value: any) => right._def.values.includes(value))
-    if (sharedValues.length === 0) {
-      return { success: false }
-    }
-
-    return { success: true, schema: z.enum(sharedValues) }
-  }
-
-  private findIntersectedSchemaForLiteral = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodLiteral === false ||
-      right instanceof z.ZodLiteral === false ||
-      left._def.value !== right._def.value
-    ) {
-      return { success: false }
-    }
-
-    return { success: true, schema: left }
-  }
-
-  private findIntersectedSchemaForBoolean = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodBoolean === false || right instanceof z.ZodBoolean === false) {
-      return { success: false }
-    }
-
-    return { success: true, schema: left }
-  }
-
-  private findIntersectedSchemaForBigint = (
-    left: z.ZodType,
-    right: z.ZodType,
-  ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodBigInt === false || right instanceof z.ZodBigInt === false) {
-      return { success: false }
-    }
-
-    let min: undefined | bigint = undefined
-    let max: undefined | bigint = undefined
-    let multipleOf: undefined | bigint = undefined
-    for (let check of left._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = check.value
-          break
-        case 'max':
-          max = check.value
-          break
-        case 'multipleOf':
-          multipleOf = check.value
-          break
-        default: {
-          const _: never = check
-        }
+    const items: z.ZodType[] = []
+    let rest: z.ZodType | undefined = undefined
+    for (let i = 0; i < Math.min(left._def.items.length, right._def.items.length); ++i) {
+      const result = this.findIntersectedSchema(left._def.items[i], right._def.items[i])
+      if (result.success) {
+        items.push(result.schema)
       }
     }
-    for (let check of right._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = min === undefined ? check.value : min > check.value ? min : check.value
-          break
-        case 'max':
-          max = max === undefined ? check.value : max < check.value ? max : check.value
-          break
-        case 'multipleOf':
-          multipleOf = multipleOf === undefined ? check.value : multipleOf < check.value ? multipleOf : check.value
-          break
-        default: {
-          const _: never = check
-        }
+    for (let i = left._def.items.length; i < right._def.items.length; ++i) {
+      const result = this.findIntersectedSchema(left._def.rest, right._def.items[i])
+      if (result.success) {
+        items.push(result.schema)
       }
     }
-    let schema = z.bigint()
-    if (min !== undefined) schema = schema.min(min)
-    if (max !== undefined) schema = schema.max(max)
-    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
+    for (let i = right._def.items.length; i < left._def.items.length; ++i) {
+      const result = this.findIntersectedSchema(left._def.items[i], right._def.rest)
+      if (result.success) {
+        items.push(result.schema)
+      }
+    }
+    if (left._def.rest !== undefined && right._def.rest !== undefined) {
+      const result = this.findIntersectedSchema(left._def.rest, right._def.rest)
+      if (result.success) {
+        rest = result.schema
+      }
+    }
+    let schema: z.ZodTuple<any, any> = z.tuple(items as any)
+    if (rest !== undefined) schema = schema.rest(rest)
     return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForTupleAndArray = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodArray && right instanceof z.ZodTuple) {
+      const items: z.ZodType[] = []
+      for (let i = 0; i < right._def.items.length; ++i) {
+        const result = this.findIntersectedSchema(left._def.type, right._def.items[i])
+        if (result.success) {
+          items.push(result.schema)
+        }
+      }
+      let rest: z.ZodType | undefined = undefined
+      if (right._def.rest !== undefined) {
+        const result = this.findIntersectedSchema(left._def.type, right._def.rest)
+        if (result.success) {
+          rest = result.schema
+        }
+      }
+      let schema: z.ZodTuple<any, any> = z.tuple(items as any)
+      if (rest !== undefined) schema = schema.rest(rest)
+      return this.findIntersectedSchema(schema, right)
+    }
+
+    if (left instanceof z.ZodTuple && right instanceof z.ZodArray) {
+      return this.findIntersectedSchemaForTupleAndArray(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodUnion === false || right instanceof z.ZodUnion === false) {
+      return { success: false }
+    }
+
+    let schema: z.ZodType | undefined = undefined
+    for (let leftOption of left._def.options) {
+      for (let rightOption of right._def.options) {
+        const result = this.findIntersectedSchema(leftOption, rightOption)
+        if (result.success) {
+          schema = schema === undefined ? result.schema : z.union([schema, result.schema])
+        }
+      }
+    }
+    if (schema === undefined) {
+      return { success: false }
+    }
+
+    return { success: true, schema }
+  }
+
+  private findIntersectedSchemaForUnionAndNonUnion = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (right instanceof z.ZodUnion) {
+      const result = this.findIntersectedSchema(z.union([left, z.never()]), right)
+      if (result.success) {
+        return { success: true, schema: result.schema }
+      }
+    }
+
+    if (left instanceof z.ZodUnion) {
+      return this.findIntersectedSchemaForUnionAndNonUnion(right, left)
+    }
+
+    return { success: false }
+  }
+
+  private findIntersectedSchemaForVoid = (
+    left: z.ZodType,
+    right: z.ZodType,
+  ): { success: true; schema: z.ZodType } | { success: false } => {
+    if (left instanceof z.ZodVoid === false || right instanceof z.ZodVoid === false) {
+      return { success: false }
+    }
+
+    return { success: true, schema: left }
   }
 
   private getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy = <T, U>(schema: T): U => {

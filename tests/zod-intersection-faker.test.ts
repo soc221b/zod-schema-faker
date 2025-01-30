@@ -922,7 +922,7 @@ describe('record and object', () => {
     const right = z.object({ foo: z.string().min(3), bar: z.string().min(6) })
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForRecordAndObject'](left, right)
+    const result = faker['findIntersectedSchemaForObjectAndRecord'](left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodObject) {
@@ -2632,14 +2632,14 @@ describe('default', () => {
           if (left instanceof z.ZodDate) {
             expect(left._def.checks.length).toBe(1)
             expect(
-              left._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+              left._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
             ).toBeTruthy()
           }
           const right = secondOption._def.right
           if (right instanceof z.ZodDate) {
             expect(right._def.checks.length).toBe(1)
             expect(
-              right._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+              right._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
             ).toBeTruthy()
           }
         }
@@ -2676,14 +2676,14 @@ describe('default', () => {
           if (left instanceof z.ZodDate) {
             expect(left._def.checks.length).toBe(1)
             expect(
-              left._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
+              left._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
             ).toBeTruthy()
           }
           const right = secondOption._def.right
           if (right instanceof z.ZodDate) {
             expect(right._def.checks.length).toBe(1)
             expect(
-              right._def.checks.find(check => check.kind === 'min' && check.value === new Date(123).getTime()),
+              right._def.checks.find(check => check.kind === 'max' && check.value === new Date(789).getTime()),
             ).toBeTruthy()
           }
         }
