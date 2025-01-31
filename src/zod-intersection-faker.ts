@@ -822,7 +822,31 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         shape[key] = left._def.valueType
       }
       const schema = z.object(shape)
-      return this.findIntersectedSchema(schema, right)
+      const result = this.findIntersectedSchema(schema, right)
+      if (result.success && result.schema instanceof z.ZodObject) {
+        if (right._def.catchall instanceof z.ZodNever) {
+          const unknownKeys = right._def.unknownKeys as UnknownKeysParam
+          switch (unknownKeys) {
+            case 'strict': {
+              return { success: true, schema: result.schema.strict() }
+            }
+            case 'strip': {
+              return { success: true, schema: result.schema.strip() }
+            }
+            case 'passthrough': {
+              return { success: true, schema: result.schema.catchall(left._def.valueType) }
+            }
+            default: {
+              const _: never = unknownKeys
+            }
+          }
+        } else {
+          const catchall = this.findIntersectedSchema(left._def.valueType, right._def.catchall)
+          if (catchall.success) {
+            return { success: true, schema: result.schema.catchall(catchall.schema) }
+          }
+        }
+      }
     }
 
     if (left instanceof z.ZodObject && right instanceof z.ZodRecord) {
