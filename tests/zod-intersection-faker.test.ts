@@ -259,6 +259,21 @@ describe('optional', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
+  test('optional + optional (sometimes undefined)', () => {
+    install()
+
+    const schema = z.intersection(z.date().optional(), z.date().optional())
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (++safeCount < 100) {
+      const data = faker.fake()
+      if (schema.safeParse(data).success && data === undefined) {
+        return
+      }
+    }
+    expect.unreachable()
+  })
+
   test('optional + nullish', () => {
     install()
 
@@ -369,6 +384,21 @@ describe('nullable', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
+  test('nullable + nullable (sometimes null)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullable(), z.date().nullable())
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (++safeCount < 100) {
+      const data = faker.fake()
+      if (schema.safeParse(data).success && data === null) {
+        return
+      }
+    }
+    expect.unreachable()
+  })
+
   test('nullable + nullish', () => {
     install()
 
@@ -430,6 +460,36 @@ describe('nullish', () => {
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
+  })
+
+  test('nullish + nullish (sometimes null)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.date().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (++safeCount < 100) {
+      const data = faker.fake()
+      if (schema.safeParse(data).success && data === null) {
+        return
+      }
+    }
+    expect.unreachable()
+  })
+
+  test('nullish + nullish (sometimes undefined)', () => {
+    install()
+
+    const schema = z.intersection(z.date().nullish(), z.date().nullish())
+    const faker = new ZodIntersectionFaker(schema)
+    let safeCount = 0
+    while (++safeCount < 100) {
+      const data = faker.fake()
+      if (schema.safeParse(data).success && data === undefined) {
+        return
+      }
+    }
+    expect.unreachable()
   })
 
   test('nullish + the other', () => {
