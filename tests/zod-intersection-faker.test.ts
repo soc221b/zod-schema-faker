@@ -48,6 +48,42 @@ describe('N/A', () => {
 
     expect(schema.safeParse(undefined).success).toEqual(false)
   })
+
+  test('preprocess', () => {
+    // It doesn't make sense to have preprocess in one side and not in the other side,
+    // or to have preprocess in both sides but with different preprocess functions.
+    // Thus, we don't support to find the intersected schema in a schema with preprocess.
+
+    install()
+
+    const preprocess = (value: unknown) => new Date(value as number)
+    const schema = z.date()
+    const leftWithPreprocess = z.preprocess(preprocess, schema)
+    const rightWithPreprocess = z.preprocess(preprocess, schema)
+    const intersectionLeftWithoutPreprocess = z.intersection(schema, rightWithPreprocess)
+    expect(() => intersectionLeftWithoutPreprocess.parse(123)).toThrow()
+    const intersectionRightWithoutPreprocess = z.intersection(leftWithPreprocess, schema)
+    expect(() => intersectionRightWithoutPreprocess.parse(123)).toThrow()
+  })
+
+  test('transform', () => {
+    // It doesn't make sense to have transform in one side and not in the other side,
+    // or to have transform in both sides but with different transform functions.
+    // Thus, we don't support to find the intersected schema in a schema with transform.
+
+    install()
+
+    const schema = z.date()
+    const leftWithTransform = schema.transform(date => date.toISOString())
+    const rightWithTransform = schema.transform(date => date.getTime())
+
+    const intersectionLeftWithoutTransform = z.intersection(schema, rightWithTransform)
+    expect(() => intersectionLeftWithoutTransform.parse(new Date())).toThrow()
+    const intersectionRightWithoutTransform = z.intersection(leftWithTransform, schema)
+    expect(() => intersectionRightWithoutTransform.parse(new Date())).toThrow()
+    const intersection = z.intersection(leftWithTransform, rightWithTransform)
+    expect(() => intersection.parse(new Date())).toThrow()
+  })
 })
 
 test('ZodIntersectionFaker should assert parameters', () => {
