@@ -28,7 +28,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
   }
 
-  private findIntersectedSchema(
+  findIntersectedSchema(
     leftSchema: z.ZodType,
     rightSchema: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } {

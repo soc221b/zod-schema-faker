@@ -86,7 +86,7 @@ describe('any', () => {
     const right = z.date()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForAny'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.schema).toBeInstanceOf(z.ZodDate)
@@ -103,7 +103,7 @@ describe('any', () => {
     const right = z.any()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForAny'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.schema).toBeInstanceOf(z.ZodDate)
@@ -122,7 +122,7 @@ describe('unknown', () => {
     const right = z.date()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForUnknown'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.schema).toBeInstanceOf(z.ZodDate)
@@ -139,7 +139,7 @@ describe('unknown', () => {
     const right = z.unknown()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForUnknown'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.schema).toBeInstanceOf(z.ZodDate)
@@ -522,7 +522,7 @@ describe('date', () => {
 
     const schema = z.intersection(z.date(), z.date())
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](z.date(), z.date())
+    const result = faker.findIntersectedSchema(z.date(), z.date())
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(0)
     }
@@ -538,7 +538,7 @@ describe('date', () => {
     const right = z.date().min(new Date(123))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -557,7 +557,7 @@ describe('date', () => {
     const right = z.date()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -576,7 +576,7 @@ describe('date', () => {
     const right = z.date().max(new Date(123))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -595,7 +595,7 @@ describe('date', () => {
     const right = z.date()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -614,7 +614,7 @@ describe('date', () => {
     const right = z.date().min(new Date(456))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -633,7 +633,7 @@ describe('date', () => {
     const right = z.date().min(new Date(123))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -652,7 +652,7 @@ describe('date', () => {
     const right = z.date().max(new Date(123))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -671,7 +671,7 @@ describe('date', () => {
     const right = z.date()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDate'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(
@@ -692,7 +692,7 @@ describe('array', () => {
     const right = z.array(z.date().max(new Date(0)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodArray) {
@@ -720,7 +720,7 @@ describe('array', () => {
     const right = z.array(z.date()).min(3)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.minLength?.value).toBe(3)
     }
@@ -736,7 +736,7 @@ describe('array', () => {
     const right = z.array(z.date())
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.minLength?.value).toBe(3)
     }
@@ -752,7 +752,7 @@ describe('array', () => {
     const right = z.array(z.date()).max(3)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.maxLength?.value).toBe(3)
     }
@@ -768,7 +768,7 @@ describe('array', () => {
     const right = z.array(z.date())
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.maxLength?.value).toBe(3)
     }
@@ -784,7 +784,7 @@ describe('array', () => {
     const right = z.array(z.date()).length(3)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.exactLength?.value).toBe(3)
     }
@@ -800,7 +800,7 @@ describe('array', () => {
     const right = z.array(z.date())
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.exactLength?.value).toBe(3)
     }
@@ -816,7 +816,7 @@ describe('array', () => {
     const right = z.array(z.date()).min(5)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.minLength?.value).toBe(5)
     }
@@ -832,7 +832,7 @@ describe('array', () => {
     const right = z.array(z.date()).min(3)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.minLength?.value).toBe(5)
     }
@@ -848,7 +848,7 @@ describe('array', () => {
     const right = z.array(z.date()).max(5)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.maxLength?.value).toBe(3)
     }
@@ -864,7 +864,7 @@ describe('array', () => {
     const right = z.array(z.date()).max(3)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForArray'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodArray) {
       expect(result.schema._def.maxLength?.value).toBe(3)
     }
@@ -882,7 +882,7 @@ describe('record', () => {
     const right = z.record(z.date().max(new Date(0)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForRecord'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodRecord) {
@@ -922,7 +922,7 @@ describe('record and object', () => {
     const right = z.object({ foo: z.string().min(3), bar: z.string().min(6) })
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForObjectAndRecord'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodObject) {
@@ -955,7 +955,7 @@ describe('tuple', () => {
     const right = z.tuple([z.date().max(new Date(456))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(1)
@@ -983,7 +983,7 @@ describe('tuple', () => {
     const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(2)
@@ -1017,7 +1017,7 @@ describe('tuple', () => {
     const right = z.tuple([z.date().max(new Date(456)), z.number().max(654)])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(2)
@@ -1051,7 +1051,7 @@ describe('tuple', () => {
     const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForTuple'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(1)
@@ -1095,7 +1095,7 @@ describe('array and tuple', () => {
     const right = z.array(z.date().max(new Date(789)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(2)
@@ -1142,7 +1142,7 @@ describe('array and tuple', () => {
     const right = z.tuple([z.date().min(new Date(123)), z.date().min(new Date(456))]).rest(z.date().min(new Date(789)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodTuple) {
       const items: any[] = result.schema._def.items
       expect(items.length).toBe(2)
@@ -1203,7 +1203,7 @@ describe('union/or', () => {
     const right = z.union([z.date().max(new Date(456)), z.date().max(new Date(654))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForUnion'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodUnion) {
       const firstUnionOptions: any[] = result.schema._def.options
       const secondUnion = firstUnionOptions[0]
@@ -1291,7 +1291,7 @@ describe('non-union and union', () => {
     const right = z.date().max(new Date(321))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(2)
       expect(
@@ -1313,7 +1313,7 @@ describe('non-union and union', () => {
     const right = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodUnion) {
       const items: any[] = result.schema._def.options
       expect(items.length).toBe(2)
@@ -1374,7 +1374,7 @@ describe('discriminatedUnion', () => {
     const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date().max(new Date(987)) })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForDiscriminatedUnion'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(1)
@@ -1419,7 +1419,7 @@ describe('object and discriminated union', () => {
     ])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
@@ -1465,7 +1465,7 @@ describe('object and discriminated union', () => {
     const right = z.object({ type: z.string(), a: z.date().max(new Date(789)) })
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
@@ -1523,7 +1523,7 @@ describe('record and discriminated union', () => {
     ])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
@@ -1561,7 +1561,7 @@ describe('record and discriminated union', () => {
     const right = z.record(z.string().max(9))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDiscriminatedUnion) {
       const options = result.schema._def.options
       expect(options.length).toBe(2)
@@ -1607,7 +1607,7 @@ describe('number', () => {
     const right = z.number().min(10)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
@@ -1624,7 +1624,7 @@ describe('number', () => {
     const right = z.number()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10)).toBeTruthy()
@@ -1641,7 +1641,7 @@ describe('number', () => {
     const right = z.number().max(10)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
@@ -1658,7 +1658,7 @@ describe('number', () => {
     const right = z.number()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
@@ -1675,7 +1675,7 @@ describe('number', () => {
     const right = z.number().int()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'int')).toBeTruthy()
@@ -1692,7 +1692,7 @@ describe('number', () => {
     const right = z.number()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'int')).toBeTruthy()
@@ -1709,7 +1709,7 @@ describe('number', () => {
     const right = z.number().finite()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'finite')).toBeTruthy()
@@ -1726,7 +1726,7 @@ describe('number', () => {
     const right = z.number()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'finite')).toBeTruthy()
@@ -1743,7 +1743,7 @@ describe('number', () => {
     const right = z.number().multipleOf(10)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10)).toBeTruthy()
@@ -1760,7 +1760,7 @@ describe('number', () => {
     const right = z.number()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10)).toBeTruthy()
@@ -1777,7 +1777,7 @@ describe('number', () => {
     const right = z.number().min(20)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20)).toBeTruthy()
@@ -1794,7 +1794,7 @@ describe('number', () => {
     const right = z.number().min(10)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20)).toBeTruthy()
@@ -1811,7 +1811,7 @@ describe('number', () => {
     const right = z.number().max(20)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
@@ -1828,7 +1828,7 @@ describe('number', () => {
     const right = z.number().max(10)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForNumber'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodNumber) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10)).toBeTruthy()
@@ -2280,7 +2280,7 @@ describe('bigint', () => {
     const right = z.bigint().min(10n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10n)).toBeTruthy()
@@ -2297,7 +2297,7 @@ describe('bigint', () => {
     const right = z.bigint()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10n)).toBeTruthy()
@@ -2314,7 +2314,7 @@ describe('bigint', () => {
     const right = z.bigint().max(10n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
@@ -2331,7 +2331,7 @@ describe('bigint', () => {
     const right = z.bigint()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
@@ -2348,7 +2348,7 @@ describe('bigint', () => {
     const right = z.bigint().multipleOf(10n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10n)).toBeTruthy()
@@ -2365,7 +2365,7 @@ describe('bigint', () => {
     const right = z.bigint()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'multipleOf' && check.value === 10n)).toBeTruthy()
@@ -2382,7 +2382,7 @@ describe('bigint', () => {
     const right = z.bigint().min(20n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20n)).toBeTruthy()
@@ -2399,7 +2399,7 @@ describe('bigint', () => {
     const right = z.bigint().min(10n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20n)).toBeTruthy()
@@ -2416,7 +2416,7 @@ describe('bigint', () => {
     const right = z.bigint().max(20n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
@@ -2433,7 +2433,7 @@ describe('bigint', () => {
     const right = z.bigint().max(10n)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBigint'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
       expect(result.schema._def.checks.length).toBe(1)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
@@ -2458,7 +2458,7 @@ describe('readonly', () => {
       .readonly()
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForReadonly'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodArray) {
@@ -2490,7 +2490,7 @@ describe('lazy', () => {
     const right = z.lazy(() => z.date().max(new Date(0)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForLazy'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodDate) {
       expect(result.schema._def.checks.length).toBe(2)
       expect(
@@ -2514,7 +2514,7 @@ describe('intersection/and', () => {
     const right = z.intersection(z.date().max(new Date(0)), z.date())
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForIntersection'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodDate) {
@@ -2548,7 +2548,7 @@ describe('pipe', () => {
       .pipe(z.number().max(20))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForPipe'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodNumber) {
@@ -2577,7 +2577,7 @@ describe('brand', () => {
       .brand('dog')
     const schema = z.intersection(cat, dog)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchemaForBrand'](cat, dog)
+    const result = faker.findIntersectedSchema(cat, dog)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodObject) {
@@ -2614,7 +2614,7 @@ describe('default', () => {
     const right = z.date().max(new Date(789))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodUnion) {
@@ -2658,7 +2658,7 @@ describe('default', () => {
     const right = z.date().max(new Date(789)).default(_default)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodUnion) {
@@ -2704,7 +2704,7 @@ describe('catch', () => {
     const right = z.date().max(new Date(789))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodUnion) {
@@ -2748,7 +2748,7 @@ describe('catch', () => {
     const right = z.date().max(new Date(789)).catch(_catch)
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker['findIntersectedSchema'](left, right)
+    const result = faker.findIntersectedSchema(left, right)
     if (result.success) {
       const schema = result.schema
       if (schema instanceof z.ZodUnion) {
