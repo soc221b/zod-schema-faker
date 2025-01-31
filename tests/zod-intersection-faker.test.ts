@@ -14,39 +14,118 @@ const Employee = z.object({
 
 describe('N/A', () => {
   test('nan + nan', () => {
-    const schema = z.intersection(z.nan(), z.nan())
+    // This may work in the future, but for now, it doesn't.
+    const innerSchema = z.nan()
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = NaN
 
-    expect(schema.safeParse(NaN).success).toEqual(false)
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('map + map', () => {
-    const schema = z.intersection(z.map(z.string(), z.number()), z.map(z.string(), z.number()))
+    // This may work in the future, but for now, it doesn't.
 
-    expect(schema.safeParse(new Map([['foo', 1]])).success).toEqual(false)
+    const innerSchema = z.map(z.string(), z.number())
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = new Map([['a', 1]])
+
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('set + set', () => {
-    const schema = z.intersection(z.set(z.number()), z.set(z.number()))
+    // This may work in the future, but for now, it doesn't.
 
-    expect(schema.safeParse(new Set([1])).success).toEqual(false)
+    const innerSchema = z.set(z.number())
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = new Set([1])
+
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('function + function', () => {
-    const schema = z.intersection(z.function(), z.function())
+    // This may work in the future, but for now, it doesn't.
 
-    expect(schema.safeParse(() => {}).success).toEqual(false)
+    const innerSchema = z.function()
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = () => {}
+
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('promise + promise', () => {
-    const schema = z.intersection(z.promise(z.number()), z.promise(z.number()))
+    // This may work in the future, but for now, it doesn't.
 
-    expect(schema.safeParse(Promise.resolve(1)).success).toEqual(false)
+    const innerSchema = z.promise(z.number())
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = Promise.resolve(1)
+
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('never + never', () => {
-    const schema = z.intersection(z.never(), z.never())
+    // This may work in the future, but for now, it doesn't.
 
-    expect(schema.safeParse(undefined).success).toEqual(false)
+    const innerSchema = z.function(z.tuple([]), z.never())
+    const schema = z.intersection(innerSchema, innerSchema)
+    const data = () => {
+      throw Error()
+    }
+
+    expect(innerSchema.safeParse(data).success).toEqual(true)
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 
   test('preprocess', () => {
@@ -54,16 +133,102 @@ describe('N/A', () => {
     // or to have preprocess in both sides but with different preprocess functions.
     // Thus, we don't support to find the intersected schema in a schema with preprocess.
 
-    install()
-
-    const preprocess = (value: unknown) => new Date(value as number)
+    const fromNumber = (value: unknown) => {
+      if (typeof value === 'number') {
+        return new Date(value)
+      }
+      return undefined
+    }
+    const fromISOString = (value: unknown) => {
+      if (typeof value === 'string') {
+        return new Date(value)
+      }
+      return undefined
+    }
     const schema = z.date()
-    const leftWithPreprocess = z.preprocess(preprocess, schema)
-    const rightWithPreprocess = z.preprocess(preprocess, schema)
-    const intersectionLeftWithoutPreprocess = z.intersection(schema, rightWithPreprocess)
-    expect(() => intersectionLeftWithoutPreprocess.parse(123)).toThrow()
-    const intersectionRightWithoutPreprocess = z.intersection(leftWithPreprocess, schema)
-    expect(() => intersectionRightWithoutPreprocess.parse(123)).toThrow()
+    const fromNumberSchema = z.preprocess(fromNumber, schema)
+    const fromISOStringSchema = z.preprocess(fromISOString, schema)
+    const noIntersection1 = z.intersection(schema, fromISOStringSchema)
+    const noIntersection2 = z.intersection(fromNumberSchema, schema)
+    const noIntersection3 = z.intersection(fromNumberSchema, fromISOStringSchema)
+    const data = false
+
+    expect(fromNumberSchema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        }
+      ]]
+    `)
+    expect(fromISOStringSchema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        }
+      ]]
+    `)
+    expect(noIntersection1.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "boolean",
+          "path": [],
+          "message": "Expected date, received boolean"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        }
+      ]]
+    `)
+    expect(noIntersection2.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "boolean",
+          "path": [],
+          "message": "Expected date, received boolean"
+        }
+      ]]
+    `)
+    expect(noIntersection3.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "date",
+          "received": "undefined",
+          "path": [],
+          "message": "Required"
+        }
+      ]]
+    `)
   })
 
   test('transform', () => {
@@ -71,18 +236,41 @@ describe('N/A', () => {
     // or to have transform in both sides but with different transform functions.
     // Thus, we don't support to find the intersected schema in a schema with transform.
 
-    install()
-
     const schema = z.date()
-    const leftWithTransform = schema.transform(date => date.toISOString())
-    const rightWithTransform = schema.transform(date => date.getTime())
+    const toISOString = schema.transform(date => date.toISOString())
+    const toTimestamp = schema.transform(date => date.getTime())
+    const noIntersection1 = z.intersection(schema, toTimestamp)
+    const noIntersection2 = z.intersection(toISOString, schema)
+    const noIntersection3 = z.intersection(toISOString, toTimestamp)
+    const data = new Date()
 
-    const intersectionLeftWithoutTransform = z.intersection(schema, rightWithTransform)
-    expect(() => intersectionLeftWithoutTransform.parse(new Date())).toThrow()
-    const intersectionRightWithoutTransform = z.intersection(leftWithTransform, schema)
-    expect(() => intersectionRightWithoutTransform.parse(new Date())).toThrow()
-    const intersection = z.intersection(leftWithTransform, rightWithTransform)
-    expect(() => intersection.parse(new Date())).toThrow()
+    expect(noIntersection1.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
+    expect(noIntersection2.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
+    expect(noIntersection3.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_intersection_types",
+          "path": [],
+          "message": "Intersection results could not be merged"
+        }
+      ]]
+    `)
   })
 })
 
