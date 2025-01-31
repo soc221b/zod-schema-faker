@@ -8,16 +8,13 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     const leftSchema: z.ZodType = this.schema._def.left
     const rightSchema: z.ZodType = this.schema._def.right
 
-    // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
-    if (
-      this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(leftSchema) instanceof z.ZodNaN &&
-      this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(rightSchema) instanceof z.ZodNaN
-    ) {
-      return NaN
-    }
-
     const result = this.findIntersectedSchema(leftSchema, rightSchema)
     if (result.success) {
+      // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
+      if (result.schema instanceof z.ZodNaN) {
+        return NaN
+      }
+
       let safeCount = 0
       while (++safeCount < 100) {
         const data = fake(result.schema) as z.infer<T>
@@ -1131,21 +1128,5 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     return { success: true, schema: left }
-  }
-
-  private getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy = <T, U>(schema: T): U => {
-    if (schema instanceof z.ZodNullable) {
-      return this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(schema._def.innerType)
-    }
-    if (schema instanceof z.ZodOptional) {
-      return this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(schema._def.innerType)
-    }
-    if (schema instanceof z.ZodReadonly) {
-      return this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(schema._def.innerType)
-    }
-    if (schema instanceof z.ZodLazy) {
-      return this.getInnerTypeDespiteOptionalAndNullableAndReadonlyAndLazy(schema._def.getter())
-    }
-    return schema as any
   }
 }
