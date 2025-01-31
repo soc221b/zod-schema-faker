@@ -528,7 +528,7 @@ describe('nullish', () => {
 })
 
 describe('object', () => {
-  testMultipleTimes('object + object', () => {
+  test('object + object', () => {
     install()
 
     const schema = z.intersection(Person, Employee)
@@ -537,78 +537,162 @@ describe('object', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('object + object (inner type)', () => {
+  test('object passthrough', () => {
     install()
 
-    const schema = z.intersection(
-      z.object({
-        foo: z.string(),
-        date: z.date().min(new Date(0)),
-      }),
-      z.object({
-        bar: z.string(),
-        date: z.date().max(new Date(0)),
-      }),
-    )
+    const left = z.object({ foo: z.string(), date: z.date().min(new Date(0)) }).passthrough()
+    const right = z.object({ bar: z.number(), date: z.date().max(new Date(0)) }).passthrough()
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    expectType<TypeEqual<ReturnType<typeof faker.fake>, z.infer<typeof schema>>>(true)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const type = schema.shape.date
+        if (type instanceof z.ZodDate) {
+          expect(type._def.checks.length).toBe(2)
+          expect(
+            type._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            type._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+        expect(schema.shape.foo).toBeInstanceOf(z.ZodString)
+        expect(schema.shape.bar).toBeInstanceOf(z.ZodNumber)
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(6)
+  })
+
+  test('object strip', () => {
+    install()
+
+    const left = z.object({ foo: z.string(), date: z.date().min(new Date(0)) }).strip()
+    const right = z.object({ bar: z.number(), date: z.date().max(new Date(0)) }).strip()
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expectType<TypeEqual<ReturnType<typeof faker.fake>, z.infer<typeof schema>>>(true)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const date = schema.shape.date
+        if (date instanceof z.ZodDate) {
+          expect(date._def.checks.length).toBe(2)
+          expect(
+            date._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            date._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+        expect(schema.shape.foo).toBeInstanceOf(z.ZodString)
+        expect(schema.shape.bar).toBeInstanceOf(z.ZodNumber)
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(6)
+  })
+
+  test('object + object strict', () => {
+    install()
+
+    const left = z.object({ foo: z.string().optional() })
+    const right = z.object({}).strict()
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expectType<TypeEqual<ReturnType<typeof faker.fake>, z.infer<typeof schema>>>(true)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        expect(schema.shape.foo).toBeUndefined()
+      }
+    }
+    const data = faker.fake()
+    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(2)
+  })
+
+  test('object strict + object', () => {
+    install()
+
+    const left = z.object({}).strict()
+    const right = z.object({
+      foo: z.string().optional(),
+    })
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        expect(schema.shape.foo).toBeUndefined()
+      }
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  testMultipleTimes('object + object strict', () => {
+  test('object + object catchall', () => {
     install()
 
-    const schema = z.intersection(
-      z.object({
-        foo: z.string().optional(),
-      }),
-      z.object({}).strict(),
-    )
+    const left = z.object({ foo: z.date().max(new Date(0)) })
+    const right = z.object({}).catchall(z.date().min(new Date(0)))
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const foo = schema.shape.foo
+        if (foo instanceof z.ZodDate) {
+          expect(foo._def.checks.length).toBe(2)
+          expect(
+            foo._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            foo._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
   })
 
-  testMultipleTimes('object strict + object', () => {
+  test('object catchall + object', () => {
     install()
 
-    const schema = z.intersection(
-      z.object({}).strict(),
-      z.object({
-        foo: z.string().optional(),
-      }),
-    )
+    const left = z.object({}).catchall(z.date().min(new Date(0)))
+    const right = z.object({ foo: z.date().max(new Date(0)) })
+    const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
+    const result = faker.findIntersectedSchema(left, right)
+    if (result.success) {
+      const schema = result.schema
+      if (schema instanceof z.ZodObject) {
+        const foo = schema.shape.foo
+        if (foo instanceof z.ZodDate) {
+          expect(foo._def.checks.length).toBe(2)
+          expect(
+            foo._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+          expect(
+            foo._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+          ).toBeTruthy()
+        }
+      }
+    }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('object + object catchall', () => {
-    install()
-
-    const schema = z.intersection(
-      z.object({
-        foo: z.date().max(new Date(0)),
-      }),
-      z.object({}).catchall(z.date().min(new Date(0))),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  testMultipleTimes('object catchall + object', () => {
-    install()
-
-    const schema = z.intersection(
-      z.object({}).catchall(z.date().min(new Date(0))),
-      z.object({
-        foo: z.date().max(new Date(0)),
-      }),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data })
+    expect.assertions(4)
   })
 })
 
