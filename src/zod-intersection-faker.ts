@@ -65,7 +65,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       this.findIntersectedSchemaForNumber,
       this.findIntersectedSchemaForObject,
       this.findIntersectedSchemaForObjectAndRecord,
-      this.findIntersectedSchemaForRecord,
+      this.findIntersectedSchemaForRecordWithKeyTypeString,
       this.findIntersectedSchemaForString,
       this.findIntersectedSchemaForSymbol,
       this.findIntersectedSchemaForTuple,
@@ -891,11 +891,15 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     return { success: false }
   }
 
-  private findIntersectedSchemaForRecord = (
+  private findIntersectedSchemaForRecordWithKeyTypeString = (
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
     if (left instanceof z.ZodRecord === false || right instanceof z.ZodRecord === false) {
+      return { success: false }
+    }
+
+    if (left._def.keyType instanceof z.ZodString === false || right._def.keyType instanceof z.ZodString === false) {
       return { success: false }
     }
 

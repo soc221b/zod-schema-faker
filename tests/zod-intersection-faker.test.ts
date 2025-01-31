@@ -1559,7 +1559,7 @@ describe('array', () => {
 })
 
 describe('record', () => {
-  test('record', () => {
+  test('key type string', () => {
     install()
 
     const left = z.record(z.date().min(new Date(0)))
