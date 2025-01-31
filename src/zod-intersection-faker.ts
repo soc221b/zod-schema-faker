@@ -757,15 +757,32 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    let schema = z.object({})
+    let schema = z.object({}) as z.ZodObject<any, any>
     const leftUnknownKeys = left._def.unknownKeys as UnknownKeysParam
     const rightUnknownKeys = right._def.unknownKeys as UnknownKeysParam
+    const unknownKeys =
+      leftUnknownKeys === 'strict' || rightUnknownKeys === 'strict'
+        ? 'strict'
+        : leftUnknownKeys === 'strip' || rightUnknownKeys === 'strip'
+          ? 'strip'
+          : 'passthrough'
+    const leftCatchall = left._def.catchall
+    const rightCatchall = right._def.catchall
+    const catchall =
+      (leftCatchall instanceof z.ZodNever && rightUnknownKeys === 'strict') ||
+      (rightCatchall instanceof z.ZodNever && leftUnknownKeys === 'strict') ||
+      leftUnknownKeys === 'strict' ||
+      rightUnknownKeys === 'strict'
+        ? z.never()
+        : leftCatchall instanceof z.ZodNever
+          ? rightCatchall
+          : leftCatchall
     const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
     for (const key of keys) {
       const leftValue = left.shape[key]
       const rightValue = right.shape[key]
       if (leftValue === undefined) {
-        if (left._def.catchall instanceof z.ZodNever) {
+        if (leftCatchall instanceof z.ZodNever) {
           switch (leftUnknownKeys) {
             case 'strict':
               break
@@ -783,7 +800,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           }
         }
       } else if (rightValue === undefined) {
-        if (right._def.catchall instanceof z.ZodNever) {
+        if (rightCatchall instanceof z.ZodNever) {
           switch (rightUnknownKeys) {
             case 'strict':
               break
@@ -808,6 +825,24 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           return { success: false }
         }
       }
+    }
+    if (catchall instanceof z.ZodNever) {
+      switch (unknownKeys) {
+        case 'strict':
+          schema = schema.strict()
+          break
+        case 'strip':
+          schema = schema.strip()
+          break
+        case 'passthrough':
+          schema = schema.catchall(catchall)
+          break
+        default: {
+          const _: never = unknownKeys
+        }
+      }
+    } else {
+      schema = schema.catchall(catchall)
     }
     return { success: true, schema }
   }
