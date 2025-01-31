@@ -133,10 +133,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return this.findIntersectedSchemaForOptional(right, left)
     }
 
-    if (left instanceof z.ZodOptional && right instanceof z.ZodOptional) {
-      return { success: true, schema: z.undefined() }
-    }
-
     return { success: false }
   }
 
@@ -236,10 +232,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     if (left instanceof z.ZodNullable) {
       return this.findIntersectedSchemaForNullable(right, left)
-    }
-
-    if (left instanceof z.ZodNullable && right instanceof z.ZodNullable) {
-      return { success: true, schema: z.null() }
     }
 
     return { success: false }
