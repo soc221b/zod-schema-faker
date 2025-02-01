@@ -25,4 +25,16 @@ export default defineConfig({
       rollupTypes: true,
     }),
   ],
+  test: {
+    coverage: {
+      include: ['src/**/*'],
+      thresholds: {
+        autoUpdate: true,
+        branches: 94.97,
+        functions: 97.87,
+        lines: 97.17,
+        statements: 97.17,
+      },
+    },
+  },
 })
