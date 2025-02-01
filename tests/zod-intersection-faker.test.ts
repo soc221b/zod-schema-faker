@@ -1361,6 +1361,40 @@ describe('object', () => {
   })
 
   describe('passthrough', () => {
+    test('object passthrough + object passthrough', () => {
+      install()
+
+      const left = z.object({ foo: z.string(), date: z.date().max(new Date(0)) }).passthrough()
+      const right = z.object({ bar: z.number(), date: z.date().min(new Date(0)) }).passthrough()
+      const schema = z.intersection(left, right)
+      expect(schema.safeParse({ foo: 'foo', bar: 1, date: new Date(0) }).success).toBe(true)
+      const faker = new ZodIntersectionFaker(schema)
+      expectType<TypeEqual<ReturnType<typeof faker.fake>, z.infer<typeof schema>>>(true)
+      const result = faker.findIntersectedSchema(left, right)
+      if (result.success) {
+        const schema = result.schema
+        if (schema instanceof z.ZodObject) {
+          const date = schema.shape.date
+          if (date instanceof z.ZodDate) {
+            expect(date._def.checks.length).toBe(2)
+            expect(
+              date._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+            ).toBeTruthy()
+            expect(
+              date._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+            ).toBeTruthy()
+          }
+          expect(schema.shape.foo).toBeInstanceOf(z.ZodString)
+          expect(schema.shape.bar).toBeInstanceOf(z.ZodNumber)
+          expect(schema._def.unknownKeys).toBe('passthrough')
+          expect(schema._def.catchall).toBeInstanceOf(z.ZodNever)
+        }
+      }
+      const data = faker.fake()
+      expect(schema.safeParse(data)).toEqual({ success: true, data })
+      expect.assertions(9)
+    })
+
     test('object passthrough + object catchall', () => {
       install()
 

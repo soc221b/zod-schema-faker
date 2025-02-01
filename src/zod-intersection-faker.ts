@@ -817,7 +817,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           schema = schema.strip()
           break
         case 'passthrough':
-          schema = schema.catchall(catchall)
+          schema = schema.passthrough().catchall(catchall)
           break
         /* v8 ignore next 3 */
         default: {
