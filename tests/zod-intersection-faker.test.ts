@@ -3381,6 +3381,18 @@ describe('boolean', () => {
 })
 
 describe('bigint', () => {
+  describe('unrelated', () => {
+    test('bigint multipleOf + bigint multipleOf (different)', () => {
+      install()
+
+      const left = z.bigint().multipleOf(10n)
+      const right = z.bigint().multipleOf(20n)
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow()
+    })
+  })
+
   test('bigint + bigint', () => {
     install()
 

@@ -404,7 +404,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           max = max === undefined ? check.value : max < check.value ? max : check.value
           break
         case 'multipleOf':
-          multipleOf = multipleOf === undefined ? check.value : multipleOf < check.value ? multipleOf : check.value
+          if (multipleOf !== undefined && check.value !== multipleOf) {
+            return { success: false }
+          }
+          multipleOf = check.value
           break
         /* v8 ignore next 3 */
         default: {
