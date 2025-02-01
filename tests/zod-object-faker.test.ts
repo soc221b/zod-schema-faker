@@ -58,6 +58,19 @@ describe('passthrough', () => {
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
   })
+
+  test('ZodObjectFaker.fake should sometimes return extra keys', () => {
+    install()
+
+    const schema = z.object({ foo: z.number(), bar: z.string() }).passthrough()
+    const faker = new ZodObjectFaker(schema)
+    while (true) {
+      const data = faker.fake()
+      if (Object.keys(data).length > 2) {
+        return
+      }
+    }
+  })
 })
 
 describe('strict', () => {

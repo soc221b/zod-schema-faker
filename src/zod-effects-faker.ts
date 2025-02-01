@@ -15,10 +15,14 @@ export class ZodEffectsFaker<T extends z.ZodEffects<any, any, any>> extends ZodT
         break
 
       case 'transform':
-        result = this.schema._def.effect.transform(fake(this.schema._def.schema), { addIssue: () => void 0, path: [] })
+        result = this.schema._def.effect.transform(fake(this.schema._def.schema), {
+          /* v8 ignore next 1 */
+          addIssue: () => void 0,
+          path: [],
+        })
         break
 
-      /* istanbul ignore next */
+      /* v8 ignore next 3 */
       default: {
         const _: never = this.schema._def.effect
       }

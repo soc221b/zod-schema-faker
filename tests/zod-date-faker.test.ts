@@ -51,3 +51,25 @@ test('max', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('should sometimes generate an edge date (min)', () => {
+  const schema = z.date()
+  const faker = new ZodDateFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.getTime() < new Date('1970-01-01').getTime()) {
+      break
+    }
+  }
+})
+
+test('should sometimes generate an edge date (max)', () => {
+  const schema = z.date()
+  const faker = new ZodDateFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.getTime() > new Date('2038-01-19').getTime()) {
+      break
+    }
+  }
+})

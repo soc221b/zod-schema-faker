@@ -60,6 +60,34 @@ test('cidr', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('cidr should sometimes return v4', () => {
+  const schema = z.string().cidr()
+  const v4 = schema.cidr({ version: 'v4' })
+  const faker = new ZodStringFaker(schema)
+  let safeCount = 0
+  while (++safeCount < 100) {
+    const data = faker.fake()
+    if (v4.safeParse(data).success) {
+      return
+    }
+  }
+  expect.unreachable()
+})
+
+test('cidr should sometimes return v6', () => {
+  const schema = z.string().cidr()
+  const v6 = schema.cidr({ version: 'v6' })
+  const faker = new ZodStringFaker(schema)
+  let safeCount = 0
+  while (++safeCount < 100) {
+    const data = faker.fake()
+    if (v6.safeParse(data).success) {
+      return
+    }
+  }
+  expect.unreachable()
+})
+
 test('cidr v4', () => {
   const schema = z.string().cidr({ version: 'v4' })
   const faker = new ZodStringFaker(schema)
@@ -107,6 +135,72 @@ test('duration', () => {
   const faker = new ZodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('duration should sometimes include years', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('Y')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes include months', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('M')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes include days', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('D')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes include hours', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('H')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes include minutes', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (/T.*\d+M/.test(data)) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes include seconds', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('S')) {
+      return
+    }
+  }
 })
 
 test('email', () => {

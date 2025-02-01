@@ -953,6 +953,28 @@ describe('nullish', () => {
 })
 
 describe('object', () => {
+  describe('unrelated', () => {
+    test('object + object catchall', () => {
+      install()
+
+      const left = z.object({ foo: z.string().min(5) })
+      const right = z.object({}).catchall(z.string().max(0))
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow()
+    })
+
+    test('object catchall + object', () => {
+      install()
+
+      const left = z.object({}).catchall(z.string().max(0))
+      const right = z.object({ foo: z.string().min(5) })
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow()
+    })
+  })
+
   test('object + object', () => {
     install()
 
@@ -1569,8 +1591,8 @@ describe('date', () => {
   test('date + date max (larger)', () => {
     install()
 
-    const left = z.date()
-    const right = z.date().max(new Date(123))
+    const left = z.date().max(new Date(123))
+    const right = z.date().max(new Date(456))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -1588,8 +1610,8 @@ describe('date', () => {
   test('date max (larger) + date', () => {
     install()
 
-    const left = z.date().max(new Date(123))
-    const right = z.date()
+    const left = z.date().max(new Date(456))
+    const right = z.date().max(new Date(123))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -1606,6 +1628,16 @@ describe('date', () => {
 })
 
 describe('array', () => {
+  test('unrelated', () => {
+    install()
+
+    const schema = z.intersection(z.array(z.string()), z.array(z.number()))
+    const faker = new ZodIntersectionFaker(schema)
+    const result = faker.findIntersectedSchema(z.array(z.string()), z.array(z.number()))
+    expect(result.success).toBe(false)
+    expect.assertions(1)
+  })
+
   test('array (inner type)', () => {
     install()
 
@@ -1796,32 +1828,54 @@ describe('array', () => {
 })
 
 describe('record', () => {
-  test('key type string', () => {
+  test('key type other than string is not yet supported', () => {
     install()
 
-    const left = z.record(z.date().min(new Date(0)))
-    const right = z.record(z.date().max(new Date(0)))
+    const left = z.record(z.literal('foo'), z.string().min(5))
+    const right = z.record(z.literal('bar'), z.string().max(0))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    const result = faker.findIntersectedSchema(left, right)
-    if (result.success) {
-      const schema = result.schema
-      if (schema instanceof z.ZodRecord) {
-        const valueType = schema._def.valueType
-        if (valueType instanceof z.ZodDate) {
-          expect(valueType._def.checks.length).toBe(2)
-          expect(
-            valueType._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
-          ).toBeTruthy()
-          expect(
-            valueType._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
-          ).toBeTruthy()
+    expect(() => faker.fake()).toThrow()
+  })
+
+  describe('key type string', () => {
+    test('unrelated', () => {
+      install()
+
+      const left = z.record(z.string().min(5))
+      const right = z.record(z.string().max(0))
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow()
+    })
+
+    test('related', () => {
+      install()
+
+      const left = z.record(z.date().min(new Date(0)))
+      const right = z.record(z.date().max(new Date(0)))
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      const result = faker.findIntersectedSchema(left, right)
+      if (result.success) {
+        const schema = result.schema
+        if (schema instanceof z.ZodRecord) {
+          const valueType = schema._def.valueType
+          if (valueType instanceof z.ZodDate) {
+            expect(valueType._def.checks.length).toBe(2)
+            expect(
+              valueType._def.checks.find(check => check.kind === 'min' && check.value === new Date(0).getTime()),
+            ).toBeTruthy()
+            expect(
+              valueType._def.checks.find(check => check.kind === 'max' && check.value === new Date(0).getTime()),
+            ).toBeTruthy()
+          }
         }
       }
-    }
-    const data = faker.fake()
-    expect(schema.safeParse(data)).toEqual({ success: true, data: data })
-    expect.assertions(4)
+      const data = faker.fake()
+      expect(schema.safeParse(data)).toEqual({ success: true, data: data })
+      expect.assertions(4)
+    })
   })
 })
 

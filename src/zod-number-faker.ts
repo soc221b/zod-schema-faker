@@ -26,8 +26,10 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
         case 'finite':
           finite = true
           break
-        default:
+        /* v8 ignore next 3 */
+        default: {
           const _: never = check
+        }
       }
     }
 

@@ -17,7 +17,7 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
         case 'max':
           max = check.value
           break
-        /* istanbul ignore next */
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }

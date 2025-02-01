@@ -18,8 +18,10 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
         case 'multipleOf':
           multipleOf = check.value < 0n ? -check.value : check.value
           break
-        default:
+        /* v8 ignore next 3 */
+        default: {
           const _: never = check
+        }
       }
     }
     const largeThanMultipleOf = multipleOf === undefined ? 1000n : multipleOf * 1000n

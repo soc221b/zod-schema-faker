@@ -413,6 +413,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'multipleOf':
           multipleOf = check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -429,6 +430,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'multipleOf':
           multipleOf = multipleOf === undefined ? check.value : multipleOf < check.value ? multipleOf : check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -470,6 +472,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'max':
           max = check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -483,6 +486,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'max':
           max = max === undefined ? check.value : max < check.value ? max : check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -712,6 +716,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'multipleOf':
           multipleOf = check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -734,6 +739,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'multipleOf':
           multipleOf = check.value
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }
@@ -837,6 +843,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'passthrough':
           schema = schema.catchall(catchall)
           break
+        /* v8 ignore next 3 */
         default: {
           const _: never = unknownKeys
         }
@@ -871,6 +878,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
             case 'passthrough': {
               return { success: true, schema: result.schema.catchall(left._def.valueType) }
             }
+            /* v8 ignore next 3 */
             default: {
               const _: never = unknownKeys
             }
@@ -995,6 +1003,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'emoji':
           emoji = true
           break
+        /* v8 ignore next 3 */
         default: {
           const _: (typeof dedicatedKinds)[number] = check.kind
         }
@@ -1033,6 +1042,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         case 'emoji':
           emoji = true
           break
+        /* v8 ignore next 3 */
         default: {
           const _: (typeof dedicatedKinds)[number] = check.kind
         }

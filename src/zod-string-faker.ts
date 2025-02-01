@@ -56,6 +56,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
                 ? runFake(faker => faker.internet.ip() + '/' + faker.number.int({ min: 0, max: 32 }))
                 : runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
               break
+            /* v8 ignore next 3 */
             default: {
               const _: never = check.version
             }
@@ -112,6 +113,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
             case undefined:
               ip = runFake(faker => faker.internet.ip())
               break
+            /* v8 ignore next 3 */
             default: {
               const _: never = check.version
             }
@@ -153,7 +155,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           return runFake(faker => faker.internet.url())
         case 'uuid':
           return runFake(faker => faker.string.uuid())
-        /* istanbul ignore next */
+        /* v8 ignore next 3 */
         default: {
           const _: never = check
         }

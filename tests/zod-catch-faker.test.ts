@@ -39,3 +39,27 @@ test('ZodCatchFaker.fake should return a valid data', () => {
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
 })
+
+test('ZodCatchFaker.fake should sometimes return catch value', () => {
+  install()
+  const schema = z.number().catch(42)
+  const faker = new ZodCatchFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data === 42) {
+      return
+    }
+  }
+})
+
+test('ZodCatchFaker.fake should sometimes not return catch value', () => {
+  install()
+  const schema = z.number().catch(42)
+  const faker = new ZodCatchFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data !== 42) {
+      return
+    }
+  }
+})
