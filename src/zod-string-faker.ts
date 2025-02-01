@@ -53,7 +53,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
               break
             case undefined:
               cidr = runFake(faker => faker.datatype.boolean())
-                ? runFake(faker => faker.internet.ip() + '/' + faker.number.int({ min: 0, max: 32 }))
+                ? runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
                 : runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
               break
             /* v8 ignore next 3 */

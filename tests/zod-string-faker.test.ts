@@ -2,7 +2,6 @@ import { expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodStringFaker } from '../src/zod-string-faker'
 import { expectType, TypeEqual } from 'ts-expect'
-import { testMultipleTimes } from './util'
 
 test('ZodStringFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -64,28 +63,24 @@ test('cidr should sometimes return v4', () => {
   const schema = z.string().cidr()
   const v4 = schema.cidr({ version: 'v4' })
   const faker = new ZodStringFaker(schema)
-  let safeCount = 0
-  while (++safeCount < 100) {
+  while (true) {
     const data = faker.fake()
     if (v4.safeParse(data).success) {
-      return
+      break
     }
   }
-  expect.unreachable()
 })
 
 test('cidr should sometimes return v6', () => {
   const schema = z.string().cidr()
   const v6 = schema.cidr({ version: 'v6' })
   const faker = new ZodStringFaker(schema)
-  let safeCount = 0
-  while (++safeCount < 100) {
+  while (true) {
     const data = faker.fake()
     if (v6.safeParse(data).success) {
-      return
+      break
     }
   }
-  expect.unreachable()
 })
 
 test('cidr v4', () => {
