@@ -185,9 +185,8 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       result = result.toUpperCase()
     }
     if (includes) {
-      result = runFake(faker => faker.datatype.boolean())
-        ? includes + result.slice(includes.length)
-        : result.slice(-1 * includes.length) + includes
+      const start = runFake(faker => faker.number.int({ min: 0, max: Math.max(0, result.length - includes.length) }))
+      result = result.slice(0, start) + includes + result.slice(start)
     }
     if (startsWith) {
       result = startsWith + result.slice(startsWith.length)
