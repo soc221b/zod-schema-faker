@@ -23,7 +23,7 @@ const schemas = (() => {
     // z.any(),
     z.unknown(),
     // z.never(),
-    z.nan(),
+    // z.nan(), // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
     z.enum(['Salmon', 'Tuna', 'Trout']),
     z.nativeEnum({
       Apple: 'apple',
