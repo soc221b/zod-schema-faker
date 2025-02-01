@@ -29,11 +29,7 @@ export default defineConfig({
     coverage: {
       include: ['src/**/*'],
       thresholds: {
-        autoUpdate: true,
-        branches: 100,
-        functions: 100,
-        lines: 100,
-        statements: 100,
+        '100': true,
       },
     },
   },
