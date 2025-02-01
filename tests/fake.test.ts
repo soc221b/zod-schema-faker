@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { fake, install } from '../src'
-import { uninstall } from '../src/zod-type-kind-to-zod-type-faker'
+import { uninstall } from '../src/installation'
 
 describe('fake', () => {
   test('fake is a function', () => {
