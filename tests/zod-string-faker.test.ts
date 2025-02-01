@@ -210,8 +210,22 @@ test('email', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
-testMultipleTimes('emoji', () => {
+test('emoji', () => {
   const schema = z.string().emoji()
+  const faker = new ZodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('emoji with even length', () => {
+  const schema = z.string().emoji().length(2)
+  const faker = new ZodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('emoji with odd length', () => {
+  const schema = z.string().emoji().length(1)
   const faker = new ZodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)

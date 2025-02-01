@@ -10,7 +10,7 @@ const averageParagraphLength = averageWordLength * 200
 // https://github.com/colinhacks/zod/blob/main/src/types.ts
 const cuidRegex = /^c[^\s-]{8,}$/i
 const cuid2Regex = /^[0-9a-z]+$/
-const emojisLength1 = ['☘', '➡️', '⚜']
+const emojisLength1 = ['☘', '⚜']
 const emojisLength2 = ['😳', '😀', '😁', '🤣', '😃', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '🥰', '😗', '😈', '👿']
 const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
 const base64UrlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/
@@ -195,11 +195,12 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       result = result.slice(-1 * endsWith.length) + endsWith
     }
     if (emoji) {
-      result = Array(result.length - (result.length % 2))
+      const odd = result.length % 2
+      result = Array((result.length - odd) / 2)
         .fill(null)
         .map(() => runFake(faker => faker.helpers.arrayElement(emojisLength2)))
         .join('')
-      if (result.length % 2) {
+      if (odd) {
         result += runFake(faker => faker.helpers.arrayElement(emojisLength1))
       }
     }
