@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodIntersectionFaker } from '../src/zod-intersection-faker'
 import { expectType, TypeEqual } from 'ts-expect'
-import { install } from '../src'
+import { install, installCustom, runFake, ZodTypeFaker } from '../src'
 import { testMultipleTimes } from './util'
 
 const Person = z.object({
@@ -10,6 +10,243 @@ const Person = z.object({
 })
 const Employee = z.object({
   role: z.string(),
+})
+
+describe('TODO', () => {
+  test('intersection 1', () => {
+    install()
+
+    const left = z.record(z.literal('a'), z.date().min(new Date(0)))
+    const right = z.record(z.literal('b'), z.date().max(new Date(0)))
+    const schema = z.intersection(left, right)
+    type T = z.infer<typeof schema>
+    const data: T = {
+      a: new Date(0),
+    }
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "received": "a",
+          "code": "invalid_literal",
+          "expected": "b",
+          "path": [
+            "a"
+          ],
+          "message": "Invalid literal value, expected \\"b\\""
+        }
+      ]]
+    `)
+  })
+
+  test('intersection 2', () => {
+    install()
+
+    const left = z.object({ name: z.object({ first: z.string() }) })
+    const right = z.record(z.enum(['a', 'b']), z.object({ sub: z.string() }))
+    const schema = z.intersection(left, right)
+    type T = z.infer<typeof schema>
+    const data: T = {
+      a: { sub: 'sub' },
+      name: { first: 'first' },
+    }
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "received": "name",
+          "code": "invalid_enum_value",
+          "options": [
+            "a",
+            "b"
+          ],
+          "path": [
+            "name"
+          ],
+          "message": "Invalid enum value. Expected 'a' | 'b', received 'name'"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "received": "undefined",
+          "path": [
+            "name",
+            "sub"
+          ],
+          "message": "Required"
+        }
+      ]]
+    `)
+  })
+
+  test('intersection 3', () => {
+    install()
+
+    const left = z.record(z.union([z.literal('one'), z.literal('two'), z.literal('three')]), z.string())
+    const right = z.record(z.union([z.literal('ones'), z.literal('twos'), z.literal('threes')]), z.string().array())
+    const schema = z.intersection(left, right)
+    type T = z.infer<typeof schema>
+    const data: T = {
+      one: 'foo',
+      ones: ['bar', 'baz'],
+    }
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "invalid_union",
+          "unionErrors": [
+            {
+              "issues": [
+                {
+                  "received": "ones",
+                  "code": "invalid_literal",
+                  "expected": "one",
+                  "path": [
+                    "ones"
+                  ],
+                  "message": "Invalid literal value, expected \\"one\\""
+                }
+              ],
+              "name": "ZodError"
+            },
+            {
+              "issues": [
+                {
+                  "received": "ones",
+                  "code": "invalid_literal",
+                  "expected": "two",
+                  "path": [
+                    "ones"
+                  ],
+                  "message": "Invalid literal value, expected \\"two\\""
+                }
+              ],
+              "name": "ZodError"
+            },
+            {
+              "issues": [
+                {
+                  "received": "ones",
+                  "code": "invalid_literal",
+                  "expected": "three",
+                  "path": [
+                    "ones"
+                  ],
+                  "message": "Invalid literal value, expected \\"three\\""
+                }
+              ],
+              "name": "ZodError"
+            }
+          ],
+          "path": [
+            "ones"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "string",
+          "received": "array",
+          "path": [
+            "ones"
+          ],
+          "message": "Expected string, received array"
+        },
+        {
+          "code": "invalid_union",
+          "unionErrors": [
+            {
+              "issues": [
+                {
+                  "received": "one",
+                  "code": "invalid_literal",
+                  "expected": "ones",
+                  "path": [
+                    "one"
+                  ],
+                  "message": "Invalid literal value, expected \\"ones\\""
+                }
+              ],
+              "name": "ZodError"
+            },
+            {
+              "issues": [
+                {
+                  "received": "one",
+                  "code": "invalid_literal",
+                  "expected": "twos",
+                  "path": [
+                    "one"
+                  ],
+                  "message": "Invalid literal value, expected \\"twos\\""
+                }
+              ],
+              "name": "ZodError"
+            },
+            {
+              "issues": [
+                {
+                  "received": "one",
+                  "code": "invalid_literal",
+                  "expected": "threes",
+                  "path": [
+                    "one"
+                  ],
+                  "message": "Invalid literal value, expected \\"threes\\""
+                }
+              ],
+              "name": "ZodError"
+            }
+          ],
+          "path": [
+            "one"
+          ],
+          "message": "Invalid input"
+        },
+        {
+          "code": "invalid_type",
+          "expected": "array",
+          "received": "string",
+          "path": [
+            "one"
+          ],
+          "message": "Expected array, received string"
+        }
+      ]]
+    `)
+  })
+
+  test('intersection 4', () => {
+    const fooKeySchema = z.custom<`foo.${string}`>(val => {
+      return typeof val === 'string' ? /^foo\..*$/.test(val) : false
+    })
+    class ZodFooKeyFaker extends ZodTypeFaker<typeof fooKeySchema> {
+      fake(): `foo.${string}` {
+        return `foo.${runFake(faker => faker.lorem.word())}`
+      }
+    }
+    install()
+    installCustom(fooKeySchema, ZodFooKeyFaker)
+
+    const left = z.record(fooKeySchema, z.string())
+    const right = z.object({ bar: z.string().optional() }).strip()
+    const schema = z.intersection(left, right)
+    type T = z.infer<typeof schema>
+    const data: T = {
+      bar: 'bar',
+      'foo.bar': 'bar',
+    }
+    expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
+      [ZodError: [
+        {
+          "code": "custom",
+          "fatal": true,
+          "path": [
+            "bar"
+          ],
+          "message": "Invalid input"
+        }
+      ]]
+    `)
+  })
 })
 
 describe('N/A', () => {
