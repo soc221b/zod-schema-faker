@@ -10,17 +10,9 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
     const result = this.findIntersectedSchema(leftSchema, rightSchema)
     if (result.success) {
-      // https://github.com/colinhacks/zod/blob/v3.24.1/src/types.ts#L3405
-      if (result.schema instanceof z.ZodNaN) {
-        return NaN
-      }
-
       let safeCount = 0
       while (++safeCount < 100) {
         const data = fake(result.schema) as z.infer<T>
-        if (Number.isNaN(data as any)) {
-          continue
-        }
         return data
       }
     }
@@ -88,14 +80,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodUndefined &&
-      right instanceof z.ZodUndefined &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
-    ) {
-      return { success: true, schema: z.undefined() }
-    }
-
     if (right instanceof z.ZodUndefined) {
       const result = this.findIntersectedSchema(z.never().optional(), left)
       if (result.success) {
@@ -189,14 +173,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (
-      left instanceof z.ZodNull &&
-      right instanceof z.ZodNull &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
-    ) {
-      return { success: true, schema: z.null() }
-    }
-
     if (right instanceof z.ZodNull) {
       const result = this.findIntersectedSchema(left, z.never().nullable())
       if (result.success) {

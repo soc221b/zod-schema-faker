@@ -34,7 +34,7 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
       if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
         max = maxDateValue
       } else {
-        max = (min ?? new Date('2025-01-01T00:00:00.000Z').getTime()) + 31536000000
+        max = min + 31536000000
       }
     }
 

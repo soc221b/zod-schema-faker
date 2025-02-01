@@ -24,7 +24,7 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
         }
       }
     }
-    const largeThanMultipleOf = multipleOf === undefined ? 1000n : multipleOf * 1000n
+    const largeThanMultipleOf = multipleOf * 1000n
     if (min !== undefined && max !== undefined) {
     } else if (min !== undefined) {
       max = min + largeThanMultipleOf
