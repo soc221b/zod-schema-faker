@@ -9,6 +9,6 @@ export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
 }
 
 export { seed, runFake, randexp } from './random'
-export { install, installCustom } from './zod-type-kind-to-zod-type-faker'
+export { install, installCustom } from './installation'
 export { ZodSchemaFakerError } from './error'
 export { ZodTypeFaker } from './zod-type-faker'
