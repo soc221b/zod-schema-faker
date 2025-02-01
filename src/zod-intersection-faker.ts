@@ -1024,6 +1024,9 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         }
       }
     }
+    if (min !== undefined && max !== undefined && min > max) {
+      return { success: false }
+    }
     let schema = z.string()
     if (min !== undefined) schema = schema.min(min)
     if (max !== undefined) schema = schema.max(max)
