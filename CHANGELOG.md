@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.1](https://github.com/soc221b/zod-schema-faker/compare/1.3.0...1.3.1) (2025-02-01)
+
+
+### Bug Fixes
+
+* **any:** prevent NaN genearetion as intersection of NaN is not allowed ([51f680f](https://github.com/soc221b/zod-schema-faker/commit/51f680fa01ef49c2d6b1872c8ee48a167d756c39))
+* **interseciton:** generate extra data when both objects are passthrough ([b112e59](https://github.com/soc221b/zod-schema-faker/commit/b112e590e1c1a069e2a026b905ce5cd5d947159f))
+* **intersection:** throw error on conflicting multipleOf values of bigint ([7d3f9b7](https://github.com/soc221b/zod-schema-faker/commit/7d3f9b75ce96726fdf9beae354d405f67b4d553e))
+* **intersection:** throw error on conflicting string length limits ([a675082](https://github.com/soc221b/zod-schema-faker/commit/a67508232c0dff079606fe451e754b9b6974166e))
+* **string:** ensure emoji adheres to length limits ([8ed7d19](https://github.com/soc221b/zod-schema-faker/commit/8ed7d19a5e924532648a84480aefd2f9ea43685e))
+
 ## [1.3.0](https://github.com/soc221b/zod-schema-faker/compare/1.2.2...1.3.0) (2025-01-31)
 
 
