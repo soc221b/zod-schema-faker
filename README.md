@@ -31,6 +31,7 @@
 - ✅ z.date
 - ✅ z.discriminatedUnion
 - ✅ z.enum
+- ✅ z.instanceof: see [example](./tests/zod-instanceof-faker.test.ts) for details.
 - ✅ z.intersection
 - ✅ z.function
 - ✅ z.lazy
