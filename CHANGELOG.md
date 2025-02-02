@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.2](https://github.com/soc221b/zod-schema-faker/compare/1.3.1...1.3.2) (2025-02-02)
+
+
+### Bug Fixes
+
+* handle multiple checks of the same kind ([#353](https://github.com/soc221b/zod-schema-faker/issues/353)) ([5790523](https://github.com/soc221b/zod-schema-faker/commit/579052343d92e204fee37dd6cc036c962cfad938))
+
 ## [1.3.1](https://github.com/soc221b/zod-schema-faker/compare/1.3.0...1.3.1) (2025-02-01)
 
 
