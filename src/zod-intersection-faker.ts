@@ -375,19 +375,17 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    let min: undefined | bigint = undefined
-    let max: undefined | bigint = undefined
-    let multipleOf: undefined | bigint = undefined
+    let schema = z.bigint()
     for (let check of left._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = check.value
+          schema = schema.min(check.value)
           break
         case 'max':
-          max = check.value
+          schema = schema.max(check.value)
           break
         case 'multipleOf':
-          multipleOf = check.value
+          schema = schema.multipleOf(check.value)
           break
         /* v8 ignore next 3 */
         default: {
@@ -398,16 +396,13 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     for (let check of right._def.checks) {
       switch (check.kind) {
         case 'min':
-          min = min === undefined ? check.value : min > check.value ? min : check.value
+          schema = schema.min(check.value)
           break
         case 'max':
-          max = max === undefined ? check.value : max < check.value ? max : check.value
+          schema = schema.max(check.value)
           break
         case 'multipleOf':
-          if (multipleOf !== undefined && check.value !== multipleOf) {
-            return { success: false }
-          }
-          multipleOf = check.value
+          schema = schema.multipleOf(check.value)
           break
         /* v8 ignore next 3 */
         default: {
@@ -415,10 +410,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         }
       }
     }
-    let schema = z.bigint()
-    if (min !== undefined) schema = schema.min(min)
-    if (max !== undefined) schema = schema.max(max)
-    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
     return { success: true, schema }
   }
 

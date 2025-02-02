@@ -3381,18 +3381,6 @@ describe('boolean', () => {
 })
 
 describe('bigint', () => {
-  describe('unrelated', () => {
-    test('bigint multipleOf + bigint multipleOf (different)', () => {
-      install()
-
-      const left = z.bigint().multipleOf(10n)
-      const right = z.bigint().multipleOf(20n)
-      const schema = z.intersection(left, right)
-      const faker = new ZodIntersectionFaker(schema)
-      expect(() => faker.fake()).toThrow()
-    })
-  })
-
   test('bigint + bigint', () => {
     install()
 
@@ -3513,12 +3501,13 @@ describe('bigint', () => {
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
-      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.length).toBe(2)
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10n)).toBeTruthy()
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20n)).toBeTruthy()
     }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(3)
+    expect.assertions(4)
   })
 
   test('bigint min (larger) + bigint min', () => {
@@ -3530,12 +3519,13 @@ describe('bigint', () => {
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
-      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.length).toBe(2)
       expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 20n)).toBeTruthy()
+      expect(result.schema._def.checks.find(check => check.kind === 'min' && check.value === 10n)).toBeTruthy()
     }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(3)
+    expect.assertions(4)
   })
 
   test('bigint max + bigint max (larger)', () => {
@@ -3547,12 +3537,13 @@ describe('bigint', () => {
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
-      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.length).toBe(2)
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 20n)).toBeTruthy()
     }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(3)
+    expect.assertions(4)
   })
 
   test('bigint max (larger) + bigint max', () => {
@@ -3564,12 +3555,13 @@ describe('bigint', () => {
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
     if (result.success && result.schema instanceof z.ZodBigInt) {
-      expect(result.schema._def.checks.length).toBe(1)
+      expect(result.schema._def.checks.length).toBe(2)
+      expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 20n)).toBeTruthy()
       expect(result.schema._def.checks.find(check => check.kind === 'max' && check.value === 10n)).toBeTruthy()
     }
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-    expect.assertions(3)
+    expect.assertions(4)
   })
 })
 
