@@ -189,3 +189,40 @@ describe('edge case', () => {
     expect(schema.safeParse(data).success).toBe(true)
   })
 })
+
+describe('multiple checks of the same kind', () => {
+  test('multiple min', () => {
+    const schema = z.bigint().min(200n).min(300n).min(100n).max(300n)
+    const faker = new ZodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data).toBe(300n)
+  })
+
+  test('multiple max', () => {
+    const schema = z.bigint().max(100n).max(300n).max(200n).min(100n)
+    const faker = new ZodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data).toBe(100n)
+  })
+
+  test('multiple multipleOf', () => {
+    const schema = z.bigint().multipleOf(2n).multipleOf(3n).min(2n).max(6n)
+    const faker = new ZodBigIntFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data).toBe(6n)
+  })
+})
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    const schema = z.bigint().min(100n).max(99n)
+    const faker = new ZodBigIntFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('min > max', () => {
+    const schema = z.bigint().min(100n).max(99n)
+    const faker = new ZodBigIntFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+})

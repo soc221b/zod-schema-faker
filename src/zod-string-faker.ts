@@ -19,14 +19,8 @@ const isoDateSchema = z.date().min(new Date('0000-01-01T00:00:00.000Z')).max(new
 
 export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
   fake(): z.infer<z.ZodString> {
-    let min = 0
-    let max = runFake(faker =>
-      faker.datatype.boolean()
-        ? averageWordLength
-        : faker.datatype.boolean()
-          ? averageSentenceLength
-          : averageParagraphLength,
-    )
+    let min: number | undefined = undefined
+    let max: number | undefined = undefined
     let exact: number | undefined = undefined
     let endsWith: string | undefined = undefined
     let includes: string | undefined = undefined
@@ -122,15 +116,24 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         }
         case 'jwt':
           return runFake(faker => faker.internet.jwt())
-        case 'length':
-          exact = check.value
+        case 'length': {
+          const _exact = check.value
+          if (exact !== undefined && exact !== _exact) {
+            throw new RangeError()
+          }
+          exact = _exact
           break
-        case 'max':
-          max = check.value
+        }
+        case 'max': {
+          const _max = check.value
+          max = max === undefined ? _max : Math.min(max, _max)
           break
-        case 'min':
-          min = check.value
+        }
+        case 'min': {
+          const _min = check.value
+          min = min === undefined ? _min : Math.max(min, _min)
           break
+        }
         case 'nanoid':
           return runFake(faker => faker.string.nanoid())
         case 'regex':
@@ -161,9 +164,33 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         }
       }
     }
-    min = exact ?? min
-    max = exact ?? max
-    max = Math.max(min, max)
+    if (exact !== undefined) {
+      if (min !== undefined && exact !== min) {
+        throw new RangeError()
+      }
+      if (max !== undefined && exact !== max) {
+        throw new RangeError()
+      }
+    }
+    if (min !== undefined) {
+      if (max !== undefined && min > max) {
+        throw new RangeError()
+      }
+    } else {
+      min = 0
+    }
+    if (max === undefined) {
+      max =
+        exact ??
+        min +
+          runFake(faker =>
+            faker.datatype.boolean()
+              ? averageWordLength
+              : faker.datatype.boolean()
+                ? averageSentenceLength
+                : averageParagraphLength,
+          )
+    }
 
     let result = ''
     while (Number.isFinite(min) && result.length < min) {

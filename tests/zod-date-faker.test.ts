@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodDateFaker } from '../src/zod-date-faker'
 import { expectType, TypeEqual } from 'ts-expect'
@@ -72,4 +72,30 @@ test('should sometimes generate an edge date (max)', () => {
       break
     }
   }
+})
+
+describe('multiple checks of the same kind', () => {
+  test('min', () => {
+    const schema = z
+      .date()
+      .min(new Date('2000-01-01T00:00:00.000Z'))
+      .min(new Date('2002-01-01T00:00:00.000Z'))
+      .min(new Date('2001-01-01T00:00:00.000Z'))
+      .max(new Date('2002-01-01T00:00:00.000Z'))
+    const faker = new ZodDateFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data).toEqual(new Date('2002-01-01T00:00:00.000Z'))
+  })
+
+  test('max', () => {
+    const schema = z
+      .date()
+      .max(new Date('2002-01-01T00:00:00.000Z'))
+      .max(new Date('2000-01-01T00:00:00.000Z'))
+      .max(new Date('2001-01-01T00:00:00.000Z'))
+      .min(new Date('2000-01-01T00:00:00.000Z'))
+    const faker = new ZodDateFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data).toEqual(new Date('2000-01-01T00:00:00.000Z'))
+  })
 })

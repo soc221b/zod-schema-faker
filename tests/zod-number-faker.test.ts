@@ -212,3 +212,40 @@ describe('edge case', () => {
     expect(schema.safeParse(data).success).toBe(true)
   })
 })
+
+describe('multiple checks of the same kind', () => {
+  test('min', () => {
+    const schema = z.number().int().min(5).min(3).min(4).max(5)
+    const faker = new ZodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toEqual(5)
+  })
+
+  test('max', () => {
+    const schema = z.number().int().max(3).max(5).max(4).min(3)
+    const faker = new ZodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toEqual(3)
+  })
+
+  test('multipleOf', () => {
+    const schema = z.number().int().multipleOf(2).multipleOf(3).min(2).max(6)
+    const faker = new ZodNumberFaker(schema)
+    const data = faker.fake()
+    expect(data).toEqual(6)
+  })
+})
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    const schema = z.number().min(1).max(0)
+    const faker = new ZodNumberFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('min > max', () => {
+    const schema = z.number().min(1).max(0)
+    const faker = new ZodNumberFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+})
