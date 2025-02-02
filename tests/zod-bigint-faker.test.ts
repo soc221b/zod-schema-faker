@@ -212,3 +212,17 @@ describe('multiple checks of the same kind', () => {
     expect(schema.safeParse(data).data).toBe(6n)
   })
 })
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    const schema = z.bigint().min(100n).max(99n)
+    const faker = new ZodBigIntFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('min > max', () => {
+    const schema = z.bigint().min(100n).max(99n)
+    const faker = new ZodBigIntFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+})

@@ -33,6 +33,9 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
     }
     const largeThanMultipleOf = multipleOf * 1000n
     if (min !== undefined && max !== undefined) {
+      if (min > max) {
+        throw new RangeError()
+      }
     } else if (min !== undefined) {
       max = min + largeThanMultipleOf
     } else if (max !== undefined) {
