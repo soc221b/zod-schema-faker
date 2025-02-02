@@ -17,5 +17,5 @@ export function lcm<T extends bigint | number>(a: T, b: T): T {
 }
 
 export function gcd<T extends bigint | number>(a: T, b: T): T {
-  return b === 0n ? a : gcd(b, (a % b) as T)
+  return b === 0n || b === 0 ? a : gcd(b, (a % b) as T)
 }
