@@ -1100,7 +1100,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
       let schema: z.ZodTuple<any, any> = z.tuple(items as any)
       if (rest !== undefined) schema = schema.rest(rest)
-      return this.findIntersectedSchema(schema, right)
+      const result = this.findIntersectedSchema(schema, right)
+      if (result.success) {
+        return { success: true, schema }
+      }
     }
 
     if (left instanceof z.ZodTuple && right instanceof z.ZodArray) {
