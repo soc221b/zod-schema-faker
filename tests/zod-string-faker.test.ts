@@ -375,3 +375,29 @@ describe('multiple checks of the same kind', () => {
     expect(data.length).toEqual(3)
   })
 })
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    const schema = z.string().min(5).max(4)
+    const faker = new ZodStringFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('min !== length', () => {
+    const schema = z.string().length(5).min(6)
+    const faker = new ZodStringFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('max !== length', () => {
+    const schema = z.string().length(5).max(4)
+    const faker = new ZodStringFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('length !== length', () => {
+    const schema = z.string().length(5).length(4)
+    const faker = new ZodStringFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+})
