@@ -7,82 +7,28 @@
 
 ## Motivation
 
-Despite the availability of several popular mocking libraries, they often fall short by being either too simplistic or
-generating invalid data.
+While several popular mocking libraries exist, they often fall short either by being too simplistic or by generating
+invalid data.
 
-### Up-to-date Support
+### Up-to-Date Support
 
-Our library ensures prompt support for any new methods introduced in zod. If a new method is added, our exhaustive
-checks will fail, prompting us to update the library accordingly.
+Our library guarantees timely updates for any new methods introduced in Zod. Whenever a new method is added, our
+exhaustive checks will catch inconsistencies, prompting immediate updates to maintain compatibility.
 
 ### Handling Edge Cases
 
-We generate data that covers edge cases to help test applications more thoroughly. For instance, if the schema is
-`z.number().int()`, the generated data will include boundary values like `Number.MIN_SAFE_INTEGER` and
+We generate data that covers edge cases, enabling more thorough application mocking. For example, if the schema is
+`z.number().int()`, the generated data will include boundary values such as `Number.MIN_SAFE_INTEGER` and
 `Number.MAX_SAFE_INTEGER`.
 
 ### Comprehensive Schema Support
 
-We strive to support all methods and types provided by zod, including complex ones like `z.intersection` and `z.custom`.
+We strive for full support of all Zod methods and types, including complex schemas like `z.intersection` and `z.custom`.
 
 ### Robust Test Coverage
 
-Our library boasts high test coverage, ensuring that all zod methods and types are thoroughly tested. We also add tests
-for every reported issue to prevent regressions.
-
-## Supported APIs
-
-- methods
-  - ✅ .and
-  - ✅ .array
-  - ✅ .brand
-  - ✅ .catch
-  - ✅ .default
-  - ✅ .nullable
-  - ✅ .nullish
-  - ✅ .optional
-  - ✅ .or
-  - ✅ .pipe
-  - ✅ .promise
-  - ✅ .readonly
-  - ❌ .refine
-  - ❌ .superRefine
-  - ✅ .transform
-- ✅ z.any
-- ✅ z.array
-- ✅ z.bigint
-- ✅ z.boolean
-- ✅ z.custom: see [example](./tests/zod-custom-faker.test.ts) for details.
-- ✅ z.date
-- ✅ z.discriminatedUnion
-- ✅ z.enum
-- ✅ z.instanceof: see [example](./tests/zod-instanceof-faker.test.ts) for details.
-- ✅ z.intersection
-- ✅ z.function
-- ✅ z.lazy
-- ✅ z.literal
-- ✅ z.map
-- ✅ z.nan
-- ✅ z.nativeEnum
-- ✅ z.never: always throws an error
-- ✅ z.null
-- ✅ z.number
-- ✅ z.object
-- ✅ z.preprocess[^2]
-- ✅ z.promise
-- ✅ z.record
-- ✅ z.set
-- ✅ z.string[^1]
-- ✅ z.symbol
-- ✅ z.tuple
-- ✅ z.undefined
-- ✅ z.union
-- ✅ z.unknown
-- ✅ z.void
-
-[^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
-
-[^2]: Not applicable, ignored
+Our library maintains extensive test coverage, validating every Zod method and type. Additionally, we introduce tests
+for all reported issues to prevent regressions and ensure long-term stability.
 
 ## Installation
 
@@ -317,6 +263,60 @@ const data = {
 - `class ZodTypeFaker`: see [example](./tests/zod-custom-faker.test.ts) for details
 
 - `class ZodSchemaFakerError`
+
+## Supported APIs
+
+- methods
+  - ✅ .and
+  - ✅ .array
+  - ✅ .brand
+  - ✅ .catch
+  - ✅ .default
+  - ✅ .nullable
+  - ✅ .nullish
+  - ✅ .optional
+  - ✅ .or
+  - ✅ .pipe
+  - ✅ .promise
+  - ✅ .readonly
+  - ❌ .refine
+  - ❌ .superRefine
+  - ✅ .transform
+- ✅ z.any
+- ✅ z.array
+- ✅ z.bigint
+- ✅ z.boolean
+- ✅ z.custom: see [example](./tests/zod-custom-faker.test.ts) for details.
+- ✅ z.date
+- ✅ z.discriminatedUnion
+- ✅ z.enum
+- ✅ z.instanceof: see [example](./tests/zod-instanceof-faker.test.ts) for details.
+- ✅ z.intersection
+- ✅ z.function
+- ✅ z.lazy
+- ✅ z.literal
+- ✅ z.map
+- ✅ z.nan
+- ✅ z.nativeEnum
+- ✅ z.never: always throws an error
+- ✅ z.null
+- ✅ z.number
+- ✅ z.object
+- ✅ z.preprocess[^2]
+- ✅ z.promise
+- ✅ z.record
+- ✅ z.set
+- ✅ z.string[^1]
+- ✅ z.symbol
+- ✅ z.tuple
+- ✅ z.undefined
+- ✅ z.union
+- ✅ z.unknown
+- ✅ z.void
+
+[^1]: Not compatible with other validations. For example, `z.length(5)` is ignored in `z.base64().length(5)`.
+
+[^2]: Not applicable, ignored
 
 ## About
 
