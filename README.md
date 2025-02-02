@@ -10,7 +10,7 @@
 Despite the availability of several popular mocking libraries, they often fall short by being either too simplistic or
 generating invalid data.
 
-### Staying Current
+### Up-to-date Support
 
 Our library ensures prompt support for any new methods introduced in zod. If a new method is added, our exhaustive
 checks will fail, prompting us to update the library accordingly.
