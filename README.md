@@ -1,9 +1,34 @@
 # zod-schema-faker
 
-> Generates mock data from [zod](https://github.com/colinhacks/zod) schema. Powered by
-> [@faker-js/faker](https://github.com/faker-js/faker) and [randexp.js](https://github.com/fent/randexp.js)
+> Generate mock data from [zod](https://github.com/colinhacks/zod) schemas. Powered by
+> [@faker-js/faker](https://github.com/faker-js/faker) and [randexp.js](https://github.com/fent/randexp.js).
 
 [![zod-schema-faker version](https://img.shields.io/npm/v/zod-schema-faker.svg?label=zod-schema-faker&color=brightgreen)](https://www.npmjs.com/package/zod-schema-faker)
+
+## Motivation
+
+Despite the availability of several popular mocking libraries, they often fall short by being either too simplistic or
+generating invalid data.
+
+### Staying Current
+
+Our library ensures prompt support for any new methods introduced in zod. If a new method is added, our exhaustive
+checks will fail, prompting us to update the library accordingly.
+
+### Handling Edge Cases
+
+We generate data that covers edge cases to help test applications more thoroughly. For instance, if the schema is
+`z.number().int()`, the generated data will include boundary values like `Number.MIN_SAFE_INTEGER` and
+`Number.MAX_SAFE_INTEGER`.
+
+### Comprehensive Schema Support
+
+We strive to support all methods and types provided by zod, including complex ones like `z.intersection` and `z.custom`.
+
+### Robust Test Coverage
+
+Our library boasts high test coverage, ensuring that all zod methods and types are thoroughly tested. We also add tests
+for every reported issue to prevent regressions.
 
 ## Supported APIs
 
