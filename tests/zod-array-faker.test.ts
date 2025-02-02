@@ -96,3 +96,23 @@ describe('multiple checks of the same kind', () => {
     expect(schema.safeParse(data).data?.length).toBeLessThanOrEqual(4)
   })
 })
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    const schema = z.array(z.number()).min(5).max(4)
+    const faker = new ZodArrayFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('min !== length', () => {
+    const schema = z.array(z.number()).min(5).length(4)
+    const faker = new ZodArrayFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+
+  test('max !== length', () => {
+    const schema = z.array(z.number()).max(5).length(4)
+    const faker = new ZodArrayFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
+})
