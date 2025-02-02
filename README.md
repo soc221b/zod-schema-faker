@@ -318,6 +318,30 @@ const data = {
 
 [^2]: Not applicable, ignored
 
+## Comparison
+
+### @anatine/zod-mock
+
+https://github.com/anatine/zod-plugins/tree/main/packages/zod-mock
+
+- Excels at generating realistic data for `z.string`. For instance, `z.object({ image: z.string() })` will produce a URL
+  string.
+- Lacks support for some basic zod types such as `z.any`, `z.default`, `z.tuple`, etc.
+
+### zod-fixture
+
+https://github.com/timdeschryver/zod-fixture
+
+- Provides support for custom zod types.
+- Occasionally generates invalid mocked data. For example, calling with the function generated from
+  `z.function(z.tuple([]), z.boolean())` did not return a boolean value.
+
+### Libraries not actively maintained in the past year
+
+- https://github.com/dipasqualew/zod-mocking
+- https://github.com/LorisSigrist/zocker
+- https://github.com/ItMaga/zodock
+
 ## About
 
 Distributed under the MIT license. See LICENSE for more information.
