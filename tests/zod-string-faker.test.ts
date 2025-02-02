@@ -2,6 +2,7 @@ import { expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodStringFaker } from '../src/zod-string-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { describe } from 'node:test'
 
 test('ZodStringFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -357,4 +358,20 @@ test('uuid', () => {
   const faker = new ZodStringFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+describe('multiple checks of the same kind', () => {
+  test('min', () => {
+    const schema = z.string().min(5).min(3).min(4).max(5)
+    const faker = new ZodStringFaker(schema)
+    const data = faker.fake()
+    expect(data.length).toEqual(5)
+  })
+
+  test('max', () => {
+    const schema = z.string().max(3).max(5).max(4).min(3)
+    const faker = new ZodStringFaker(schema)
+    const data = faker.fake()
+    expect(data.length).toEqual(3)
+  })
 })

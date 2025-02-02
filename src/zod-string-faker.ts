@@ -125,12 +125,16 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
         case 'length':
           exact = check.value
           break
-        case 'max':
-          max = check.value
+        case 'max': {
+          const _max = check.value
+          max = max === undefined ? _max : Math.min(max, _max)
           break
-        case 'min':
-          min = check.value
+        }
+        case 'min': {
+          const _min = check.value
+          min = min === undefined ? _min : Math.max(min, _min)
           break
+        }
         case 'nanoid':
           return runFake(faker => faker.string.nanoid())
         case 'regex':
