@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodArrayFaker } from '../src/zod-array-faker'
 import { expectType, TypeEqual } from 'ts-expect'
@@ -75,4 +75,24 @@ test('length', () => {
   const faker = new ZodArrayFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+describe('multiple checks of the same kind', () => {
+  test('min', () => {
+    install()
+
+    const schema = z.array(z.number()).min(5).min(3).min(4).max(5)
+    const faker = new ZodArrayFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data?.length).toBeGreaterThanOrEqual(4)
+  })
+
+  test('max', () => {
+    install()
+
+    const schema = z.array(z.number()).max(3).max(5).max(4).min(3)
+    const faker = new ZodArrayFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).data?.length).toBeLessThanOrEqual(4)
+  })
 })
