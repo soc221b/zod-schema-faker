@@ -11,12 +11,16 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
     let max: undefined | number = undefined
     for (const check of this.schema._def.checks) {
       switch (check.kind) {
-        case 'min':
-          min = check.value
+        case 'min': {
+          const _min = check.value
+          min = min !== undefined ? Math.max(min, _min) : _min
           break
-        case 'max':
-          max = check.value
+        }
+        case 'max': {
+          const _max = check.value
+          max = max !== undefined ? Math.min(max, _max) : _max
           break
+        }
         /* v8 ignore next 3 */
         default: {
           const _: never = check
