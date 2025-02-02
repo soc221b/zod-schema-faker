@@ -1,4 +1,4 @@
-import { expect, test } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodSetFaker } from '../src/zod-set-faker'
 import { expectType, TypeEqual } from 'ts-expect'
@@ -75,4 +75,14 @@ test('size', () => {
   const faker = new ZodSetFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
+})
+
+describe('impossible case', () => {
+  test('min > max', () => {
+    install()
+
+    const schema = z.set(z.number()).min(10).max(5)
+    const faker = new ZodSetFaker(schema)
+    expect(() => faker.fake()).toThrow(RangeError)
+  })
 })

@@ -8,6 +8,10 @@ export class ZodSetFaker<T extends z.ZodSet<any>> extends ZodTypeFaker<T> {
     const min = this.schema._def.minSize?.value ?? 0
     const max = this.schema._def.maxSize?.value ?? runFake(faker => faker.number.int({ min, max: min + 10 }))
 
+    if (min > max) {
+      throw new RangeError()
+    }
+
     const set = new Set()
     while (set.size < min) {
       set.add(fake(this.schema._def.valueType))
