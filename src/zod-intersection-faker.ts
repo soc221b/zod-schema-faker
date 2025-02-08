@@ -626,64 +626,30 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       return { success: false }
     }
 
-    let min = -Infinity
-    let max = Infinity
-    let int = false
-    let finite = false
-    let multipleOf = undefined
-    for (let check of left._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = Math.max(min, check.value)
-          break
-        case 'max':
-          max = Math.min(max, check.value)
-          break
-        case 'int':
-          int = true
-          break
-        case 'finite':
-          finite = true
-          break
-        case 'multipleOf':
-          multipleOf = check.value
-          break
-        /* v8 ignore next 3 */
-        default: {
-          const _: never = check
-        }
-      }
-    }
-    for (let check of right._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = Math.max(min, check.value)
-          break
-        case 'max':
-          max = Math.min(max, check.value)
-          break
-        case 'int':
-          int = true
-          break
-        case 'finite':
-          finite = true
-          break
-        case 'multipleOf':
-          multipleOf = check.value
-          break
-        /* v8 ignore next 3 */
-        default: {
-          const _: never = check
-        }
-      }
-    }
-
     let schema = z.number()
-    if (min !== -Infinity) schema = schema.min(min)
-    if (max !== Infinity) schema = schema.max(max)
-    if (finite) schema = schema.finite()
-    if (int) schema = schema.int()
-    if (multipleOf !== undefined) schema = schema.multipleOf(multipleOf)
+    for (const check of [...left._def.checks, ...right._def.checks]) {
+      switch (check.kind) {
+        case 'min':
+          schema = schema.min(check.value)
+          break
+        case 'max':
+          schema = schema.max(check.value)
+          break
+        case 'int':
+          schema = schema.int()
+          break
+        case 'finite':
+          schema = schema.finite()
+          break
+        case 'multipleOf':
+          schema = schema.multipleOf(check.value)
+          break
+        /* v8 ignore next 3 */
+        default: {
+          const _: never = check
+        }
+      }
+    }
     return { success: true, schema }
   }
 
