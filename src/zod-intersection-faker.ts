@@ -1,4 +1,4 @@
-import { UnknownKeysParam, z } from 'zod'
+import { UnknownKeysParam, z, ZodString } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
 import { runFake } from './random'
@@ -844,122 +844,29 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       'base64',
       'base64url',
     ] as const
-    for (let check of left._def.checks) {
-      for (let kind of dedicatedKinds) {
-        if (check.kind === kind) {
-          return { success: true, schema: left }
-        }
-      }
-    }
-    for (let check of right._def.checks) {
-      for (let kind of dedicatedKinds) {
-        if (check.kind === kind) {
-          return { success: true, schema: right }
-        }
-      }
-    }
-
-    let min: undefined | number = undefined
-    let max: undefined | number = undefined
-    let endsWith: undefined | string = undefined
-    let includes: undefined | string = undefined
-    let startsWith: undefined | string = undefined
-    let toLowercase = false
-    let toUppercase = false
-    let trim = false
-    let emoji = false
-    for (let check of left._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = check.value
-          break
-        case 'max':
-          max = check.value
-          break
-        case 'length':
-          min = check.value
-          max = check.value
-          break
-        case 'endsWith':
-          endsWith = check.value
-          break
-        case 'includes':
-          includes = check.value
-          break
-        case 'startsWith':
-          startsWith = check.value
-          break
-        case 'toLowerCase':
-          toLowercase = true
-          break
-        case 'toUpperCase':
-          toUppercase = true
-          break
-        case 'trim':
-          trim = true
-          break
-        case 'emoji':
-          emoji = true
-          break
-        /* v8 ignore next 3 */
-        default: {
-          const _: (typeof dedicatedKinds)[number] = check.kind
-        }
-      }
-    }
-    for (let check of right._def.checks) {
-      switch (check.kind) {
-        case 'min':
-          min = Math.max(min ?? check.value, check.value)
-          break
-        case 'max':
-          max = Math.min(max ?? check.value, check.value)
-          break
-        case 'length':
-          min = Math.max(min ?? check.value, check.value)
-          max = Math.min(max ?? check.value, check.value)
-          break
-        case 'endsWith':
-          endsWith = check.value
-          break
-        case 'includes':
-          includes = check.value
-          break
-        case 'startsWith':
-          startsWith = check.value
-          break
-        case 'toLowerCase':
-          toLowercase = true
-          break
-        case 'toUpperCase':
-          toUppercase = true
-          break
-        case 'trim':
-          trim = true
-          break
-        case 'emoji':
-          emoji = true
-          break
-        /* v8 ignore next 3 */
-        default: {
-          const _: (typeof dedicatedKinds)[number] = check.kind
-        }
-      }
-    }
-    if (min !== undefined && max !== undefined && min > max) {
+    const leftDedicatedCheckKinds = left._def.checks
+      .map(check => check.kind)
+      .filter(kind => dedicatedKinds.some(dedicatedKind => kind === dedicatedKind))
+    const rightDedicatedCheckKinds = right._def.checks
+      .map(check => check.kind)
+      .filter(kind => dedicatedKinds.some(dedicatedKind => kind === dedicatedKind))
+    if (
+      leftDedicatedCheckKinds.length &&
+      leftDedicatedCheckKinds.some(
+        kind => rightDedicatedCheckKinds.length === 0 || rightDedicatedCheckKinds.includes(kind),
+      ) === false
+    ) {
       return { success: false }
     }
-    let schema = z.string()
-    if (min !== undefined) schema = schema.min(min)
-    if (max !== undefined) schema = schema.max(max)
-    if (endsWith !== undefined) schema = schema.endsWith(endsWith)
-    if (includes !== undefined) schema = schema.includes(includes)
-    if (startsWith !== undefined) schema = schema.startsWith(startsWith)
-    if (toLowercase) schema = schema.toLowerCase()
-    if (toUppercase) schema = schema.toUpperCase()
-    if (trim) schema = schema.trim()
-    if (emoji) schema = schema.emoji()
-    return { success: true, schema }
+
+    return {
+      success: true,
+      schema: new ZodString({
+        coerce: left._def.coerce || right._def.coerce,
+        checks: [...left._def.checks, ...right._def.checks],
+        typeName: left._def.typeName,
+      }),
+    }
   }
 
   private findIntersectedSchemaForSymbol = (
