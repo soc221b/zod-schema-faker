@@ -51,6 +51,7 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
 
     min ??= Number.MIN_SAFE_INTEGER
     max ??= Number.MAX_SAFE_INTEGER
+    int = int || (multipleOf !== undefined && multipleOf % 1 === 0)
     if (min > max) {
       throw new RangeError()
     }

@@ -234,6 +234,13 @@ describe('multiple checks of the same kind', () => {
     const data = faker.fake()
     expect(data).toEqual(6)
   })
+
+  test('multipleOf w/o int', () => {
+    const schema = z.number().multipleOf(7).multipleOf(11)
+    const faker = new ZodNumberFaker(schema)
+    const data = faker.fake()
+    expect(schema.safeParse(data).success).toBe(true)
+  })
 })
 
 describe('impossible case', () => {
