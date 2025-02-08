@@ -1844,8 +1844,8 @@ describe('record', () => {
     test('unrelated', () => {
       install()
 
-      const left = z.record(z.string().min(5))
-      const right = z.record(z.string().max(0))
+      const left = z.record(z.string())
+      const right = z.record(z.number())
       const schema = z.intersection(left, right)
       const faker = new ZodIntersectionFaker(schema)
       expect(() => faker.fake()).toThrow()

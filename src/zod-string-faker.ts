@@ -165,11 +165,19 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       }
     }
     if (exact !== undefined) {
-      if (min !== undefined && exact !== min) {
-        throw new RangeError()
+      if (min !== undefined) {
+        if (exact < min) {
+          throw new RangeError()
+        } else {
+          min = exact
+        }
       }
-      if (max !== undefined && exact !== max) {
-        throw new RangeError()
+      if (max !== undefined) {
+        if (max < exact) {
+          throw new RangeError()
+        } else {
+          max = exact
+        }
       }
     }
     if (min !== undefined) {

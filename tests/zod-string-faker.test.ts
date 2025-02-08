@@ -360,6 +360,20 @@ test('uuid', () => {
   expect(schema.safeParse(data).success).toBe(true)
 })
 
+test('min < length', () => {
+  const schema = z.string().length(5).min(4)
+  const faker = new ZodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
+test('max > length', () => {
+  const schema = z.string().length(5).max(6)
+  const faker = new ZodStringFaker(schema)
+  const data = faker.fake()
+  expect(schema.safeParse(data).success).toBe(true)
+})
+
 describe('multiple checks of the same kind', () => {
   test('min', () => {
     const schema = z.string().min(5).min(3).min(4).max(5)
@@ -383,13 +397,13 @@ describe('impossible case', () => {
     expect(() => faker.fake()).toThrow(RangeError)
   })
 
-  test('min !== length', () => {
+  test('min > length', () => {
     const schema = z.string().length(5).min(6)
     const faker = new ZodStringFaker(schema)
     expect(() => faker.fake()).toThrow(RangeError)
   })
 
-  test('max !== length', () => {
+  test('max < length', () => {
     const schema = z.string().length(5).max(4)
     const faker = new ZodStringFaker(schema)
     expect(() => faker.fake()).toThrow(RangeError)
