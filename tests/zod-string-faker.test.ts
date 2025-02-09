@@ -144,12 +144,34 @@ test('duration should sometimes include years', () => {
   }
 })
 
+test('duration should sometimes not include years', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('Y') === false) {
+      return
+    }
+  }
+})
+
 test('duration should sometimes include months', () => {
   const schema = z.string().duration()
   const faker = new ZodStringFaker(schema)
   while (true) {
     const data = faker.fake()
     if (data.includes('M')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes not include months', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('M') === false) {
       return
     }
   }
@@ -166,12 +188,34 @@ test('duration should sometimes include days', () => {
   }
 })
 
+test('duration should sometimes not include days', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('D') === false) {
+      return
+    }
+  }
+})
+
 test('duration should sometimes include hours', () => {
   const schema = z.string().duration()
   const faker = new ZodStringFaker(schema)
   while (true) {
     const data = faker.fake()
     if (data.includes('H')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes not include hours', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('H') === false) {
       return
     }
   }
@@ -188,12 +232,34 @@ test('duration should sometimes include minutes', () => {
   }
 })
 
+test('duration should sometimes not include minutes', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (/T.*\d+M/.test(data) === false) {
+      return
+    }
+  }
+})
+
 test('duration should sometimes include seconds', () => {
   const schema = z.string().duration()
   const faker = new ZodStringFaker(schema)
   while (true) {
     const data = faker.fake()
     if (data.includes('S')) {
+      return
+    }
+  }
+})
+
+test('duration should sometimes not include seconds', () => {
+  const schema = z.string().duration()
+  const faker = new ZodStringFaker(schema)
+  while (true) {
+    const data = faker.fake()
+    if (data.includes('S') === false) {
       return
     }
   }
