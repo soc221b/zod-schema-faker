@@ -1638,14 +1638,56 @@ describe('date', () => {
 })
 
 describe('array', () => {
-  test('unrelated', () => {
-    install()
+  describe('unrelated', () => {
+    test('type', () => {
+      install()
 
-    const schema = z.intersection(z.array(z.string()), z.array(z.number()))
-    const faker = new ZodIntersectionFaker(schema)
-    const result = faker.findIntersectedSchema(z.array(z.string()), z.array(z.number()))
-    expect(result.success).toBe(false)
-    expect.assertions(1)
+      const left = z.array(z.string())
+      const right = z.array(z.number())
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('length', () => {
+      install()
+
+      const left = z.array(z.string()).length(0)
+      const right = z.array(z.string()).length(1)
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('length < min', () => {
+      install()
+
+      const left = z.array(z.string()).length(0)
+      const right = z.array(z.string()).min(1)
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('length > max', () => {
+      install()
+
+      const left = z.array(z.string()).length(2)
+      const right = z.array(z.string()).max(1)
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('min > max', () => {
+      install()
+
+      const left = z.array(z.string()).min(1)
+      const right = z.array(z.string()).max(0)
+      const schema = z.intersection(left, right)
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
   })
 
   test('array (inner type)', () => {
