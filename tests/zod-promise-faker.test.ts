@@ -1,8 +1,16 @@
-import { expect, test } from 'vitest'
+import { afterEach, beforeEach, expect, test, vitest } from 'vitest'
 import { z } from 'zod'
 import { ZodPromiseFaker } from '../src/zod-promise-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../src'
+
+beforeEach(() => {
+  vitest.useFakeTimers()
+})
+
+afterEach(() => {
+  vitest.useRealTimers()
+})
 
 test('ZodPromiseFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -38,6 +46,50 @@ test('ZodPromiseFaker.fake should return a valid data', async () => {
   const schema = z.promise(z.string())
   const faker = new ZodPromiseFaker(schema)
   const data = faker.fake()
+  vitest.runAllTimers()
   expect((await schema.safeParseAsync(data)).success).toBe(true)
-  await data
+})
+
+test('microtask', async () => {
+  install()
+  const schema = z.promise(z.string())
+  const faker = new ZodPromiseFaker(schema)
+
+  while (true) {
+    let data
+    faker.fake().then(_data => {
+      data = _data
+    })
+    const micro = Promise.resolve()
+    vitest.runAllTicks()
+    await micro
+    if (typeof data === 'string') {
+      return
+    }
+  }
+})
+
+test('task', async () => {
+  install()
+  const schema = z.promise(z.string())
+  const faker = new ZodPromiseFaker(schema)
+
+  while (true) {
+    let data
+    faker.fake().then(_data => {
+      data = _data
+    })
+    const micro = Promise.resolve()
+    const macro = new Promise(resolve => setTimeout(resolve))
+    vitest.runAllTicks()
+    await micro
+    if (typeof data === 'string') {
+      continue
+    }
+    await vitest.advanceTimersByTime(0)
+    await macro
+    if (typeof data === 'string') {
+      return
+    }
+  }
 })
