@@ -5,19 +5,12 @@ import { runFake } from './random'
 
 export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends ZodTypeFaker<T> {
   fake(): z.infer<T> {
-    const leftSchema: z.ZodType = this.schema._def.left
-    const rightSchema: z.ZodType = this.schema._def.right
-
-    const result = this.findIntersectedSchema(leftSchema, rightSchema)
+    const result = this.findIntersectedSchema(this.schema._def.left, this.schema._def.right)
     if (result.success) {
-      let safeCount = 0
-      while (++safeCount < 100) {
-        const data = fake(result.schema) as z.infer<T>
-        return data
-      }
+      return fake(result.schema) as z.infer<T>
+    } else {
+      throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
     }
-
-    throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
   }
 
   findIntersectedSchema(
@@ -216,11 +209,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
     if (right instanceof z.ZodIntersection) {
-      const result = this.findIntersectedSchema(left, right._def.left)
-      if (result.success) {
-        const result2 = this.findIntersectedSchema(result.schema, right._def.right)
-        if (result2.success) {
-          return { success: true, schema: result2.schema }
+      const rightIntersectedSchema = this.findIntersectedSchema(right._def.left, right._def.right)
+      if (rightIntersectedSchema.success) {
+        const intersectedSchema = this.findIntersectedSchema(left, rightIntersectedSchema.schema)
+        if (intersectedSchema.success) {
+          return { success: true, schema: intersectedSchema.schema }
         }
       }
     }
