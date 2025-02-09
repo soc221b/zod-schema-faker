@@ -2,7 +2,7 @@
   "name": "zod-schema-faker",
   "type": "module",
   "sideEffects": false,
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Generates mock data from zod schema. Powered by @faker-js/faker and randexp.js",
   "keywords": [
     "zod",
