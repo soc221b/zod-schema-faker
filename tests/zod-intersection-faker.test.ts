@@ -612,6 +612,24 @@ describe('unknown', () => {
 })
 
 describe('undefined', () => {
+  describe('unrelated', () => {
+    test('undefined + the-other', () => {
+      install()
+
+      const schema = z.intersection(z.undefined(), z.date())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('the-other + undefined', () => {
+      install()
+
+      const schema = z.intersection(z.date(), z.undefined())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+  })
+
   test('undefined + undefined', () => {
     install()
 
@@ -639,14 +657,6 @@ describe('undefined', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  test('undefined + the-other', () => {
-    install()
-
-    const schema = z.intersection(z.undefined(), z.date())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
-
   test('optional + undefined', () => {
     install()
 
@@ -664,17 +674,27 @@ describe('undefined', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
-
-  test('the-other + undefined', () => {
-    install()
-
-    const schema = z.intersection(z.date(), z.undefined())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
 })
 
 describe('optional', () => {
+  describe('unrelated', () => {
+    test('optional + the other', () => {
+      install()
+
+      const schema = z.intersection(z.date().optional(), z.boolean())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('the other + optional', () => {
+      install()
+
+      const schema = z.intersection(z.boolean(), z.date().optional())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+  })
+
   test('optional + optional', () => {
     install()
 
@@ -717,14 +737,6 @@ describe('optional', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  test('optional + the other (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.date().optional(), z.boolean())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
-
   test('nullish + optional', () => {
     install()
 
@@ -741,14 +753,6 @@ describe('optional', () => {
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  test('the other + optional (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.boolean(), z.date().optional())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
   })
 })
 
@@ -800,6 +804,24 @@ describe('null', () => {
 })
 
 describe('nullable', () => {
+  describe('unrelated', () => {
+    test('nullable + the other', () => {
+      install()
+
+      const schema = z.intersection(z.date().nullable(), z.boolean())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('the other + nullable', () => {
+      install()
+
+      const schema = z.intersection(z.boolean(), z.date().nullable())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+  })
+
   test('nullable + nullable', () => {
     install()
 
@@ -842,14 +864,6 @@ describe('nullable', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  test('nullable + the other (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.date().nullable(), z.boolean())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
-
   test('nullish + nullable', () => {
     install()
 
@@ -867,17 +881,27 @@ describe('nullable', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
-
-  test('the other + nullable (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.boolean(), z.date().nullable())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
 })
 
 describe('nullish', () => {
+  describe('unrelated', () => {
+    test('nullish + the other', () => {
+      install()
+
+      const schema = z.intersection(z.date().nullish(), z.boolean())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+
+    test('the other + nullish', () => {
+      install()
+
+      const schema = z.intersection(z.boolean(), z.date().nullish())
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
+  })
+
   test('nullish + nullish', () => {
     install()
 
@@ -926,14 +950,6 @@ describe('nullish', () => {
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
 
-  test('nullish + the other (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.date().nullish(), z.boolean())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
-
   test('the other + nullish', () => {
     install()
 
@@ -942,14 +958,6 @@ describe('nullish', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
-
-  test('the other + nullish (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.boolean(), z.date().nullish())
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
 })
 
 describe('object', () => {
@@ -957,21 +965,21 @@ describe('object', () => {
     test('object + object catchall', () => {
       install()
 
-      const left = z.object({ foo: z.string().min(5) })
-      const right = z.object({}).catchall(z.string().max(0))
+      const left = z.object({ foo: z.number() }).strict()
+      const right = z.object({}).catchall(z.boolean()).strict()
       const schema = z.intersection(left, right)
       const faker = new ZodIntersectionFaker(schema)
-      expect(() => faker.fake()).toThrow()
+      expect(() => faker.fake()).toThrow(TypeError)
     })
 
     test('object catchall + object', () => {
       install()
 
-      const left = z.object({}).catchall(z.string().max(0))
-      const right = z.object({ foo: z.string().min(5) })
+      const left = z.object({}).catchall(z.boolean()).strict()
+      const right = z.object({ foo: z.number() }).strict()
       const schema = z.intersection(left, right)
       const faker = new ZodIntersectionFaker(schema)
-      expect(() => faker.fake()).toThrow()
+      expect(() => faker.fake()).toThrow(TypeError)
     })
   })
 
@@ -1837,7 +1845,7 @@ describe('record', () => {
     const right = z.record(z.literal('bar'), z.string().max(0))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   describe('key type string', () => {
@@ -1848,7 +1856,7 @@ describe('record', () => {
       const right = z.record(z.number())
       const schema = z.intersection(left, right)
       const faker = new ZodIntersectionFaker(schema)
-      expect(() => faker.fake()).toThrow()
+      expect(() => faker.fake()).toThrow(TypeError)
     })
 
     test('related', () => {
@@ -1889,7 +1897,7 @@ describe('record and object', () => {
     const right = z.record(z.date())
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('record + object strict', () => {
@@ -2170,7 +2178,7 @@ describe('array and tuple', () => {
     const right = z.tuple([z.literal(1), z.literal(2), z.literal(3)])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('tuple [date, date] + array [date]', () => {
@@ -2366,7 +2374,7 @@ describe('non-union and union', () => {
     const right = z.union([z.number(), z.date()])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('union [date min, number] + date max', () => {
@@ -2430,26 +2438,28 @@ describe('non-union and union', () => {
 })
 
 describe('discriminatedUnion', () => {
-  test('discriminated union + discriminated union (different discriminator)', () => {
-    install()
+  describe('unrelated', () => {
+    test('discriminated union + discriminated union (different discriminator)', () => {
+      install()
 
-    const schema = z.intersection(
-      z.discriminatedUnion('foo', [z.object({ foo: z.literal('a'), a: z.date() })]),
-      z.discriminatedUnion('bar', [z.object({ bar: z.literal('a'), a: z.date() })]),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
-  })
+      const schema = z.intersection(
+        z.discriminatedUnion('foo', [z.object({ foo: z.literal('a'), a: z.date() })]),
+        z.discriminatedUnion('bar', [z.object({ bar: z.literal('a'), a: z.date() })]),
+      )
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
 
-  test('discriminated union + discriminated union (different discriminator value)', () => {
-    install()
+    test('discriminated union + discriminated union (different discriminator value)', () => {
+      install()
 
-    const schema = z.intersection(
-      z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })]),
-      z.discriminatedUnion('type', [z.object({ type: z.literal('b'), b: z.date() })]),
-    )
-    const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+      const schema = z.intersection(
+        z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })]),
+        z.discriminatedUnion('type', [z.object({ type: z.literal('b'), b: z.date() })]),
+      )
+      const faker = new ZodIntersectionFaker(schema)
+      expect(() => faker.fake()).toThrow(TypeError)
+    })
   })
 
   test('discriminated union + discriminated union', () => {
@@ -2491,7 +2501,7 @@ describe('object and discriminated union', () => {
     const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('object + discriminated union', () => {
@@ -2595,7 +2605,7 @@ describe('record and discriminated union', () => {
     const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('record + discriminated union', () => {
@@ -2962,7 +2972,7 @@ describe('string', () => {
 
     const schema = z.intersection(z.string().ip(), z.string().email())
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   testMultipleTimes('string + string', () => {
@@ -3250,6 +3260,16 @@ describe('symbol', () => {
 })
 
 describe('nativeEnum', () => {
+  test('unrelated', () => {
+    install()
+
+    enum Foo {}
+    enum Bar {}
+    const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Bar))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('nativeEnum + nativeEnum', () => {
     install()
 
@@ -3262,26 +3282,17 @@ describe('nativeEnum', () => {
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
   })
-
-  test('nativeEnum + nativeEnum (no common value)', () => {
-    install()
-
-    enum Foo {
-      A,
-      B,
-    }
-    enum Bar {
-      C,
-      D,
-    }
-    const schema = z.intersection(z.nativeEnum(Foo), z.nativeEnum(Bar))
-    const faker = new ZodIntersectionFaker(schema)
-
-    expect(() => faker.fake()).toThrow()
-  })
 })
 
 describe('enum', () => {
+  test('unrelated', () => {
+    install()
+
+    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['baz', 'qux']))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('enum + enum', () => {
     install()
 
@@ -3289,15 +3300,6 @@ describe('enum', () => {
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  test('enum + enum (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['baz', 'qux']))
-    const faker = new ZodIntersectionFaker(schema)
-
-    expect(() => faker.fake()).toThrow()
   })
 })
 
@@ -3307,7 +3309,7 @@ describe('non-enum and enum', () => {
 
     const schema = z.intersection(z.number(), z.enum(['foo', 'bar']))
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('enum + string', () => {
@@ -3330,6 +3332,14 @@ describe('non-enum and enum', () => {
 })
 
 describe('literal', () => {
+  test('unrelated', () => {
+    install()
+
+    const schema = z.intersection(z.literal('foo'), z.literal('bar'))
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('literal + literal', () => {
     install()
 
@@ -3337,15 +3347,6 @@ describe('literal', () => {
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
-  })
-
-  test('literal + literal (no common value)', () => {
-    install()
-
-    const schema = z.intersection(z.literal('foo'), z.literal('bar'))
-    const faker = new ZodIntersectionFaker(schema)
-
-    expect(() => faker.fake()).toThrow()
   })
 })
 
@@ -3355,7 +3356,7 @@ describe('non-literal and literal', () => {
 
     const schema = z.intersection(z.string(), z.literal(42))
     const faker = new ZodIntersectionFaker(schema)
-    expect(() => faker.fake()).toThrow()
+    expect(() => faker.fake()).toThrow(TypeError)
   })
 
   test('literal + string', () => {
@@ -3574,6 +3575,16 @@ describe('bigint', () => {
 })
 
 describe('readonly', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.object({}).readonly()
+    const right = z.array(z.string()).readonly()
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('readonly', () => {
     install()
 
@@ -3612,6 +3623,16 @@ describe('readonly', () => {
 })
 
 describe('lazy', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.lazy(() => z.date())
+    const right = z.lazy(() => z.number())
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('lazy', () => {
     install()
 
@@ -3636,6 +3657,16 @@ describe('lazy', () => {
 })
 
 describe('intersection/and', () => {
+  test('unrelated', () => {
+    install()
+
+    const left = z.intersection(z.date(), z.number())
+    const right = z.intersection(z.boolean(), z.string())
+    const schema = z.intersection(left, right)
+    const faker = new ZodIntersectionFaker(schema)
+    expect(() => faker.fake()).toThrow(TypeError)
+  })
+
   test('intersection/and', () => {
     install()
 
