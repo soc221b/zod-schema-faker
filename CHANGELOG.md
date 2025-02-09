@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.3](https://github.com/soc221b/zod-schema-faker/compare/1.3.2...1.3.3) (2025-02-09)
+
+
+### Bug Fixes
+
+* **intersection:** generate valid data for intersection of number.multipleOf constraints ([adc98f9](https://github.com/soc221b/zod-schema-faker/commit/adc98f9d56b1e79226f1705a17c71929aadf933d))
+* **intersection:** infinite loop ([77b8621](https://github.com/soc221b/zod-schema-faker/commit/77b862135ef81a99b86735ac1ed463d47a5de8bd))
+* **intersection:** it should throw TypeError if unable to fake the given schema ([5daa9b9](https://github.com/soc221b/zod-schema-faker/commit/5daa9b902297ffe3be07c2bdfa0864743f82b0a7))
+* **intersection:** it should throw when intersecting unrelated string schema ([38e7849](https://github.com/soc221b/zod-schema-faker/commit/38e784962c09b8b1147c7256025b2d4025811e43))
+* **number:** should generate valid data for multipleOf without int ([a11d2e7](https://github.com/soc221b/zod-schema-faker/commit/a11d2e72040eb297edba89549356ed9850db3646))
+* **promise:** it should sometimes resolve on next microtask and task ([1e2ab6f](https://github.com/soc221b/zod-schema-faker/commit/1e2ab6fecd34a10b958a8316728313212fe6be03))
+* **string:** it should generate valid data when the string length constriant is smaller than the max or larger than the min ([e9bf5c3](https://github.com/soc221b/zod-schema-faker/commit/e9bf5c32bdd2018dab99a162ee7cb6e16151640b))
+
 ## [1.3.2](https://github.com/soc221b/zod-schema-faker/compare/1.3.1...1.3.2) (2025-02-02)
 
 
