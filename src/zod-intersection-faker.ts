@@ -9,7 +9,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (result.success) {
       return fake(result.schema) as z.infer<T>
     } else {
-      throw new SyntaxError('ZodIntersectionFaker: unable to fake the given schema')
+      throw new TypeError('ZodIntersectionFaker: unable to fake the given schema')
     }
   }
 
