@@ -255,9 +255,9 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       const result = this.findIntersectedSchema(left, right._def.innerType)
       if (result.success) {
         return result
-      } else {
-        return { success: false }
       }
+
+      return { success: false }
     }
 
     if (left instanceof z.ZodReadonly) {
@@ -502,10 +502,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodObject) {
-      ;[left, right] = [right, left]
-    }
-
     if (left instanceof z.ZodObject && right instanceof z.ZodDiscriminatedUnion) {
       const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
       for (let rightOption of right._def.options) {
@@ -529,6 +525,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       }
     }
 
+    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodObject) {
+      return this.findIntersectedSchemaForDiscriminatedUnionAndObject(right, left)
+    }
+
     return { success: false }
   }
 
@@ -536,10 +536,6 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodRecord) {
-      ;[left, right] = [right, left]
-    }
-
     if (left instanceof z.ZodRecord && right instanceof z.ZodDiscriminatedUnion) {
       const leftDiscriminatedUnionOptions = [] as z.ZodObject<any, any>[]
       for (let rightOption of right._def.options) {
@@ -557,6 +553,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           return { success: true, schema: result.schema }
         }
       }
+    }
+
+    if (left instanceof z.ZodDiscriminatedUnion && right instanceof z.ZodRecord) {
+      return this.findIntersectedSchemaForDiscriminatedUnionAndRecord(right, left)
     }
 
     return { success: false }
