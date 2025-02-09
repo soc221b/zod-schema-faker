@@ -946,8 +946,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
   ): { success: true; schema: z.ZodType } | { success: false } => {
     if (left instanceof z.ZodArray && right instanceof z.ZodTuple) {
       const items: z.ZodType[] = []
-      for (let i = 0; i < right._def.items.length; ++i) {
-        const result = this.findIntersectedSchema(left._def.type, right._def.items[i])
+      for (const item of right._def.items) {
+        const result = this.findIntersectedSchema(left._def.type, item)
         if (result.success) {
           items.push(result.schema)
         }
