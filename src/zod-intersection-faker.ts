@@ -216,6 +216,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
           return { success: true, schema: intersectedSchema.schema }
         }
       }
+
+      return { success: false }
     }
 
     if (left instanceof z.ZodIntersection) {
@@ -234,6 +236,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (result.success) {
         return result
       }
+
+      return { success: false }
     }
 
     if (left instanceof z.ZodLazy) {
@@ -251,6 +255,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       const result = this.findIntersectedSchema(left, right._def.innerType)
       if (result.success) {
         return result
+      } else {
+        return { success: false }
       }
     }
 
@@ -570,6 +576,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (values.length) {
         return { success: true, schema: z.enum(values as any) }
       }
+
+      return { success: false }
     }
 
     if (left instanceof z.ZodEnum) {
@@ -587,6 +595,8 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       if (left.safeParse(right._def.value).success) {
         return { success: true, schema: right }
       }
+
+      return { success: false }
     }
 
     if (left instanceof z.ZodLiteral) {
@@ -603,7 +613,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (
       left instanceof z.ZodNativeEnum === false ||
       right instanceof z.ZodNativeEnum === false ||
-      left._def.values !== right._def.values
+      left.enum !== right.enum
     ) {
       return { success: false }
     }
@@ -974,14 +984,11 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     left: z.ZodType,
     right: z.ZodType,
   ): { success: true; schema: z.ZodType } | { success: false } => {
-    if (right instanceof z.ZodUnion) {
-      const result = this.findIntersectedSchema(z.union([left, z.never()]), right)
-      if (result.success) {
-        return { success: true, schema: result.schema }
-      }
+    if (right instanceof z.ZodUnion && left instanceof z.ZodUnion === false) {
+      return this.findIntersectedSchema(z.union([left, z.never()]), right)
     }
 
-    if (left instanceof z.ZodUnion) {
+    if (left instanceof z.ZodUnion && right instanceof z.ZodUnion === false) {
       return this.findIntersectedSchemaForUnionAndNonUnion(right, left)
     }
 
