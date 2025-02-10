@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.4](https://github.com/soc221b/zod-schema-faker/compare/1.3.3...1.3.4) (2025-02-09)
+
+
+### Bug Fixes
+
+* **intersection:** it should throw error when intersecting unrelated array schema ([#361](https://github.com/soc221b/zod-schema-faker/issues/361)) ([f1d5020](https://github.com/soc221b/zod-schema-faker/commit/f1d50205d4e21df5713ceb2dcc25d4811157437e))
+
 ## [1.3.3](https://github.com/soc221b/zod-schema-faker/compare/1.3.2...1.3.3) (2025-02-09)
 
 
