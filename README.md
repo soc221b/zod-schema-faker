@@ -158,7 +158,3 @@ https://github.com/timdeschryver/zod-fixture
 ## About
 
 Distributed under the MIT license. See LICENSE for more information.
-
-```
-
-```
