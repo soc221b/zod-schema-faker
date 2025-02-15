@@ -3,5 +3,15 @@
   "automerge": true,
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "extends": ["config:base"]
+  "packageRules": [
+    {
+      "matchPackageNames": ["*"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "matchDepTypes": ["engines", "peerDependencies"],
+      "rangeStrategy": "auto"
+    }
+  ],
+  "extends": ["config:recommended"]
 }
