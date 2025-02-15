@@ -10,6 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "isolatedModules": true,
+    "isolatedDeclarations": true,
     "noEmit": true,
     "declaration": true,
     "esModuleInterop": true,
