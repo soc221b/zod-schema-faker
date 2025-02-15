@@ -40,7 +40,7 @@ Custom zod types:
 
 ```ts
 import { z } from 'zod'
-import { install, installCustom, fake } from 'zod-schema-faker'
+import { installCustom, fake, runFake, ZodTypeFaker } from 'zod-schema-faker'
 
 // define a custom zod schema
 const pxSchema = z.custom<`${number}px`>(val => {
@@ -54,7 +54,7 @@ class ZodPxFaker extends ZodTypeFaker<typeof pxSchema> {
   }
 }
 
-// call install() to register fakers
+// call installCustom() to register custom fakers
 installCustom(pxSchema, ZodPxFaker)
 
 // generate fake data based on schema
