@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/soc221b/zod-schema-faker/compare/1.3.6...1.4.0) (2025-02-23)
+
+
+### Features
+
+* support different locales and custom faker instances ([#382](https://github.com/soc221b/zod-schema-faker/issues/382)) ([196e990](https://github.com/soc221b/zod-schema-faker/commit/196e99092c8dfdf8d50508f0587ec5087d2109d1))
+
 ## [1.3.6](https://github.com/soc221b/zod-schema-faker/compare/1.3.5...1.3.6) (2025-02-12)
 
 
