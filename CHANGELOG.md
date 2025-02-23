@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.1](https://github.com/soc221b/zod-schema-faker/compare/1.4.0...1.4.1) (2025-02-23)
+
+
+### Bug Fixes
+
+* randexp generation ([#384](https://github.com/soc221b/zod-schema-faker/issues/384)) ([bc4b6be](https://github.com/soc221b/zod-schema-faker/commit/bc4b6befaa1753a6506552554c563875300310a8))
+
 ## [1.4.0](https://github.com/soc221b/zod-schema-faker/compare/1.3.6...1.4.0) (2025-02-23)
 
 
