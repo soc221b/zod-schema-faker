@@ -57,10 +57,11 @@ describe('seed', () => {
 
   test('randexp', () => {
     seed(61)
-    const re = /\d+/
+    const re = /\d{50}/
     const data1 = randexp(re)
     const data2 = randexp(re)
     expect(data1).toBe(data2)
+    expect(new Set(data1.toString().split('')).size).toBeGreaterThan(1)
 
     resetSeed()
     const data3 = randexp(re)

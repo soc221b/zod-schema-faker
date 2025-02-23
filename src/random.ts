@@ -1,4 +1,4 @@
-import { type Faker, fakerEN } from '@faker-js/faker'
+import { Faker, fakerEN, SimpleFaker } from '@faker-js/faker'
 import RandExp from 'randexp'
 
 let faker: Faker = fakerEN
@@ -26,9 +26,14 @@ export const runFake = <Runner extends (faker: Faker) => any>(
   return result
 }
 
+const simpleFaker = new SimpleFaker()
 export const randexp = (pattern: string | RegExp, flags?: string): string => {
+  if (shouldSeed) {
+    simpleFaker.seed(_seedValue)
+  }
+
   const randexp = new RandExp(pattern, flags)
-  randexp.randInt = (from, to) => runFake(faker => faker.number.int({ min: from, max: to }))
+  randexp.randInt = (from, to) => simpleFaker.number.int({ min: from, max: to })
   return randexp.gen()
 }
 
