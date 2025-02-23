@@ -1,18 +1,46 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
-import { install, fake, seed, runFake, randexp } from '../src'
+import { install, fake, seed, runFake, randexp, installFaker } from '../src'
 import { resetSeed } from '../src/random'
+import { fakerEN, fakerJA } from '@faker-js/faker'
 
-test('runFake', () => {
-  const data = runFake(faker => faker.datatype.boolean())
-  expect(data).toBeTypeOf('boolean')
+describe('@faker-js/faker', () => {
+  describe('installFaker', () => {
+    test('default', () => {
+      const spy = vi.spyOn(fakerEN.lorem, 'word')
+      const data = runFake(faker => faker.lorem.word())
+      expect(data).toBeTypeOf('string')
+      expect(spy).toHaveBeenCalled()
+    })
+
+    test('custom', () => {
+      installFaker(fakerJA)
+      const spy = vi.spyOn(fakerJA.lorem, 'word')
+      const data = runFake(faker => faker.lorem.word())
+      expect(data).toBeTypeOf('string')
+      expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('runFake', () => {
+    test('runFake can be used with sync functions', () => {
+      expect(() => runFake(() => {})).not.toThrow()
+    })
+
+    test('runFake can not be used with async functions', () => {
+      // @ts-expect-error
+      expect(() => runFake(async () => {})).toThrow()
+    })
+  })
 })
 
-test('randexp', () => {
-  const regex = /^foo|bar$/
-  const data = randexp(regex)
-  expect(data).toBeTypeOf('string')
-  expect(data).toMatch(regex)
+describe('randexp', () => {
+  test('randexp', () => {
+    const regex = /^foo|bar$/
+    const data = randexp(regex)
+    expect(data).toBeTypeOf('string')
+    expect(data).toMatch(regex)
+  })
 })
 
 describe('seed', () => {
@@ -62,13 +90,4 @@ describe('seed', () => {
     const data3 = fake(schema)
     expect(data1).not.toEqual(data3)
   })
-})
-
-test('runFake can be used with sync functions', () => {
-  expect(() => runFake(() => {})).not.toThrow()
-})
-
-test('runFake can not be used with async functions', () => {
-  // @ts-expect-error
-  expect(() => runFake(async () => {})).toThrow()
 })

@@ -70,12 +70,17 @@ Core APIs
 - `function seed(value)`: sets the seed to use
 - `class ZodSchemaFakerError`: thrown when an error occurs, such as when a corresponding faker is not registered
 
+Random Utility APIs
+
+- `function installFaker(faker)`: install a custom faker, must be called before using `runFake()`. defaults to `fakerEN`
+  from `@faker-js/faker`
+- `function runFake(runner)`
+- `function randexp(pattern, flags)`
+
 Customization APIs - see [example](./tests/zod-custom-faker.test.ts) for details
 
 - `class ZodTypeFaker`: base class for custom fakers
 - `function installCustom(schema, faker)`: register a custom faker
-- `function randexp(pattern, flags)`
-- `function runFake(faker)`
 
 ## Supported Zod Types
 
