@@ -35,6 +35,9 @@ export const seed = (value?: number): void => {
   _seedValue = value
 }
 
+/**
+ * @internal
+ */
 export const resetSeed = (): void => {
   shouldSeed = false
 }
