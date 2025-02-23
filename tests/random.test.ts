@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
 import { install, fake, seed, runFake, randexp, installFaker } from '../src'
 import { resetSeed } from '../src/random'
-import { fakerEN, fakerJA } from '@faker-js/faker'
+import { Faker, fakerEN, fakerJA } from '@faker-js/faker'
 
 describe('@faker-js/faker', () => {
   describe('installFaker', () => {
@@ -46,13 +46,18 @@ describe('randexp', () => {
 describe('seed', () => {
   test('runFake', () => {
     seed(97)
-    const data1 = runFake(faker => faker.number.int())
-    const data2 = runFake(faker => faker.number.int())
+    const runner = (faker: Faker) => faker.number.int()
+    const data1 = runFake(runner)
+    const data2 = runFake(runner)
     expect(data1).toBe(data2)
 
     resetSeed()
-    const data3 = runFake(faker => faker.number.int())
+    const data3 = runFake(runner)
     expect(data1).not.toBe(data3)
+
+    const data4 = runFake(runner)
+    expect(data1).not.toBe(data4)
+    expect(data3).not.toBe(data4)
   })
 
   test('randexp', () => {
@@ -66,6 +71,10 @@ describe('seed', () => {
     resetSeed()
     const data3 = randexp(re)
     expect(data1).not.toBe(data3)
+
+    const data4 = randexp(re)
+    expect(data1).not.toBe(data4)
+    expect(data3).not.toBe(data4)
   })
 
   test('integration', () => {
@@ -90,5 +99,9 @@ describe('seed', () => {
 
     const data3 = fake(schema)
     expect(data1).not.toEqual(data3)
+
+    const data4 = fake(schema)
+    expect(data1).not.toEqual(data4)
+    expect(data3).not.toEqual(data4)
   })
 })
