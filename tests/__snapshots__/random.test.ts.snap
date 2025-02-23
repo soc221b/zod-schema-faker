@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`seed 1`] = `
+exports[`seed > integration 1`] = `
 {
   "bar": 915093660424243,
   "date": 2024-07-21T00:59:22.656Z,

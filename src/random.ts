@@ -1,8 +1,13 @@
-import { Faker, faker as _faker } from '@faker-js/faker'
+import { type Faker, fakerEN } from '@faker-js/faker'
 import RandExp from 'randexp'
 
+let faker: Faker = fakerEN
 let shouldSeed = false
 let _seedValue: number | undefined
+
+export function installFaker(fakerInstance: Faker): void {
+  faker = fakerInstance
+}
 
 // https://github.com/faker-js/faker/issues/448
 // TODO: create standalone faker instead of use following workaround
@@ -10,10 +15,10 @@ export const runFake = <Runner extends (faker: Faker) => any>(
   runner: Awaited<ReturnType<Runner>> extends ReturnType<Runner> ? Runner : never,
 ): ReturnType<Runner> => {
   if (shouldSeed) {
-    _faker.seed(_seedValue)
+    faker.seed(_seedValue)
   }
 
-  const result = runner(_faker)
+  const result = runner(faker)
   if (result instanceof Promise) {
     throw new SyntaxError('InternalError: runFake cannot be used with async functions')
   }
@@ -35,6 +40,9 @@ export const seed = (value?: number): void => {
   _seedValue = value
 }
 
+/**
+ * @internal
+ */
 export const resetSeed = (): void => {
   shouldSeed = false
 }
