@@ -23,7 +23,7 @@
     "url": "git+https://github.com/soc221b/zod-schema-faker.git"
   },
   "license": "MIT",
-  "author": "Ernest <>",
+  "author": "Ernest <soc221b.e@gmail.com>",
   "main": "./dist/zod-schema-faker.umd.cjs",
   "module": "./dist/zod-schema-faker.js",
   "exports": {
