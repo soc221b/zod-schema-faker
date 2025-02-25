@@ -38,6 +38,7 @@
   ],
   "scripts": {
     "build": "tsc && vite build",
+    "format": "prettier --write .",
     "test": "vitest"
   },
   "devDependencies": {
