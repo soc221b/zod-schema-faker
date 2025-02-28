@@ -65,21 +65,23 @@ const data = fake(pxSchema)
 
 Core APIs
 
-- `function install()`: Install fakers for built-in types, must be called before using `fake`.
-- `function fake(schema)`: Generate fake data based on schema.
-- `function seed(value)`: Sets the seed to use.
+- `function install(): void`: Install fakers for built-in types, must be called before using `fake`.
+- `function fake<T extends z.ZodType>(schema: T): z.infer<T>`: Generate fake data based on schema.
+- `function seed(value?: number): void`: Sets the seed to use.
 - `class ZodSchemaFakerError`
 
 Random Utility APIs
 
-- `function setFaker(faker)`: Use given faker instance instead of the default one.
-- `function getFaker()`: Get the faker instance. Defaults to `fakerEN`.
-- `function randexp(pattern, flags)`: Create random strings that match a given regular expression.
+- `function setFaker(faker: Faker): void`: Use given faker instance instead of the default one.
+- `function getFaker(): Faker`: Get the faker instance. Defaults to `fakerEN`.
+- `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
+  expression.
 
 Customization APIs - see [example](./tests/zod-custom-faker.test.ts) for details
 
 - `class ZodTypeFaker`: Base class for fakers.
-- `function installCustom(schema, faker)`: Install fakers for custom schemas, must be called before using `fake`.
+- `function installCustom<T extends z.ZodTypeAny>(schema: T, faker: typeof ZodTypeFakerConcrete<T>): void`: Install
+  fakers for custom schemas, must be called before using `fake`.
 
 ## Supported Zod Types
 
