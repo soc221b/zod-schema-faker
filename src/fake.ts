@@ -9,7 +9,9 @@ export const zodFirstPartyTypeKindToZodTypeFaker: Map<
 export const zodTypeToZodTypeFaker: Map<z.ZodType, typeof ZodTypeFakerConcrete<z.ZodTypeAny>> = new Map()
 
 /**
- * generate fake data based on schema
+ * Generate fake data based on schema.
+ *
+ * @throws when a corresponding faker is not registered.
  */
 export const fake = <T extends z.ZodType>(schema: T): z.infer<T> => {
   const typeName = (schema._def as any).typeName

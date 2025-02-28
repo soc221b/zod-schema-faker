@@ -5,6 +5,13 @@ let faker: Faker = fakerEN
 let shouldSeed = false
 let _seedValue: number | undefined
 
+/**
+ * Use given faker instance instead of the default one.
+ *
+ * @default fakerEN
+ *
+ * @see https://fakerjs.dev/guide/localization.html for more information.
+ */
 export function installFaker(fakerInstance: Faker): void {
   faker = fakerInstance
 }
@@ -27,6 +34,9 @@ export const runFake = <Runner extends (faker: Faker) => any>(
 }
 
 const simpleFaker = new SimpleFaker()
+/**
+ * Create random strings that match a given regular expression.
+ */
 export const randexp = (pattern: string | RegExp, flags?: string): string => {
   if (shouldSeed) {
     simpleFaker.seed(_seedValue)
@@ -38,7 +48,9 @@ export const randexp = (pattern: string | RegExp, flags?: string): string => {
 }
 
 /**
- * sets the seed to use.
+ * Sets the seed or generates a new one.
+ *
+ * This method is intended to allow for consistent values in tests, so you might want to use hardcoded values as the seed.
  */
 export const seed = (value?: number): void => {
   shouldSeed = true
