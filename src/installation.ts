@@ -37,9 +37,10 @@ import { ZodUnionFaker } from './zod-union-faker'
 import { ZodUnknownFaker } from './zod-unknown-faker'
 import { ZodVoidFaker } from './zod-void-faker'
 import { ZodCatchFaker } from './zod-catch-faker'
+import { type fake } from './fake'
 
 /**
- * register fakers, must be called before using `fake()`
+ * Install fakers for built-in types, must be called before using {@link fake}.
  */
 export function install(): void {
   const exhaustiveZodFirstPartyTypeKindToZodTypeFaker: Record<
@@ -94,7 +95,7 @@ export function install(): void {
 }
 
 /**
- * register custom fakers for custom schemas, must be called before using `fake()`
+ * Install fakers for custom schemas, must be called before using {@link fake}.
  */
 export function installCustom<T extends z.ZodTypeAny>(schema: T, faker: typeof ZodTypeFakerConcrete<T>): void {
   zodTypeToZodTypeFaker.set(schema, faker)
