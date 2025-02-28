@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from 'vitest'
 import { z } from 'zod'
-import { fake, installCustom, ZodTypeFaker, runFake, install } from '../src'
+import { fake, installCustom, ZodTypeFaker, getFaker, install } from '../src'
 
 interface UserLike {
   name: string
@@ -16,7 +16,7 @@ const UserSchema = z.instanceof(User).and(z.object({ name: z.string() }).strict(
 // 2/5. define custom faker
 class UserFaker extends ZodTypeFaker<typeof UserSchema> {
   fake(): User {
-    return new User(`${runFake(faker => faker.person.firstName())}`)
+    return new User(`${getFaker().person.firstName()}`)
   }
 }
 

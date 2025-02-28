@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ZodTypeFaker } from './zod-type-faker'
-import { randexp, runFake } from './random'
+import { randexp, getFaker } from './random'
 import { ZodDateFaker } from './zod-date-faker'
 
 const averageWordLength = 5
@@ -40,15 +40,15 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           let cidr: string = ''
           switch (check.version) {
             case 'v4':
-              cidr = runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
+              cidr = getFaker().internet.ipv4() + '/' + getFaker().number.int({ min: 0, max: 32 })
               break
             case 'v6':
-              cidr = runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
+              cidr = getFaker().internet.ipv6() + '/' + getFaker().number.int({ min: 0, max: 128 })
               break
             case undefined:
-              cidr = runFake(faker => faker.datatype.boolean())
-                ? runFake(faker => faker.internet.ipv4() + '/' + faker.number.int({ min: 0, max: 32 }))
-                : runFake(faker => faker.internet.ipv6() + '/' + faker.number.int({ min: 0, max: 128 }))
+              cidr = getFaker().datatype.boolean()
+                ? getFaker().internet.ipv4() + '/' + getFaker().number.int({ min: 0, max: 32 })
+                : getFaker().internet.ipv6() + '/' + getFaker().number.int({ min: 0, max: 128 })
               break
             /* v8 ignore next 3 */
             default: {
@@ -69,22 +69,22 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           return (
             [
               'P',
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 2000 }) + 'Y' : '')),
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 12 }) + 'M' : '')),
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 31 }) + 'D' : '')),
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 2000 }) + 'Y' : '',
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 12 }) + 'M' : '',
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 31 }) + 'D' : '',
               'T',
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 24 }) + 'H' : '')),
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 60 }) + 'M' : '')),
-              runFake(faker => (faker.datatype.boolean() ? faker.number.int({ min: 0, max: 10 * 60 }) + 'S' : '')),
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 24 }) + 'H' : '',
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 60 }) + 'M' : '',
+              getFaker().datatype.boolean() ? getFaker().number.int({ min: 0, max: 10 * 60 }) + 'S' : '',
             ]
               .join('')
               // PnYT => PnY
               .replace(/T$/, '')
               // P => PnW
-              .replace(/^P$/, 'P' + runFake(faker => faker.number.int({ min: 0, max: 100 })) + 'W')
+              .replace(/^P$/, 'P' + getFaker().number.int({ min: 0, max: 100 }) + 'W')
           )
         case 'email':
-          return runFake(faker => faker.internet.email())
+          return getFaker().internet.email()
         case 'emoji': {
           emoji = true
           break
@@ -99,13 +99,13 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           let ip: string = ''
           switch (check.version) {
             case 'v4':
-              ip = runFake(faker => faker.internet.ipv4())
+              ip = getFaker().internet.ipv4()
               break
             case 'v6':
-              ip = runFake(faker => faker.internet.ipv6())
+              ip = getFaker().internet.ipv6()
               break
             case undefined:
-              ip = runFake(faker => faker.internet.ip())
+              ip = getFaker().internet.ip()
               break
             /* v8 ignore next 3 */
             default: {
@@ -115,7 +115,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           return ip
         }
         case 'jwt':
-          return runFake(faker => faker.internet.jwt())
+          return getFaker().internet.jwt()
         case 'length': {
           const _exact = check.value
           if (exact !== undefined && exact !== _exact) {
@@ -135,7 +135,7 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           break
         }
         case 'nanoid':
-          return runFake(faker => faker.string.nanoid())
+          return getFaker().string.nanoid()
         case 'regex':
           return randexp(check.regex)
         case 'startsWith':
@@ -153,11 +153,11 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
           trim = true
           break
         case 'ulid':
-          return runFake(faker => faker.string.ulid())
+          return getFaker().string.ulid()
         case 'url':
-          return runFake(faker => faker.internet.url())
+          return getFaker().internet.url()
         case 'uuid':
-          return runFake(faker => faker.string.uuid())
+          return getFaker().string.uuid()
         /* v8 ignore next 3 */
         default: {
           const _: never = check
@@ -191,21 +191,19 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       max =
         exact ??
         min +
-          runFake(faker =>
-            faker.datatype.boolean()
-              ? averageWordLength
-              : faker.datatype.boolean()
-                ? averageSentenceLength
-                : averageParagraphLength,
-          )
+          (getFaker().datatype.boolean()
+            ? averageWordLength
+            : getFaker().datatype.boolean()
+              ? averageSentenceLength
+              : averageParagraphLength)
     }
 
     let result = ''
     while (Number.isFinite(min) && result.length < min) {
-      result += runFake(faker => faker.lorem.word()) + ' '
+      result += getFaker().lorem.word() + ' '
     }
     while (Number.isFinite(max) && result.length < max) {
-      result += runFake(faker => faker.lorem.word()) + ' '
+      result += getFaker().lorem.word() + ' '
     }
     result = result.slice(0, max)
     if (trim) {
@@ -214,13 +212,13 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
     if (toLowercase) {
       result = result.toLowerCase()
     } else {
-      result = result.replace(/./g, c => (runFake(faker => faker.datatype.boolean()) ? c.toUpperCase() : c))
+      result = result.replace(/./g, c => (getFaker().datatype.boolean() ? c.toUpperCase() : c))
     }
     if (toUppercase) {
       result = result.toUpperCase()
     }
     if (includes) {
-      const start = runFake(faker => faker.number.int({ min: 0, max: Math.max(0, result.length - includes.length) }))
+      const start = getFaker().number.int({ min: 0, max: Math.max(0, result.length - includes.length) })
       result = result.slice(0, start) + includes + result.slice(start)
     }
     if (startsWith) {
@@ -233,10 +231,10 @@ export class ZodStringFaker extends ZodTypeFaker<z.ZodString> {
       const odd = result.length % 2
       result = Array((result.length - odd) / 2)
         .fill(null)
-        .map(() => runFake(faker => faker.helpers.arrayElement(emojisLength2)))
+        .map(() => getFaker().helpers.arrayElement(emojisLength2))
         .join('')
       if (odd) {
-        result += runFake(faker => faker.helpers.arrayElement(emojisLength1))
+        result += getFaker().helpers.arrayElement(emojisLength1)
       }
     }
     return result

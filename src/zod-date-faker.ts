@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export const minDateValue = -8640000000000000
@@ -28,20 +28,20 @@ export class ZodDateFaker extends ZodTypeFaker<z.ZodDate> {
       }
     }
     if (min === undefined) {
-      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+      if (getFaker().datatype.boolean({ probability: 0.2 })) {
         min = minDateValue
       } else {
         min = (max ?? new Date('2025-01-01T00:00:00.000Z').getTime()) - 31536000000
       }
     }
     if (max === undefined) {
-      if (runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+      if (getFaker().datatype.boolean({ probability: 0.2 })) {
         max = maxDateValue
       } else {
         max = min + 31536000000
       }
     }
 
-    return runFake(faker => faker.date.between({ from: min, to: max }))
+    return getFaker().date.between({ from: min, to: max })
   }
 }

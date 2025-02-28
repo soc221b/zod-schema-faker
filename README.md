@@ -40,7 +40,7 @@ Custom zod types:
 
 ```ts
 import { z } from 'zod'
-import { installCustom, fake, runFake, ZodTypeFaker } from 'zod-schema-faker'
+import { installCustom, fake, getFaker, ZodTypeFaker } from 'zod-schema-faker'
 
 // define a custom zod schema
 const pxSchema = z.custom<`${number}px`>(val => {
@@ -50,7 +50,7 @@ const pxSchema = z.custom<`${number}px`>(val => {
 // define a custom faker
 class ZodPxFaker extends ZodTypeFaker<typeof pxSchema> {
   fake(): `${number}px` {
-    return `${runFake(faker => faker.number.int({ min: 0 }))}px`
+    return `${getFaker().number.int({ min: 0 })}px`
   }
 }
 
@@ -72,8 +72,8 @@ Core APIs
 
 Random Utility APIs
 
-- `function setFaker(faker)`: Use given faker instance instead of the default one. Defaults to `fakerEN`.
-- `function runFake(runner)`
+- `function setFaker(faker)`: Use given faker instance instead of the default one.
+- `function getFaker()`: Get the faker instance. Defaults to `fakerEN`.
 - `function randexp(pattern, flags)`: Create random strings that match a given regular expression.
 
 Customization APIs - see [example](./tests/zod-custom-faker.test.ts) for details

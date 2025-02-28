@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ZodBigIntFaker } from '../src/zod-bigint-faker'
 import { expectType, TypeEqual } from 'ts-expect'
 import { testMultipleTimes } from './util'
-import { runFake } from '../src'
+import { getFaker } from '../src'
 
 test('ZodBigIntFaker should assert parameters', () => {
   const invalidSchema = void 0 as any
@@ -179,10 +179,10 @@ describe('edge case', () => {
   })
 
   testMultipleTimes('integration', () => {
-    const min = runFake(faker => faker.number.bigInt({ min: -1000n, max: 1000n }))
-    const max = runFake(faker => faker.number.bigInt({ min, max: min + 1000n }))
+    const min = getFaker().number.bigInt({ min: -1000n, max: 1000n })
+    const max = getFaker().number.bigInt({ min, max: min + 1000n })
     const diff = max - min
-    const multipleOf = runFake(faker => faker.number.bigInt({ min: 1n, max: diff + 1n }))
+    const multipleOf = getFaker().number.bigInt({ min: 1n, max: diff + 1n })
     const schema = z.bigint().multipleOf(multipleOf).min(min).max(max)
     const faker = new ZodBigIntFaker(schema)
     const data = faker.fake()
