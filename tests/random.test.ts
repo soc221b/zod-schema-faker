@@ -1,7 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
 import { install, fake, seed, runFake, randexp, installFaker } from '../src'
-import { resetSeed } from '../src/random'
 import { Faker, fakerEN, fakerJA } from '@faker-js/faker'
 
 describe('@faker-js/faker', () => {
@@ -45,36 +44,33 @@ describe('randexp', () => {
 
 describe('seed', () => {
   test('runFake', () => {
-    seed(97)
     const runner = (faker: Faker) => faker.number.int()
+
+    seed(97)
     const data1 = runFake(runner)
+    expect(data1).toMatchInlineSnapshot(`7538522492335270`)
+
+    seed(97)
     const data2 = runFake(runner)
     expect(data1).toBe(data2)
 
-    resetSeed()
     const data3 = runFake(runner)
     expect(data1).not.toBe(data3)
-
-    const data4 = runFake(runner)
-    expect(data1).not.toBe(data4)
-    expect(data3).not.toBe(data4)
   })
 
   test('randexp', () => {
-    seed(61)
     const re = /\d{50}/
+
+    seed(61)
     const data1 = randexp(re)
+    expect(data1).toMatchInlineSnapshot(`"81849096331484486007704357152196940134457972127416"`)
+
+    seed(61)
     const data2 = randexp(re)
     expect(data1).toBe(data2)
-    expect(new Set(data1.toString().split('')).size).toBeGreaterThan(1)
 
-    resetSeed()
     const data3 = randexp(re)
     expect(data1).not.toBe(data3)
-
-    const data4 = randexp(re)
-    expect(data1).not.toBe(data4)
-    expect(data3).not.toBe(data4)
   })
 
   test('integration', () => {
@@ -92,16 +88,24 @@ describe('seed', () => {
 
     seed(3)
     const data1 = fake(schema)
+    expect(data1).toMatchInlineSnapshot(`
+      {
+        "bar": 7138981630600537,
+        "date": -271821-05-08T18:51:09.723Z,
+        "foo": -3766725359666402,
+        "string": {
+          "date": "4408-02-05",
+          "datetime": "0298-10-05T14:52:06.368Z",
+          "time": "02:09:02",
+        },
+      }
+    `)
+
     seed(3)
     const data2 = fake(schema)
-    expect(data1).toMatchSnapshot()
     expect(data1).toEqual(data2)
 
     const data3 = fake(schema)
     expect(data1).not.toEqual(data3)
-
-    const data4 = fake(schema)
-    expect(data1).not.toEqual(data4)
-    expect(data3).not.toEqual(data4)
   })
 })
