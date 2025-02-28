@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/soc221b/zod-schema-faker/compare/1.4.1...1.5.0) (2025-02-28)
+
+
+### Features
+
+* add jsdocs ([5b4f0db](https://github.com/soc221b/zod-schema-faker/commit/5b4f0dbddc8958cc0e1915fdb646f62528b6bdc9))
+* expose getFaker and deprecate runFake ([fee613f](https://github.com/soc221b/zod-schema-faker/commit/fee613fda0f9333ec25eea90130d23ffd63e19c5))
+* rename installFaker to setFaker and deprecate installFaker ([4804968](https://github.com/soc221b/zod-schema-faker/commit/4804968230d434327c7f6dcecdf828147cc7d5b8))
+
 ## [1.4.1](https://github.com/soc221b/zod-schema-faker/compare/1.4.0...1.4.1) (2025-02-23)
 
 
