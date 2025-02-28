@@ -1,7 +1,7 @@
 import { UnknownKeysParam, z, ZodString } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
-import { runFake } from './random'
+import { getFaker } from './random'
 
 type Intersect = (left: z.ZodType, right: z.ZodType) => IntersectReturnType
 
@@ -87,7 +87,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (
       left instanceof z.ZodOptional &&
       right instanceof z.ZodOptional &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+      getFaker().datatype.boolean({ probability: 0.2 })
     ) {
       return { success: true, schema: z.undefined() }
     }
@@ -168,7 +168,7 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     if (
       left instanceof z.ZodNullable &&
       right instanceof z.ZodNullable &&
-      runFake(faker => faker.datatype.boolean({ probability: 0.2 }))
+      getFaker().datatype.boolean({ probability: 0.2 })
     ) {
       return { success: true, schema: z.null() }
     }

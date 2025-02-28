@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 import { lcm } from './utils'
 
@@ -41,10 +41,10 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
     }
 
     if (finite === false && int === false && multipleOf === undefined) {
-      if (min === undefined && runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+      if (min === undefined && getFaker().datatype.boolean({ probability: 0.2 })) {
         return -Infinity
       }
-      if (max === undefined && runFake(faker => faker.datatype.boolean({ probability: 0.2 }))) {
+      if (max === undefined && getFaker().datatype.boolean({ probability: 0.2 })) {
         return Infinity
       }
     }
@@ -56,6 +56,6 @@ export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
       throw new RangeError()
     }
     const method = int ? 'int' : 'float'
-    return runFake(faker => faker.number[method]({ min, max, multipleOf }))
+    return getFaker().number[method]({ min, max, multipleOf })
   }
 }

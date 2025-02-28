@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 import { lcm } from './utils'
 
@@ -44,7 +44,7 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
       min = -largeThanMultipleOf
       max = largeThanMultipleOf
     }
-    const data = min + runFake(faker => faker.number.bigInt({ min: 0n, max: (max - min) / multipleOf })) * multipleOf
+    const data = min + getFaker().number.bigInt({ min: 0n, max: (max - min) / multipleOf }) * multipleOf
     const remaining = multipleOf - ((data < 0n ? -data : data) % multipleOf)
     return data >= 0n
       ? data + remaining > max

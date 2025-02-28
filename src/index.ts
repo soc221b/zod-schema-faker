@@ -1,5 +1,5 @@
 export { fake } from './fake'
-export { setFaker, installFaker, seed, runFake, randexp } from './random'
+export { setFaker, getFaker, installFaker, seed, runFake, randexp } from './random'
 export { install, installCustom } from './installation'
 export { ZodSchemaFakerError } from './error'
 export { ZodTypeFaker } from './zod-type-faker'

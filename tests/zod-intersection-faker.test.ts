@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 import { ZodIntersectionFaker } from '../src/zod-intersection-faker'
 import { expectType, TypeEqual } from 'ts-expect'
-import { install, installCustom, runFake, ZodTypeFaker } from '../src'
+import { getFaker, install, installCustom, ZodTypeFaker } from '../src'
 import { testMultipleTimes } from './util'
 
 const Person = z.object({
@@ -220,7 +220,7 @@ describe('TODO', () => {
     })
     class ZodFooKeyFaker extends ZodTypeFaker<typeof fooKeySchema> {
       fake(): `foo.${string}` {
-        return `foo.${runFake(faker => faker.lorem.word())}`
+        return `foo.${getFaker().lorem.word()}`
       }
     }
     install()

@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from 'vitest'
 import { z } from 'zod'
-import { fake, installCustom, ZodTypeFaker, runFake, install } from '../src'
+import { fake, installCustom, ZodTypeFaker, getFaker, install } from '../src'
 
 // 1/5. define custom schema
 const pxSchema = z.custom<`${number}px`>(val => {
@@ -10,8 +10,8 @@ const pxSchema = z.custom<`${number}px`>(val => {
 // 2/5. define custom faker
 class ZodPxFaker extends ZodTypeFaker<typeof pxSchema> {
   fake(): `${number}px` {
-    // you can use `runFake` to generate fake data
-    return `${runFake(faker => faker.number.int({ min: 0 }))}px`
+    // you can use `getFaker` to generate fake data
+    return `${getFaker().number.int({ min: 0 })}px`
     // or use `randexp` if applicable
     // return randexp(/[1-9]\d+?px/) as `${number}px`
   }

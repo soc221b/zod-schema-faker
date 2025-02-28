@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { fake } from './fake'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodArrayFaker<T extends z.ZodArray<any, any>> extends ZodTypeFaker<T> {
@@ -23,10 +23,10 @@ export class ZodArrayFaker<T extends z.ZodArray<any, any>> extends ZodTypeFaker<
     const max =
       this.schema._def.exactLength?.value ??
       this.schema._def.maxLength?.value ??
-      runFake(faker => faker.number.int({ min, max: min + 2 }))
+      getFaker().number.int({ min, max: min + 2 })
     if (min > max) {
       throw new RangeError()
     }
-    return runFake(faker => faker.helpers.multiple(() => fake(this.schema._def.type), { count: { min, max } }))
+    return getFaker().helpers.multiple(() => fake(this.schema._def.type), { count: { min, max } })
   }
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { fake } from './fake'
 import { ZodTypeFaker } from './zod-type-faker'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodSchemaFakerError } from './error'
 
 export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFaker<T> {
@@ -11,11 +11,9 @@ export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFake
     }
 
     return Object.fromEntries(
-      runFake(faker =>
-        faker.helpers.multiple(() => [fake(this.schema._def.keyType), fake(this.schema._def.valueType)], {
-          count: { min: 0, max: 10 },
-        }),
-      ),
+      getFaker().helpers.multiple(() => [fake(this.schema._def.keyType), fake(this.schema._def.valueType)], {
+        count: { min: 0, max: 10 },
+      }),
     )
   }
 }

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { fake } from './fake'
-import { runFake } from './random'
+import { getFaker } from './random'
 import { ZodTypeFaker } from './zod-type-faker'
 
 const schemas = (() => {
@@ -52,7 +52,7 @@ const schemas = (() => {
 
 export class ZodAnyFaker extends ZodTypeFaker<z.ZodAny> {
   fake(): z.infer<z.ZodAny> {
-    const randomSchema = runFake(faker => faker.helpers.arrayElement(schemas))
+    const randomSchema = getFaker().helpers.arrayElement(schemas)
     return fake(randomSchema)
   }
 }
