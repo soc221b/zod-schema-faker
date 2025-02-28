@@ -58,7 +58,7 @@
     "zod": "*"
   },
   "dependencies": {
-    "@faker-js/faker": "9.5.0",
+    "@faker-js/faker": "9.5.1",
     "randexp": "0.5.3"
   }
 }
