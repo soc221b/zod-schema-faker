@@ -72,7 +72,7 @@ Core APIs
 
 Random Utility APIs
 
-- `function installFaker(faker)`: Use given faker instance instead of the default one. Defaults to `fakerEN`.
+- `function setFaker(faker)`: Use given faker instance instead of the default one. Defaults to `fakerEN`.
 - `function runFake(runner)`
 - `function randexp(pattern, flags)`: Create random strings that match a given regular expression.
 

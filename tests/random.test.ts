@@ -1,10 +1,10 @@
 import { describe, expect, test, vi } from 'vitest'
 import { z } from 'zod'
-import { install, fake, seed, runFake, randexp, installFaker } from '../src'
+import { install, fake, seed, runFake, randexp, setFaker } from '../src'
 import { Faker, fakerEN, fakerJA } from '@faker-js/faker'
 
 describe('@faker-js/faker', () => {
-  describe('installFaker', () => {
+  describe('setFaker', () => {
     test('default', () => {
       const spy = vi.spyOn(fakerEN.lorem, 'word')
       const data = runFake(faker => faker.lorem.word())
@@ -13,7 +13,7 @@ describe('@faker-js/faker', () => {
     })
 
     test('custom', () => {
-      installFaker(fakerJA)
+      setFaker(fakerJA)
       const spy = vi.spyOn(fakerJA.lorem, 'word')
       const data = runFake(faker => faker.lorem.word())
       expect(data).toBeTypeOf('string')

@@ -10,9 +10,18 @@ let faker: Faker = fakerEN
  *
  * @see https://fakerjs.dev/guide/localization.html for more information.
  */
-export function installFaker(fakerInstance: Faker): void {
+export function setFaker(fakerInstance: Faker): void {
   faker = fakerInstance
 }
+
+/**
+ * This exists for compatibility with the previous version. Will be removed in next major version.
+ *
+ * @deprecated Use {@link setFaker} instead.
+ *
+ * @todo Remove in next major version.
+ */
+export const installFaker: (fakerInstance: Faker) => void = setFaker
 
 // https://github.com/faker-js/faker/issues/448
 // TODO: create standalone faker instead of use following workaround
