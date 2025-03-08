@@ -44,14 +44,6 @@ export class ZodBigIntFaker extends ZodTypeFaker<z.ZodBigInt> {
       min = -largeThanMultipleOf
       max = largeThanMultipleOf
     }
-    const data = min + getFaker().number.bigInt({ min: 0n, max: (max - min) / multipleOf }) * multipleOf
-    const remaining = multipleOf - ((data < 0n ? -data : data) % multipleOf)
-    return data >= 0n
-      ? data + remaining > max
-        ? data - (multipleOf - remaining)
-        : data + remaining
-      : data - remaining < min
-        ? data + (multipleOf - remaining)
-        : data - remaining
+    return getFaker().number.bigInt({ min, max, multipleOf })
   }
 }
