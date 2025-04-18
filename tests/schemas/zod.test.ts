@@ -1,0 +1,496 @@
+import { beforeAll, expect, test } from 'vitest'
+import * as z from 'zod'
+import { faker } from '@faker-js/faker'
+import { fake } from '../../src/fake'
+import { setFaker } from '../../src/internals/random'
+
+const suits: { schema: z.ZodType; description?: string; only?: boolean }[] = [
+  // any
+  { schema: z.any() },
+
+  // array
+  { schema: z.array(z.string()) },
+  { schema: z.array(z.string()).min(1), description: 'min' },
+  { schema: z.array(z.string()).max(10), description: 'max' },
+  { schema: z.array(z.string()).length(5), description: 'length' },
+  { schema: z.array(z.string()).nonempty(), description: 'nonempty' },
+  { schema: z.array(z.string()).min(3).min(1).min(2), description: 'min (multiple)' },
+  { schema: z.array(z.string()).max(1).max(3).max(2), description: 'max (multiple)' },
+
+  // bigint
+  { schema: z.bigint() },
+  { schema: z.bigint().check(z.gt(5n)), description: 'gt' },
+  { schema: z.bigint().check(z.gte(5n)), description: 'gte' },
+  { schema: z.bigint().check(z.lt(5n)), description: 'lt' },
+  { schema: z.bigint().check(z.lte(5n)), description: 'lte' },
+  { schema: z.bigint().check(z.positive()), description: 'positive' },
+  { schema: z.bigint().check(z.nonnegative()), description: 'nonnegative' },
+  { schema: z.bigint().check(z.negative()), description: 'negative' },
+  { schema: z.bigint().check(z.nonpositive()), description: 'nonpositive' },
+  { schema: z.bigint().check(z.multipleOf(5n)), description: 'multipleOf' },
+  { schema: z.int64(), description: 'int64' },
+  { schema: z.uint64(), description: 'uint64' },
+  { schema: z.bigint().min(200n).min(300n).min(100n).max(300n), description: 'min (multiple)' },
+  { schema: z.bigint().max(100n).max(300n).max(200n).min(100n), description: 'max (multiple)' },
+  { schema: z.bigint().multipleOf(2n).multipleOf(3n).min(2n).max(6n), description: 'multipleOf (multiple)' },
+
+  // boolean
+  { schema: z.boolean() },
+
+  // brand
+  { schema: z.object({ name: z.string() }).brand<'Cat'>() },
+
+  // catch
+  { schema: z.number().catch(42) },
+  {
+    schema: z.number().catch(ctx => {
+      ctx.error // the caught ZodError
+      return Math.random()
+    }),
+    description: 'function',
+  },
+
+  // coerce
+  { schema: z.coerce.bigint() },
+  { schema: z.coerce.boolean() },
+  { schema: z.coerce.date() },
+  { schema: z.coerce.number() },
+  { schema: z.coerce.string() },
+
+  // TODO: custom
+  // {
+  //   schema: z.custom<`${number}px`>(val => {
+  //     return typeof val === 'string' ? /^\d+px$/.test(val) : false
+  //   }),
+  // },
+
+  // date
+  { schema: z.date() },
+  { schema: z.date().min(new Date('3000-01-01')), description: 'min' },
+  { schema: z.date().max(new Date('1000-01-01')), description: 'max' },
+
+  // default
+  { schema: z.string().default('tuna') },
+  { schema: z.number().default(Math.random), description: 'function' },
+
+  // discriminatedUnion
+  {
+    schema: z.discriminatedUnion([
+      z.interface({ status: z.literal('success'), data: z.string() }),
+      z.interface({ status: z.literal('failed'), error: z.string() }),
+    ]),
+    description: 'discriminated',
+  },
+  {
+    schema: (() => {
+      const BaseError = { status: z.literal('failed'), message: z.string() }
+      const MyErrors = z.discriminatedUnion([
+        z.interface({ ...BaseError, code: z.literal(400) }),
+        z.interface({ ...BaseError, code: z.literal(401) }),
+        z.interface({ ...BaseError, code: z.literal(500) }),
+      ])
+      const MyResult = z.discriminatedUnion([z.interface({ status: z.literal('success'), data: z.string() }), MyErrors])
+      return MyResult
+    })(),
+    description: 'discriminated nesting',
+  },
+
+  // enum
+  { schema: z.enum(['Salmon', 'Tuna', 'Trout']), description: 'string' },
+  {
+    schema: (() => {
+      enum Fish {
+        Salmon = 'Salmon',
+        Tuna = 'Tuna',
+        Trout = 'Trout',
+      }
+      return z.enum(Fish)
+    })(),
+    description: 'enum',
+  },
+
+  // TODO: instanceof
+  // {
+  //   schema: () => {
+  //     class Test {
+  //       name: string = ''
+  //     }
+  //     return z.instanceof(Test)
+  //   },
+  // },
+
+  // interface
+  { schema: z.interface({}) },
+  { schema: z.interface({ name: z.string(), age: z.number() }), description: 'nesting' },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
+        get subcategories() {
+          return z.array(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive array',
+  },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
+        get subcategories() {
+          return z.set(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive set',
+  },
+  {
+    schema: (() => {
+      const User = z.interface({
+        email: z.email(),
+        get posts() {
+          return z.array(Post)
+        },
+      })
+      const Post = z.interface({
+        title: z.string(),
+        get author() {
+          return User
+        },
+      })
+      return User
+    })(),
+    description: 'mutually recursive',
+  },
+  { schema: z.interface({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
+  {
+    schema: z.interface({ name: z.string(), 'age?': z.number().default(18) }),
+    description: 'optional property with default',
+  },
+  { schema: z.interface({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
+  { schema: z.interface({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
+  { schema: z.strictInterface({ name: z.string(), age: z.number() }), description: 'strict' },
+  { schema: z.looseInterface({ name: z.string(), age: z.number() }), description: 'loose' },
+
+  // TODO: intersection
+  // { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
+  // {
+  //   schema: (() => {
+  //     const Person = z.interface({ name: z.string() })
+  //     const Employee = z.interface({ role: z.string() })
+  //     const EmployedPerson = z.intersection(Person, Employee)
+  //     return EmployedPerson
+  //   })(),
+  //   description: 'complex',
+  // },
+
+  // TODO: json
+  { schema: z.json() },
+
+  // lazy
+  { schema: z.lazy(() => z.literal('lazy')) },
+
+  // literal
+  { schema: z.literal('literal') },
+  { schema: z.literal(['red', 'green', 'blue']), description: 'multiple' },
+
+  // map
+  { schema: z.map(z.string(), z.number()) },
+
+  // nan
+  { schema: z.nan() },
+
+  // never
+  { schema: z.never() },
+
+  // nonoptional
+  { schema: z.null().nonoptional() },
+
+  // null
+  { schema: z.null() },
+
+  // nullable
+  { schema: z.nullable(z.literal('nullable')) },
+
+  // nullish
+  { schema: z.nullish(z.literal('nullish')) },
+
+  // number
+  { schema: z.number() },
+  { schema: z.number().int(), description: 'int' },
+  { schema: z.number().check(z.gt(5)), description: 'gt' },
+  { schema: z.number().check(z.gte(5)), description: 'gte' },
+  { schema: z.number().check(z.lt(5)), description: 'lt' },
+  { schema: z.number().check(z.lte(5)), description: 'lte' },
+  { schema: z.number().check(z.positive()), description: 'positive' },
+  { schema: z.number().check(z.nonnegative()), description: 'nonnegative' },
+  { schema: z.number().check(z.negative()), description: 'negative' },
+  { schema: z.number().check(z.nonpositive()), description: 'nonpositive' },
+  { schema: z.number().check(z.multipleOf(5)), description: 'multipleOf' },
+  { schema: z.int(), description: 'int (top)' },
+  { schema: z.float32(), description: 'float32' },
+  { schema: z.float64(), description: 'float64' },
+  { schema: z.int32(), description: 'int32' },
+  { schema: z.uint32(), description: 'uint32' },
+  { schema: z.number().positive().int().lte(1), description: 'positive + int' },
+  { schema: z.number().nonpositive().int().gte(0), description: 'nonpositive + int' },
+  { schema: z.number().negative().int().gte(-1), description: 'negative + int' },
+  { schema: z.number().nonnegative().int().lte(0), description: 'nonnegative + int' },
+  { schema: z.number().positive().lte(0.000000000000001), description: 'positive + float' },
+  { schema: z.number().negative().gte(-0.000000000000001), description: 'negative + float' },
+  { schema: z.number().multipleOf(0.000001), description: 'multipleOf small' },
+  { schema: z.number().multipleOf(1_234_567_890), description: 'multipleOf large' },
+  { schema: z.number().int().min(5).min(3).min(4).max(5), description: 'min (multiple)' },
+  { schema: z.number().int().max(3).max(5).max(4).min(3), description: 'max (multiple)' },
+  { schema: z.number().int().multipleOf(2).multipleOf(3).min(2).max(6), description: 'multipleOf (multiple)' },
+  { schema: z.number().multipleOf(7).multipleOf(11), description: 'multipleOf float (multiple)' },
+
+  // object
+  { schema: z.object() },
+  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategories: Category[]
+      }
+      const Category: z.ZodType<Category> = z.object({
+        name: z.string(),
+        subcategories: z.lazy(() => Category.array()),
+      })
+      return Category
+    })(),
+    description: 'recursive array',
+  },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategories: Set<Category>
+      }
+      const Category: z.ZodType<Category> = z.object({
+        name: z.string(),
+        subcategories: z.lazy(() => z.set(Category)),
+      })
+      return Category
+    })(),
+    description: 'recursive set',
+  },
+  {
+    schema: (() => {
+      interface User {
+        email: string
+        posts: Post[]
+      }
+      interface Post {
+        title: string
+        author: User
+      }
+      const User: z.ZodType<User> = z.object({
+        email: z.string(),
+        posts: z.lazy(() => Post.array()),
+      })
+      const Post: z.ZodType<Post> = z.object({
+        title: z.string(),
+        author: z.lazy(() => User),
+      })
+      return User
+    })(),
+    description: 'mutually recursive',
+  },
+  {
+    schema: z.object({ name: z.string(), age: z.number().default(18) }),
+    description: 'optional property with default',
+  },
+  { schema: z.object({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
+  { schema: z.object({ name: z.string(), age: z.number() }).strip(), description: 'strip (deprecated)' },
+  { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
+  { schema: z.object({ name: z.string(), age: z.number() }).strict(), description: 'strict' },
+  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict (top)' },
+  { schema: z.object({ name: z.string(), age: z.number() }).loose(), description: 'loose' },
+  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose (top)' },
+
+  // optional
+  { schema: z.optional(z.literal('optional')) },
+
+  // pipe
+  { schema: z.string().pipe(z.transform(val => val.length)) },
+
+  // partialRecord
+  {
+    schema: z.partialRecord(z.enum(['id', 'name', 'email']).or(z.never()), z.string()),
+    description: 'partial',
+  },
+
+  // promise
+  { schema: z.promise(z.number()) },
+
+  // readonly
+  { schema: z.object({ name: z.string() }).readonly(), description: 'object' },
+  { schema: z.array(z.string()).readonly(), description: 'array' },
+  { schema: z.tuple([z.string(), z.number()]).readonly(), description: 'tuple' },
+  { schema: z.map(z.string(), z.date()).readonly(), description: 'map' },
+  { schema: z.set(z.string()).readonly(), description: 'set' },
+
+  // record
+  { schema: z.record(z.string(), z.string()) },
+  {
+    schema: z.record(z.union([z.string(), z.number(), z.symbol()]), z.unknown()),
+    description: 'union',
+  },
+  {
+    schema: z.record(z.enum(['id', 'name', 'email']), z.string()),
+    description: 'enum',
+  },
+  {
+    schema: z.record(z.literal(['id', 'name', 'email']), z.string()),
+    description: 'literal',
+  },
+
+  // set
+  { schema: z.set(z.number()) },
+  { schema: z.set(z.number()).min(1), description: 'min' },
+  { schema: z.set(z.number()).max(10), description: 'max' },
+  { schema: z.set(z.number()).size(5), description: 'size' },
+  { schema: z.set(z.number()).min(3).min(1).min(2), description: 'min (multiple)' },
+  { schema: z.set(z.number()).max(1).max(3).max(2), description: 'max (multiple)' },
+
+  // string
+  { schema: z.string() },
+  { schema: z.string().min(1), description: 'min' },
+  { schema: z.string().max(10), description: 'max' },
+  { schema: z.string().length(5), description: 'length' },
+  { schema: z.string().regex(/regex/), description: 'regex' },
+  { schema: z.string().startsWith('start'), description: 'startsWith' },
+  { schema: z.string().endsWith('end'), description: 'endsWith' },
+  { schema: z.string().includes('includes'), description: 'includes' },
+  { schema: z.string().uppercase(), description: 'uppercase' },
+  { schema: z.string().lowercase(), description: 'lowercase' },
+  { schema: z.string().trim(), description: 'trim' },
+  { schema: z.string().toUpperCase(), description: 'toUpperCaae' },
+  { schema: z.string().toLowerCase(), description: 'toLowerCase' },
+  { schema: z.string().base64(), description: 'base64 (deprecated)' },
+  { schema: z.string().base64url(), description: 'base64url (deprecated)' },
+  { schema: z.string().cidrv4(), description: 'cidrv4 (deprecated)' },
+  { schema: z.string().cidrv6(), description: 'cidrv6 (deprecated)' },
+  { schema: z.string().cuid(), description: 'cuid (deprecated)' },
+  { schema: z.string().cuid2(), description: 'cuid2 (deprecated)' },
+  { schema: z.string().date(), description: 'date (deprecated)' },
+  { schema: z.string().datetime(), description: 'datetime (deprecated)' },
+  { schema: z.string().duration(), description: 'duration (deprecated)' },
+  { schema: z.string().e164(), description: 'e164 (deprecated)' },
+  { schema: z.string().email(), description: 'email (deprecated)' },
+  { schema: z.string().emoji(), description: 'emoji (deprecated)' },
+  { schema: z.string().guid(), description: 'guid (deprecated)' },
+  { schema: z.string().ipv4(), description: 'ipv4 (deprecated)' },
+  { schema: z.string().ipv6(), description: 'ipv6 (deprecated)' },
+  { schema: z.string().jwt(), description: 'jwt (deprecated)' },
+  { schema: z.string().ksuid(), description: 'ksuid (deprecated)' },
+  { schema: z.string().nanoid(), description: 'naoid (deprecated)' },
+  { schema: z.string().time(), description: 'time (deprecated)' },
+  { schema: z.string().ulid(), description: 'ulid (deprecated)' },
+  { schema: z.string().url(), description: 'url (deprecated)' },
+  { schema: z.string().uuid(), description: 'uuid (deprecated)' },
+  { schema: z.string().xid(), description: 'xid (deprecated)' },
+  { schema: z.base64(), description: 'base64' },
+  { schema: z.base64url(), description: 'base64url' },
+  { schema: z.cidrv4(), description: 'cidrv4' },
+  { schema: z.cidrv6(), description: 'cidrv6' },
+  { schema: z.cuid(), description: 'cuid' },
+  { schema: z.cuid2(), description: 'cuid2' },
+  { schema: z.e164(), description: 'e164' },
+  { schema: z.email(), description: 'email' },
+  { schema: z.emoji(), description: 'emoji' },
+  { schema: z.guid(), description: 'guid' },
+  { schema: z.ipv4(), description: 'ipv4' },
+  { schema: z.ipv6(), description: 'ipv6' },
+  { schema: z.iso.date(), description: 'date' },
+  { schema: z.iso.datetime(), description: 'datetime' },
+  { schema: z.iso.duration(), description: 'duration' },
+  { schema: z.iso.time(), description: 'time' },
+  { schema: z.jwt(), description: 'jwt' },
+  { schema: z.ksuid(), description: 'ksuid' },
+  { schema: z.nanoid(), description: 'naoid' },
+  { schema: z.ulid(), description: 'ulid' },
+  { schema: z.url(), description: 'url' },
+  { schema: z.uuid(), description: 'uuid' },
+  { schema: z.xid(), description: 'xid' },
+  { schema: z.string().min(5).min(3).min(4).max(5), description: 'min (multiple)' },
+  { schema: z.string().max(3).max(5).max(4).min(3), description: 'max (multiple)' },
+  { schema: z.string().length(5).min(4), description: 'length + min' },
+  { schema: z.string().length(5).max(6), description: 'length + max' },
+
+  // string bool
+  { schema: z.stringbool() },
+
+  // symbol
+  { schema: z.symbol() },
+
+  // template literal
+  { schema: z.templateLiteral(['hello, ', z.string()]) as any },
+  {
+    schema: (() => {
+      const cssUnits = z.enum(['px', 'em', 'rem', '%'])
+      return z.templateLiteral([z.number(), cssUnits]) as any
+    })(),
+    description: 'enum',
+  },
+  { schema: z.templateLiteral([z.string().min(1), '@', z.string().max(64)]) as any, description: 'refinement' },
+
+  // TODO: transform
+  // { schema: z.transform(val => String(val)) },
+
+  // tuple
+  { schema: z.tuple([z.string(), z.number(), z.boolean()]) },
+  { schema: z.tuple([z.string()], z.number()), description: 'rest' },
+
+  // undefined
+  { schema: z.undefined() },
+
+  // union
+  { schema: z.union([z.string(), z.number()]) },
+  { schema: z.union([z.string(), z.never()]), description: 'never' },
+
+  // unknown
+  { schema: z.unknown() },
+
+  // void
+  { schema: z.void() },
+]
+
+beforeAll(() => {
+  setFaker(faker)
+})
+
+suits.forEach(({ schema, description, only }) => {
+  let name = schema._zod.def.type
+  if (description) {
+    name += ` ${description}`
+  }
+
+  const t = only ? test.only : test
+  t(name, async () => {
+    switch (schema._zod.def.type) {
+      case 'never': {
+        expect(() => fake(schema)).toThrowErrorMatchingInlineSnapshot(`[Error: Never]`)
+        break
+      }
+      case 'promise': {
+        const result = fake(schema)
+        await schema.parseAsync(result)
+        break
+      }
+      default: {
+        const result = fake(schema)
+        try {
+          schema.parse(result)
+        } catch (e) {
+          console.log(result)
+          throw e
+        }
+      }
+    }
+  })
+})

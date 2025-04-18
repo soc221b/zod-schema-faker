@@ -30,8 +30,11 @@ jobs:
       - run: npm ci
 
       - run: |
-          npx vitest run --coverage
-          npm run build && cd e2e/issue-189 && npm ci && npm run test
+          npx vitest run
+          npm run build
+          cd e2e/issue-189 && npm ci && npm run test && cd -
+          cd e2e/mini && npm ci && npm run test && cd -
+          cd e2e/zod && npm ci && npm run test && cd -
 
   build:
     runs-on: ubuntu-latest

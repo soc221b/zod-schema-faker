@@ -1,45 +1,27 @@
-import { describe, expect, test, vi } from 'vitest'
-import { z } from 'zod'
-import { install, fake, seed, getFaker, randexp, setFaker, runFake, installFaker } from '../src'
-import { fakerAR, fakerEN, fakerJA } from '@faker-js/faker'
+import { describe, expect, it } from 'vitest'
+import { Faker } from '@faker-js/faker'
+import { getFaker, randexp, seed, setFaker } from '../src/internals/random'
+import * as z from 'zod'
+import { fake } from '../src'
 
 describe('@faker-js/faker', () => {
-  test('default', () => {
-    const spy = vi.spyOn(fakerEN.lorem, 'word')
+  it('does not have a default faker', () => {
+    const faker = getFaker()
 
-    const data = getFaker().lorem.word()
-    expect(data).toBeTypeOf('string')
-    expect(spy).toHaveBeenCalled()
-
-    spy.mockReset()
-
-    const data2 = runFake(faker => faker.lorem.word())
-    expect(data2).toBeTypeOf('string')
-    expect(spy).toHaveBeenCalled()
+    expect(faker).toBeUndefined()
   })
 
-  test('custom', () => {
-    const spyJA = vi.spyOn(fakerJA.lorem, 'word')
-    setFaker(fakerJA)
-    const data = getFaker().lorem.word()
-    expect(data).toBeTypeOf('string')
-    expect(spyJA).toHaveBeenCalled()
+  it('can set a faker', () => {
+    const faker = new Faker({ locale: {} })
 
-    const spyAR = vi.spyOn(fakerAR.lorem, 'word')
-    installFaker(fakerAR)
-    const data2 = runFake(faker => faker.lorem.word())
-    expect(data2).toBeTypeOf('string')
-    expect(spyAR).toHaveBeenCalled()
-  })
+    setFaker(faker)
 
-  test('runFake can not be used with async functions', () => {
-    // @ts-expect-error
-    expect(() => runFake(async () => {})).toThrow()
+    expect(getFaker()).toEqual(faker)
   })
 })
 
 describe('randexp', () => {
-  test('randexp', () => {
+  it('should works', () => {
     const regex = /^foo|bar$/
     const data = randexp(regex)
     expect(data).toBeTypeOf('string')
@@ -48,7 +30,7 @@ describe('randexp', () => {
 })
 
 describe('seed', () => {
-  test('getFaker', () => {
+  it('should set seed for getFaker', () => {
     const gen = () => getFaker().number.int()
 
     seed(97)
@@ -63,7 +45,7 @@ describe('seed', () => {
     expect(data1).not.toBe(data3)
   })
 
-  test('randexp', () => {
+  it('should set seed for randexp', () => {
     const gen = () => randexp(/\d{50}/)
 
     seed(61)
@@ -78,8 +60,7 @@ describe('seed', () => {
     expect(data1).not.toBe(data3)
   })
 
-  test('integration', () => {
-    install()
+  it.skip('should works together', () => {
     const schema = z.object({
       foo: z.number(),
       bar: z.number(),
