@@ -1,24 +1,20 @@
-import { describe, expect, test } from 'vitest'
-import { z } from 'zod'
-import { fake, install } from '../src'
-import { uninstall } from '../src/installation'
+import { expect, it } from 'vitest'
+import * as mini from '@zod/mini'
+import * as zod from 'zod'
+import fake from '../src/fake'
 
-describe('fake', () => {
-  test('fake is a function', () => {
-    expect(typeof fake).toBe('function')
-  })
+it('works with @zod/mini', () => {
+  const schema = mini.undefined()
 
-  test('fake should assert parameters', () => {
-    expect(() => fake(undefined as any)).toThrow()
-  })
+  const result = fake(schema)
 
-  test('fake should accepts a ZodType schema', () => {
-    install()
-    expect(() => fake(z.number())).not.toThrow()
-    uninstall()
-  })
+  expect(result).toBeUndefined()
+})
 
-  test('fake should throw an error if not installed', () => {
-    expect(() => fake(z.number())).toThrow()
-  })
+it('works with zod', () => {
+  const schema = zod.undefined()
+
+  const result = fake(schema)
+
+  expect(result).toBeUndefined()
 })
