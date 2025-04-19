@@ -9,7 +9,6 @@
 Features
 
 - Support almost all zod types
-- Support for custom zod types
 - Extensive tests
 
 ## Installation
@@ -23,11 +22,26 @@ npm install --save-dev zod-schema-faker
 Built-in zod types:
 
 ```ts
-import * as z from 'zod' // or '@zod/mini'
-import { fake } from 'zod-schema-faker'
+import * as z from 'zod'
+import { faker } from '@faker-js/faker'
+import { setFaker, fake, fakeSchema } from 'zod-schema-faker'
 
-fake(z.string())
+setFaker(faker) // or setFaker(your faker instance)
+
+const User = z.interface({
+  name: z.string(),
+  age: z.number().meta({ [fakeSchema]: ageSchema => ageSchema.int().min(18).max(99) }),
+})
+
+const data = fake(z.string())
+
+console.log(data.name) // { name: 'lorem', age: 25 }
 ```
+
+## Migration from v1(zod@3) to v2(zod@4)
+
+- No need to invoke `install` anymore.
+- Need to set the faker instance using `setFaker` before using `fake`.
 
 ## About
 
