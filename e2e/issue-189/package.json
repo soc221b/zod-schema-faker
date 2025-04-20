@@ -11,6 +11,6 @@
     "zod-schema-faker": "file:../.."
   },
   "dependencies": {
-    "zod": "^4.0.0-beta.20250420T053007"
+    "zod": "4.0.0-beta.20250420T053007"
   }
 }
