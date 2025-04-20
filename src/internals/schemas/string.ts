@@ -1,9 +1,9 @@
 import * as core from '@zod/core'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
+import { getFaker } from '../random'
 import { unescape } from '../utils'
 import { fakeStringFormat } from './checks/string-format'
-import { getFaker } from '../random'
-import { Context } from '../context'
 
 export function fakeString<T extends core.$ZodString>(
   schema: T,

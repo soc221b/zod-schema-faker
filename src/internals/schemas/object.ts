@@ -1,7 +1,7 @@
 import * as core from '@zod/core'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
-import { Context } from '../context'
 
 export function fakeObject<T extends core.$ZodObject>(
   schema: T,
@@ -15,9 +15,20 @@ export function fakeObject<T extends core.$ZodObject>(
           ? getFaker()
               .helpers.multiple(() => getFaker().string.uuid())
               .filter(key => !schema._zod.def.shape[key])
-              .map(key => [key, schema._zod.def.catchall!])
+              .map(key => [
+                key,
+                schema._zod.def.catchall!,
+              ])
           : [],
       )
-      .map(([key, value]) => [key, fake(value, context)]),
+      .map(
+        ([
+          key,
+          value,
+        ]) => [
+          key,
+          fake(value, context),
+        ],
+      ),
   )
 }

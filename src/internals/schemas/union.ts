@@ -1,7 +1,7 @@
 import * as core from '@zod/core'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
-import { Context } from '../context'
 
 export function fakeUnion<T extends core.$ZodUnion>(
   schema: T,

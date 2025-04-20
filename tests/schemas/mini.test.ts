@@ -1,6 +1,6 @@
-import { beforeAll, expect, test } from 'vitest'
-import * as z from '@zod/mini'
 import { faker } from '@faker-js/faker'
+import * as z from '@zod/mini'
+import { beforeAll, expect, test } from 'vitest'
 import { fake } from '../../src/fake'
 import { setFaker } from '../../src/internals/random'
 
@@ -105,7 +105,14 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   // },
 
   // enum
-  { schema: z.enum(['Salmon', 'Tuna', 'Trout']), description: 'string' },
+  {
+    schema: z.enum([
+      'Salmon',
+      'Tuna',
+      'Trout',
+    ]),
+    description: 'string',
+  },
   {
     schema: (() => {
       enum Fish {
@@ -205,7 +212,14 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
 
   // literal
   { schema: z.literal('literal') },
-  { schema: z.literal(['red', 'green', 'blue']), description: 'multiple' },
+  {
+    schema: z.literal([
+      'red',
+      'green',
+      'blue',
+    ]),
+    description: 'multiple',
+  },
 
   // map
   { schema: z.map(z.string(), z.number()) },
@@ -358,22 +372,51 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   // readonly
   { schema: z.readonly(z.object({ name: z.string() })), description: 'object' },
   { schema: z.readonly(z.array(z.string())), description: 'array' },
-  { schema: z.readonly(z.tuple([z.string(), z.number()])), description: 'tuple' },
+  {
+    schema: z.readonly(
+      z.tuple([
+        z.string(),
+        z.number(),
+      ]),
+    ),
+    description: 'tuple',
+  },
   { schema: z.readonly(z.map(z.string(), z.date())), description: 'map' },
   { schema: z.readonly(z.set(z.string())), description: 'set' },
 
   // record
   { schema: z.record(z.string(), z.string()) },
   {
-    schema: z.record(z.union([z.string(), z.number(), z.symbol()]), z.unknown()),
+    schema: z.record(
+      z.union([
+        z.string(),
+        z.number(),
+        z.symbol(),
+      ]),
+      z.unknown(),
+    ),
     description: 'union',
   },
   {
-    schema: z.record(z.enum(['id', 'name', 'email']), z.string()),
+    schema: z.record(
+      z.enum([
+        'id',
+        'name',
+        'email',
+      ]),
+      z.string(),
+    ),
     description: 'enum',
   },
   {
-    schema: z.record(z.literal(['id', 'name', 'email']), z.string()),
+    schema: z.record(
+      z.literal([
+        'id',
+        'name',
+        'email',
+      ]),
+      z.string(),
+    ),
     description: 'literal',
   },
 
@@ -432,16 +475,33 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   { schema: z.symbol() },
 
   // template literal
-  { schema: z.templateLiteral(['hello, ', z.string()]) as any },
+  {
+    schema: z.templateLiteral([
+      'hello, ',
+      z.string(),
+    ]) as any,
+  },
   {
     schema: (() => {
-      const cssUnits = z.enum(['px', 'em', 'rem', '%'])
-      return z.templateLiteral([z.number(), cssUnits]) as any
+      const cssUnits = z.enum([
+        'px',
+        'em',
+        'rem',
+        '%',
+      ])
+      return z.templateLiteral([
+        z.number(),
+        cssUnits,
+      ]) as any
     })(),
     description: 'enum',
   },
   {
-    schema: z.templateLiteral([z.string().check(z.minLength(1)), '@', z.string().check(z.maxLength(64))]) as any,
+    schema: z.templateLiteral([
+      z.string().check(z.minLength(1)),
+      '@',
+      z.string().check(z.maxLength(64)),
+    ]) as any,
     description: 'refinement',
   },
 
@@ -449,15 +509,40 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   // { schema: z.transform(val => String(val)) },
 
   // tuple
-  { schema: z.tuple([z.string(), z.number(), z.boolean()]) },
-  { schema: z.tuple([z.string()], z.number()), description: 'rest' },
+  {
+    schema: z.tuple([
+      z.string(),
+      z.number(),
+      z.boolean(),
+    ]),
+  },
+  {
+    schema: z.tuple(
+      [
+        z.string(),
+      ],
+      z.number(),
+    ),
+    description: 'rest',
+  },
 
   // undefined
   { schema: z.undefined() },
 
   // union
-  { schema: z.union([z.string(), z.number()]) },
-  { schema: z.union([z.string(), z.never()]), description: 'never' },
+  {
+    schema: z.union([
+      z.string(),
+      z.number(),
+    ]),
+  },
+  {
+    schema: z.union([
+      z.string(),
+      z.never(),
+    ]),
+    description: 'never',
+  },
 
   // unknown
   { schema: z.unknown() },
