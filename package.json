@@ -2,7 +2,7 @@
   "name": "zod-schema-faker",
   "type": "module",
   "sideEffects": false,
-  "version": "1.5.4",
+  "version": "2.0.0-beta.0",
   "publishConfig": {
     "tag": "beta"
   },
