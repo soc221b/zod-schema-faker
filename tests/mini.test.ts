@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker'
 import * as z from '@zod/mini'
 import { beforeAll, expect, test } from 'vitest'
-import { fake } from '../../src/fake'
-import { setFaker } from '../../src/internals/random'
+import { fake } from '../src/fake'
+import { setFaker } from '../src/internals/random'
 
 const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] = [
   // any
