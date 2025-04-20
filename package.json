@@ -3,6 +3,9 @@
   "type": "module",
   "sideEffects": false,
   "version": "1.5.4",
+  "publishConfig": {
+    "tag": "beta"
+  },
   "description": "Generates mock data from zod schema. Powered by @faker-js/faker and randexp.js",
   "keywords": [
     "zod",
