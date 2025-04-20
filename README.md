@@ -46,6 +46,29 @@ if (process.env.NODE_ENV === 'development') {
 - No need to invoke `install` anymore.
 - Need to set the faker instance using `setFaker` before using `fake`.
 
+## API
+
+### Core APIs
+
+- `function fake<T extends core.$ZodType>(schema: T): core.infer<T>`: Generate fake data based on schema.
+- `function seed(value?: number): void`: Sets the seed to use.
+
+### Random Utility APIs
+
+- `function setFaker(faker: Faker): void`: Set the faker instance to use.
+- `function getFaker(): Faker`: Get the faker instance.
+- `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
+  expression.
+
+## Unsupported
+
+- .custom 🚧
+- .file 🚧
+- .instanceof 🚧
+- .refine ❌
+- .superRefine ❌
+- .transform 🚧
+
 ## About
 
 Distributed under the MIT license. See LICENSE for more information.
