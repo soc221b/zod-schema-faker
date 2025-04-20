@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.1](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.0...2.0.0-beta.1) (2025-04-20)
+
+
+### Bug Fixes
+
+* expose seed, randexp API ([7d83ce5](https://github.com/soc221b/zod-schema-faker/commit/7d83ce5bca413b62e988e79697b1bfd07ca1df09))
+
 ## [2.0.0-beta.0](https://github.com/soc221b/zod-schema-faker/compare/1.5.4...2.0.0-beta.0) (2025-04-20)
 
 
