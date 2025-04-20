@@ -1,11 +1,28 @@
 import * as core from '@zod/core'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
-import { Context } from '../context'
 
-const truthyValues = ['true', '1', 'yes', 'on', 'y', 'enabled']
-const falsyValues = ['false', '0', 'no', 'off', 'n', 'disabled']
-const stringBoolValues = [...truthyValues, ...falsyValues]
+const truthyValues = [
+  'true',
+  '1',
+  'yes',
+  'on',
+  'y',
+  'enabled',
+]
+const falsyValues = [
+  'false',
+  '0',
+  'no',
+  'off',
+  'n',
+  'disabled',
+]
+const stringBoolValues = [
+  ...truthyValues,
+  ...falsyValues,
+]
 
 export function fakePipe<T extends core.$ZodPipe>(
   schema: T,

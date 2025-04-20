@@ -1,17 +1,24 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "automerge": true,
-  "automergeType": "pr",
   "automergeStrategy": "squash",
+  "automergeType": "pr",
+  "extends": [
+    "config:recommended"
+  ],
   "packageRules": [
     {
-      "matchPackageNames": ["*"],
+      "matchPackageNames": [
+        "*"
+      ],
       "rangeStrategy": "pin"
     },
     {
-      "matchDepTypes": ["engines", "peerDependencies"],
+      "matchDepTypes": [
+        "engines",
+        "peerDependencies"
+      ],
       "rangeStrategy": "auto"
     }
-  ],
-  "extends": ["config:recommended"]
+  ]
 }

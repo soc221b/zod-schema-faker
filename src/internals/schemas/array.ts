@@ -1,8 +1,8 @@
 import * as core from '@zod/core'
+import { MAX_DEPTH } from '../config'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
-import { Context } from '../context'
-import { MAX_DEPTH } from '../config'
 
 export function fakeArray<T extends core.$ZodArray>(
   schema: T,

@@ -11,7 +11,9 @@ export default defineConfig({
       fileName: 'zod-schema-faker',
     },
     rollupOptions: {
-      external: ['zod'],
+      external: [
+        'zod',
+      ],
       output: {
         globals: {
           zod: 'Zod',
@@ -21,13 +23,17 @@ export default defineConfig({
   },
   plugins: [
     dts({
-      include: ['src'],
+      include: [
+        'src',
+      ],
       rollupTypes: true,
     }),
   ],
   test: {
     coverage: {
-      include: ['src/**/*'],
+      include: [
+        'src/**/*',
+      ],
       thresholds: {
         '100': true,
       },

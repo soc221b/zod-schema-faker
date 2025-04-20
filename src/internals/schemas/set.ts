@@ -1,8 +1,8 @@
 import * as core from '@zod/core'
+import { MAX_DEPTH } from '../config'
+import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
-import { Context } from '../context'
-import { MAX_DEPTH } from '../config'
 
 export function fakeSet<T extends core.$ZodSet>(schema: T, fake: typeof internalFake, context: Context): core.infer<T> {
   let min = 0

@@ -1,0 +1,20 @@
+{
+  "arrowParens": "avoid",
+  "bracketSpacing": true,
+  "endOfLine": "lf",
+  "multilineArraysWrapThreshold": 0,
+  "plugins": [
+    "prettier-plugin-sort-json",
+    "prettier-plugin-packagejson",
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-multiline-arrays"
+  ],
+  "printWidth": 120,
+  "proseWrap": "always",
+  "quoteProps": "as-needed",
+  "semi": false,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "all",
+  "useTabs": false
+}
