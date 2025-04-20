@@ -60,7 +60,7 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./package.json
-          tag: latest
+          tag: beta
           access: public
           dry-run: false
           strategy: upgrade
