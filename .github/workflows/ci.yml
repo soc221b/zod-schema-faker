@@ -33,8 +33,7 @@ jobs:
           npx vitest run
           npm run build
           cd e2e/issue-189 && npm ci && npm run test && cd -
-          cd e2e/mini && npm ci && npm run test && cd -
-          cd e2e/zod && npm ci && npm run test && cd -
+          cd example && npm ci && npm run build && cd -
 
   build:
     runs-on: ubuntu-latest

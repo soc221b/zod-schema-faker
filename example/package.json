@@ -1,18 +1,19 @@
 {
-  "name": "playground",
+  "name": "example",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
     "preview": "vite preview"
   },
   "dependencies": {
-    "zod": "3.24.3"
+    "@zod/mini": "4.0.0-beta.0"
   },
   "devDependencies": {
-    "@types/node": "22.14.1",
-    "typescript": "5.8.3",
-    "vite": "6.3.2"
+    "typescript": "5.7.2",
+    "vite": "6.3.1",
+    "zod-schema-faker": "2.0.0-beta.0"
   }
 }
