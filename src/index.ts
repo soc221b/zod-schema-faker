@@ -1,2 +1,2 @@
 export { fake } from './fake'
-export { getFaker, setFaker } from './internals/random'
+export { getFaker, randexp, seed, setFaker } from './internals/random'
