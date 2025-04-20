@@ -1,18 +1,18 @@
 {
   "name": "playground",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "dev": "vite",
     "build": "tsc && vite build",
+    "dev": "vite",
     "preview": "vite preview"
+  },
+  "dependencies": {
+    "zod": "3.24.3"
   },
   "devDependencies": {
     "@types/node": "22.14.1",
     "typescript": "5.8.3",
     "vite": "6.3.2"
-  },
-  "dependencies": {
-    "zod": "3.24.3"
   }
 }

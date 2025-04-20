@@ -1,7 +1,7 @@
-import { z } from 'zod'
 import { faker } from '@faker-js/faker'
-import { fake, setFaker } from 'zod-schema-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { z } from 'zod'
+import { fake, setFaker } from 'zod-schema-faker'
 
 const schema = z.string().optional().nullable()
 
