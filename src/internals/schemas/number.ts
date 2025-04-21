@@ -2,13 +2,14 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 import { lcm } from '../utils'
 
 export function fakeNumber<T extends core.$ZodNumber>(
   schema: T,
   fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+): Infer<T> {
   let min = Number.MIN_SAFE_INTEGER
   let max = Number.MAX_SAFE_INTEGER
   let multipleOf = undefined

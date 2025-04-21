@@ -1,3 +1,4 @@
+import * as core from '@zod/core'
 import { fakeAny } from './schemas/any'
 import { fakeArray } from './schemas/array'
 import { fakeBigInt } from './schemas/big-int'
@@ -34,7 +35,7 @@ import { fakeUnknown } from './schemas/unknown'
 import { fakeVoid } from './schemas/void'
 import { RootFake } from './type'
 
-export const fake: RootFake = (schema, context) => {
+export const fake: RootFake = ((schema: core.$ZodType, context) => {
   switch (schema._zod.def.type) {
     case 'any':
       return fakeAny(schema as any, fake, context)
@@ -126,4 +127,4 @@ export const fake: RootFake = (schema, context) => {
   }
 
   throw Error(`Unsupported schema type: ${schema._zod.def.type}`)
-}
+}) as RootFake

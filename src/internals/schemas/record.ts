@@ -2,12 +2,13 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 
 export function fakeRecord<T extends core.$ZodRecord>(
   schema: T,
   fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+): Infer<T> {
   if (schema._zod.def.keyType instanceof core.$ZodEnum) {
     return Object.fromEntries(
       Object.values(schema._zod.def.keyType._zod.def.entries).map(key => [

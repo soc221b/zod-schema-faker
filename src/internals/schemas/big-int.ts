@@ -2,13 +2,14 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 import { lcm } from '../utils'
 
 export function fakeBigInt<T extends core.$ZodBigInt>(
   schema: T,
   fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+): Infer<T> {
   let min = undefined
   let max = undefined
   let multipleOf = 1n

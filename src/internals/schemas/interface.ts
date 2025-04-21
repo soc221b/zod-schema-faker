@@ -2,12 +2,13 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 
 export function fakeInterface<T extends core.$ZodInterface>(
   schema: T,
   fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+): Infer<T> {
   return Object.fromEntries(
     Object.entries(schema._zod.def.shape)
       .filter(

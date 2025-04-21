@@ -2,6 +2,7 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 
 const truthyValues = [
   'true',
@@ -24,11 +25,7 @@ const stringBoolValues = [
   ...falsyValues,
 ]
 
-export function fakePipe<T extends core.$ZodPipe>(
-  schema: T,
-  fake: typeof internalFake,
-  context: Context,
-): core.infer<T> {
+export function fakePipe<T extends core.$ZodPipe>(schema: T, fake: typeof internalFake, context: Context): Infer<T> {
   if (schema._zod.def.out._zod.def.type === 'boolean') {
     return getFaker().helpers.arrayElement(stringBoolValues)
   }

@@ -2,6 +2,7 @@ import * as core from '@zod/core'
 import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 import { unescape } from '../utils'
 import { fakeStringFormat } from './checks/string-format'
 
@@ -9,7 +10,7 @@ export function fakeString<T extends core.$ZodString>(
   schema: T,
   fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+): Infer<T> {
   let data = getFaker().lorem.sentence()
   let min = undefined
   let max = undefined
