@@ -1,10 +1,10 @@
 import * as core from '@zod/core'
-import { fake as internalFake } from '../../fake'
+import { rootFake as internalFake } from '../../fake'
 import { getFaker, randexp } from '../../random'
 
 export function fakeStringFormat<T extends core.$ZodStringFormat>(
   schema: T,
-  fake: typeof internalFake,
+  rootFake: typeof internalFake,
 ): undefined | string {
   let data = undefined
   switch (schema._zod.def.format) {

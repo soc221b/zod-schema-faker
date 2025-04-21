@@ -1,13 +1,13 @@
 import * as core from '@zod/core'
 import { Context } from '../context'
-import { fake as internalFake } from '../fake'
+import { rootFake as internalFake } from '../fake'
 import { getFaker } from '../random'
 import { Infer } from '../type'
 
 export function fakeObject<T extends core.$ZodObject>(
   schema: T,
   context: Context,
-  fake: typeof internalFake,
+  rootFake: typeof internalFake,
 ): Infer<T> {
   return Object.fromEntries(
     Object.entries(schema._zod.def.shape)
@@ -28,7 +28,7 @@ export function fakeObject<T extends core.$ZodObject>(
           value,
         ]) => [
           key,
-          fake(value, context),
+          rootFake(value, context),
         ],
       ),
   )

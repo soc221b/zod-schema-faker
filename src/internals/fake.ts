@@ -35,26 +35,26 @@ import { fakeUnknown } from './schemas/unknown'
 import { fakeVoid } from './schemas/void'
 import { RootFake } from './type'
 
-export const fake: RootFake = ((schema: core.$ZodType, context) => {
+export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
   switch (schema._zod.def.type) {
     case 'any':
-      return fakeAny(schema as any, context, fake)
+      return fakeAny(schema as any, context, rootFake)
     case 'array':
-      return fakeArray(schema as any, context, fake)
+      return fakeArray(schema as any, context, rootFake)
     case 'bigint':
-      return fakeBigInt(schema as any, context, fake)
+      return fakeBigInt(schema as any, context, rootFake)
     case 'boolean':
-      return fakeBoolean(schema as any, context, fake)
+      return fakeBoolean(schema as any, context, rootFake)
     case 'catch':
-      return fakeCatch(schema as any, context, fake)
+      return fakeCatch(schema as any, context, rootFake)
     case 'custom':
-      return fakeCustom(schema as any, context, fake)
+      return fakeCustom(schema as any, context, rootFake)
     case 'date':
-      return fakeDate(schema as any, context, fake)
+      return fakeDate(schema as any, context, rootFake)
     case 'default':
-      return fakeDefault(schema as any, context, fake)
+      return fakeDefault(schema as any, context, rootFake)
     case 'enum':
-      return fakeEnum(schema as any, context, fake)
+      return fakeEnum(schema as any, context, rootFake)
     case 'file':
       // TODO
       break
@@ -62,64 +62,64 @@ export const fake: RootFake = ((schema: core.$ZodType, context) => {
       // TODO
       break
     case 'interface':
-      return fakeInterface(schema as any, context, fake)
+      return fakeInterface(schema as any, context, rootFake)
     case 'intersection':
       // TODO
       break
     case 'lazy':
-      return fakeLazy(schema as any, context, fake)
+      return fakeLazy(schema as any, context, rootFake)
     case 'literal':
-      return fakeLiteral(schema as any, context, fake)
+      return fakeLiteral(schema as any, context, rootFake)
     case 'map':
-      return fakeMap(schema as any, context, fake)
+      return fakeMap(schema as any, context, rootFake)
     case 'nan':
-      return fakeNaN(schema as any, context, fake)
+      return fakeNaN(schema as any, context, rootFake)
     case 'never':
-      return fakeNever(schema as any, context, fake)
+      return fakeNever(schema as any, context, rootFake)
     case 'nonoptional':
-      return fakeNonOptional(schema as any, context, fake)
+      return fakeNonOptional(schema as any, context, rootFake)
     case 'null':
-      return fakeNull(schema as any, context, fake)
+      return fakeNull(schema as any, context, rootFake)
     case 'nullable':
-      return fakeNullable(schema as any, context, fake)
+      return fakeNullable(schema as any, context, rootFake)
     case 'number':
-      return fakeNumber(schema as any, context, fake)
+      return fakeNumber(schema as any, context, rootFake)
     case 'object':
-      return fakeObject(schema as any, context, fake)
+      return fakeObject(schema as any, context, rootFake)
     case 'optional':
-      return fakeOptional(schema as any, context, fake)
+      return fakeOptional(schema as any, context, rootFake)
     case 'pipe':
-      return fakePipe(schema as any, context, fake)
+      return fakePipe(schema as any, context, rootFake)
     case 'promise':
-      return fakePromise(schema as any, context, fake)
+      return fakePromise(schema as any, context, rootFake)
     case 'readonly':
-      return fakeReadonly(schema as any, context, fake)
+      return fakeReadonly(schema as any, context, rootFake)
     case 'record':
-      return fakeRecord(schema as any, context, fake)
+      return fakeRecord(schema as any, context, rootFake)
     case 'set':
-      return fakeSet(schema as any, context, fake)
+      return fakeSet(schema as any, context, rootFake)
     case 'string':
-      return fakeString(schema as any, context, fake)
+      return fakeString(schema as any, context, rootFake)
     case 'success':
       // TODO
       break
     case 'symbol':
-      return fakeSymbol(schema as any, context, fake)
+      return fakeSymbol(schema as any, context, rootFake)
     case 'template_literal':
-      return fakeTemplateLiteral(schema as any, context, fake)
+      return fakeTemplateLiteral(schema as any, context, rootFake)
     case 'transform':
       // TODO
       break
     case 'tuple':
-      return fakeTuple(schema as any, context, fake)
+      return fakeTuple(schema as any, context, rootFake)
     case 'undefined':
-      return fakeUndefined(schema as any, context, fake)
+      return fakeUndefined(schema as any, context, rootFake)
     case 'union':
-      return fakeUnion(schema as any, context, fake)
+      return fakeUnion(schema as any, context, rootFake)
     case 'unknown':
-      return fakeUnknown(schema as any, context, fake)
+      return fakeUnknown(schema as any, context, rootFake)
     case 'void':
-      return fakeVoid(schema as any, context, fake)
+      return fakeVoid(schema as any, context, rootFake)
     default: {
       const _: never = schema._zod.def.type
       break
