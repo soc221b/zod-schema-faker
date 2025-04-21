@@ -1,10 +1,9 @@
-import * as core from '@zod/core'
-import { Context } from './context'
 import { fakeAny } from './schemas/any'
 import { fakeArray } from './schemas/array'
 import { fakeBigInt } from './schemas/big-int'
 import { fakeBoolean } from './schemas/boolean'
 import { fakeCatch } from './schemas/catch'
+import { fakeCustom } from './schemas/custom'
 import { fakeDate } from './schemas/date'
 import { fakeDefault } from './schemas/default'
 import { fakeEnum } from './schemas/enum'
@@ -33,8 +32,9 @@ import { fakeUndefined } from './schemas/undefined'
 import { fakeUnion } from './schemas/union'
 import { fakeUnknown } from './schemas/unknown'
 import { fakeVoid } from './schemas/void'
+import { RootFake } from './type'
 
-export function fake<T extends core.$ZodType>(schema: T, context: Context): core.infer<T> {
+export const fake: RootFake = (schema, context) => {
   switch (schema._zod.def.type) {
     case 'any':
       return fakeAny(schema as any, fake, context)
@@ -47,8 +47,7 @@ export function fake<T extends core.$ZodType>(schema: T, context: Context): core
     case 'catch':
       return fakeCatch(schema as any, fake, context)
     case 'custom':
-      // TODO
-      break
+      return fakeCustom(schema as any, fake, context)
     case 'date':
       return fakeDate(schema as any, fake, context)
     case 'default':

@@ -1,8 +1,7 @@
 import { faker } from '@faker-js/faker'
 import * as z from '@zod/mini'
 import { beforeAll, expect, test } from 'vitest'
-import { fake } from '../src/fake'
-import { setFaker } from '../src/internals/random'
+import { custom, fake, Fake, getFaker, setFaker } from '../src'
 
 const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] = [
   // any
@@ -65,12 +64,19 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   { schema: z.coerce.number() },
   { schema: z.coerce.string() },
 
-  // TODO: custom
-  // {
-  //   schema: z.custom<`${number}px`>(val => {
-  //     return typeof val === 'string' ? /^\d+px$/.test(val) : false
-  //   }),
-  // },
+  // custom
+  {
+    schema: (() => {
+      const px = z.custom<`${number}px`>(val => {
+        return typeof val === 'string' ? /^\d+px$/.test(val) : false
+      })
+      const fakePx: Fake<any> = () => {
+        return getFaker().number.int({ min: 1, max: 100 }) + 'px'
+      }
+      custom(px, fakePx)
+      return px
+    })(),
+  },
 
   // date
   { schema: z.date() },
@@ -125,15 +131,20 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
     description: 'enum',
   },
 
-  // TODO: instanceof
-  // {
-  //   schema: () => {
-  //     class Test {
-  //       name: string = ''
-  //     }
-  //     return z.instanceof(Test)
-  //   },
-  // },
+  // instanceof
+  {
+    schema: (() => {
+      class Test {
+        name: string = ''
+      }
+      const TestSchema = z.instanceof(Test)
+      const fakeTest: Fake<typeof TestSchema> = () => {
+        return new Test()
+      }
+      custom(TestSchema, fakeTest)
+      return TestSchema
+    })(),
+  },
 
   // interface
   { schema: z.interface({}) },
