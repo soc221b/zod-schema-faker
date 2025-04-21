@@ -24,7 +24,7 @@ Built-in zod types:
 ```ts
 import * as z from 'zod' // or import * as z from '@zod/mini'
 import { faker } from '@faker-js/faker'
-import { setFaker, fake, fakeSchema } from 'zod-schema-faker'
+import { fake, fakeSchema, setFaker } from 'zod-schema-faker'
 
 const User = z.interface({
   name: z.string(),
@@ -34,11 +34,28 @@ const User = z.interface({
 // enable tree shaking
 if (process.env.NODE_ENV === 'development') {
   setFaker(faker) // or setFaker(your faker instance)
-
-  const data = fake(z.string())
-
-  console.log(data.name) // { name: 'lorem', age: 42 }
+  fake(z.string()) // { name: 'lorem', age: 42 }
 }
+```
+
+Custom zod types:
+
+```ts
+import * as z from 'zod' // or import * as z from '@zod/mini'
+import { faker } from '@faker-js/faker'
+import { custom, fake, Fake, getFaker, setFaker } from 'zod-schema-faker'
+
+const px = z.custom<`${number}px`>(val => {
+  return typeof val === 'string' ? /^\d+px$/.test(val) : false
+})
+
+const fakePx: Fake<any> = () => {
+  return getFaker().number.int({ min: 1, max: 100 }) + 'px'
+}
+custom(px, fakePx)
+
+setFaker(faker) // or setFaker(your faker instance)
+fake(px) // '100px'
 ```
 
 ## Migration from v1(zod@3) to v2(zod@4)
@@ -51,20 +68,25 @@ if (process.env.NODE_ENV === 'development') {
 ### Core APIs
 
 - `function fake<T extends core.$ZodType>(schema: T): core.infer<T>`: Generate fake data based on schema.
-- `function seed(value?: number): void`: Sets the seed to use.
 
 ### Random Utility APIs
 
+- `function seed(value?: number): void`: Sets the seed or generates a new one. This method is intended to allow for
+  consistent values in tests, so you might want to use hardcoded values as the seed.
 - `function setFaker(faker: Faker): void`: Set the faker instance to use.
 - `function getFaker(): Faker`: Get the faker instance.
 - `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
   expression.
 
+### Customization APIs
+
+- `function custom<T extends core.$ZodType>(schema: T, fake: Fake<T>): void`: Generate fake data based on schema.
+- `type Fake<T extends core.$ZodType> = (schema: T, context: Context, rootFake: RootFake) => core.infer<T>`: Custom fake
+  function.
+
 ## Unsupported
 
-- .custom 🚧
 - .file 🚧
-- .instanceof 🚧
 - .refine ❌
 - .superRefine ❌
 - .transform 🚧

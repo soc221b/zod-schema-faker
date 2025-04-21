@@ -1,14 +1,15 @@
 import * as core from '@zod/core'
 import { MAX_DEPTH } from '../config'
 import { Context } from '../context'
-import { fake as internalFake } from '../fake'
+import { rootFake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 
 export function fakeArray<T extends core.$ZodArray>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+  rootFake: typeof internalFake,
+): Infer<T> {
   let min = 0
   let max = Infinity
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
@@ -50,5 +51,5 @@ export function fakeArray<T extends core.$ZodArray>(
   if (context.depth > MAX_DEPTH) {
     max = min
   }
-  return getFaker().helpers.multiple(() => fake(schema._zod.def.element, context), { count: { min, max } })
+  return getFaker().helpers.multiple(() => rootFake(schema._zod.def.element, context), { count: { min, max } })
 }

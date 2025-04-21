@@ -1,7 +1,6 @@
-import { fake as internalFake } from './internals/fake'
-
-type ZodType = { _zod: { output: unknown } }
+import { rootFake } from './internals/fake'
+import { ZodType } from './internals/type'
 
 export function fake<T extends ZodType>(schema: T): T['_zod']['output'] {
-  return internalFake(schema as any, { depth: 0 })
+  return rootFake(schema, { depth: 0 })
 }

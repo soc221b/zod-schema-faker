@@ -3,10 +3,16 @@ import RandExp from 'randexp'
 
 let _faker: Faker
 
+/**
+ * Set the faker instance to use.
+ */
 export function setFaker(faker: Faker): void {
   _faker = faker
 }
 
+/**
+ * Get the faker instance.
+ */
 export function getFaker(): Faker {
   return _faker!
 }

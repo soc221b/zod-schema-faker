@@ -1,15 +1,16 @@
 import * as core from '@zod/core'
 import { Context } from '../context'
-import { fake as internalFake } from '../fake'
+import { rootFake as internalFake } from '../fake'
 import { getFaker } from '../random'
+import { Infer } from '../type'
 import { unescape } from '../utils'
 import { fakeStringFormat } from './checks/string-format'
 
 export function fakeString<T extends core.$ZodString>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
-): core.infer<T> {
+  rootFake: typeof internalFake,
+): Infer<T> {
   let data = getFaker().lorem.sentence()
   let min = undefined
   let max = undefined
@@ -18,7 +19,7 @@ export function fakeString<T extends core.$ZodString>(
   let endsWith = ''
   let uppercase = false
   let lowercase = false
-  data = fakeStringFormat(schema as any, fake) ?? data
+  data = fakeStringFormat(schema as any, rootFake) ?? data
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
     switch (check._zod.def.check) {
       case 'length_equals': {
@@ -35,7 +36,7 @@ export function fakeString<T extends core.$ZodString>(
         break
       }
       case 'string_format': {
-        data = fakeStringFormat(check as any, fake) ?? data
+        data = fakeStringFormat(check as any, rootFake) ?? data
         const checkStringFormat = check as core.$ZodCheckStringFormat
         switch (checkStringFormat._zod.def.format) {
           case 'ends_with': {
