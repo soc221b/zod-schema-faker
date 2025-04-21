@@ -7,8 +7,8 @@ import { lcm } from '../utils'
 
 export function fakeNumber<T extends core.$ZodNumber>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   let min = Number.MIN_SAFE_INTEGER
   let max = Number.MAX_SAFE_INTEGER

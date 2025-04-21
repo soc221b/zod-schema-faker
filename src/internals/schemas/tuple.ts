@@ -4,7 +4,7 @@ import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
 import { Infer } from '../type'
 
-export function fakeTuple<T extends core.$ZodTuple>(schema: T, fake: typeof internalFake, context: Context): Infer<T> {
+export function fakeTuple<T extends core.$ZodTuple>(schema: T, context: Context, fake: typeof internalFake): Infer<T> {
   return schema._zod.def.items
     .map(item => fake(item, context))
     .concat(

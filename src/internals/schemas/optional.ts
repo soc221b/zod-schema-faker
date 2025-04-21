@@ -6,8 +6,8 @@ import { Infer } from '../type'
 
 export function fakeOptional<T extends core.$ZodOptional>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return getFaker().datatype.boolean() ? fake(schema._zod.def.innerType, context) : undefined
 }

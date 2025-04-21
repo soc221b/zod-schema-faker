@@ -7,8 +7,8 @@ import { lcm } from '../utils'
 
 export function fakeBigInt<T extends core.$ZodBigInt>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   let min = undefined
   let max = undefined

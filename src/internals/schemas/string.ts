@@ -8,8 +8,8 @@ import { fakeStringFormat } from './checks/string-format'
 
 export function fakeString<T extends core.$ZodString>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   let data = getFaker().lorem.sentence()
   let min = undefined

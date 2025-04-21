@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakeUndefined<T extends core.$ZodUndefined>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return undefined
 }

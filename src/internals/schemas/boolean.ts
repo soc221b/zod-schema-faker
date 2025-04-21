@@ -6,8 +6,8 @@ import { Infer } from '../type'
 
 export function fakeBoolean<T extends core.$ZodBoolean>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return getFaker().datatype.boolean()
 }

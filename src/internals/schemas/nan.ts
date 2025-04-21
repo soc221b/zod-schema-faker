@@ -3,6 +3,6 @@ import { Context } from '../context'
 import { fake as internalFake } from '../fake'
 import { Infer } from '../type'
 
-export function fakeNaN<T extends core.$ZodNaN>(schema: T, fake: typeof internalFake, context: Context): Infer<T> {
+export function fakeNaN<T extends core.$ZodNaN>(schema: T, context: Context, fake: typeof internalFake): Infer<T> {
   return NaN
 }

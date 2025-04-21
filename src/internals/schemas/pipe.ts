@@ -25,7 +25,7 @@ const stringBoolValues = [
   ...falsyValues,
 ]
 
-export function fakePipe<T extends core.$ZodPipe>(schema: T, fake: typeof internalFake, context: Context): Infer<T> {
+export function fakePipe<T extends core.$ZodPipe>(schema: T, context: Context, fake: typeof internalFake): Infer<T> {
   if (schema._zod.def.out._zod.def.type === 'boolean') {
     return getFaker().helpers.arrayElement(stringBoolValues)
   }

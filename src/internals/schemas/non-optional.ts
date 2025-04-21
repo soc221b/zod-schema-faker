@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakeNonOptional<T extends core.$ZodNonOptional>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return fake(schema._zod.def.innerType, context)
 }

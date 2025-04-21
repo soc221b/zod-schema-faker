@@ -81,7 +81,7 @@ fake(px) // '100px'
 ### Customization APIs
 
 - `function custom<T extends core.$ZodType>(schema: T, fake: Fake<T>): void`: Generate fake data based on schema.
-- `type Fake<T extends core.$ZodType> = (schema: T, fake: RootFake, context: Context) => core.infer<T>`: Custom fake
+- `type Fake<T extends core.$ZodType> = (schema: T, context: Context, fake: RootFake) => core.infer<T>`: Custom fake
   function.
 
 ## Unsupported

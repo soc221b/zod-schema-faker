@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakeSymbol<T extends core.$ZodSymbol>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return Symbol()
 }

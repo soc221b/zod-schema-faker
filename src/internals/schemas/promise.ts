@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakePromise<T extends core.$ZodPromise>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return Promise.resolve(fake(schema._zod.def.innerType, context))
 }

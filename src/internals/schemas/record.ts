@@ -6,8 +6,8 @@ import { Infer } from '../type'
 
 export function fakeRecord<T extends core.$ZodRecord>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   if (schema._zod.def.keyType instanceof core.$ZodEnum) {
     return Object.fromEntries(

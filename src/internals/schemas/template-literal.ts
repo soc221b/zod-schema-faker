@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakeTemplateLiteral<T extends core.$ZodTemplateLiteral>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return schema._zod.def.parts.map(part => (part instanceof core.$ZodType ? fake(part, context) : part)).join('')
 }

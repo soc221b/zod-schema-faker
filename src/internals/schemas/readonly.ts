@@ -5,8 +5,8 @@ import { Infer } from '../type'
 
 export function fakeReadonly<T extends core.$ZodReadonly>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return Object.freeze(fake(schema._zod.def.innerType, context))
 }

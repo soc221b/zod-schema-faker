@@ -5,7 +5,7 @@ import { fake as internalFake } from '../fake'
 import { getFaker } from '../random'
 import { Infer } from '../type'
 
-export function fakeSet<T extends core.$ZodSet>(schema: T, fake: typeof internalFake, context: Context): Infer<T> {
+export function fakeSet<T extends core.$ZodSet>(schema: T, context: Context, fake: typeof internalFake): Infer<T> {
   let min = 0
   let max = Infinity
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {

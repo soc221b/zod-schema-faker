@@ -7,6 +7,6 @@ export function custom<T extends ZodType>(schema: T, fake: Fake<T>): void {
   customs.set(schema, fake as any)
 }
 
-export function fakeCustom<T extends core.$ZodCustom>(schema: T, fake: RootFake, context: Context): Infer<T> {
-  return customs.get(schema)!(schema, fake, context)
+export function fakeCustom<T extends core.$ZodCustom>(schema: T, context: Context, fake: RootFake): Infer<T> {
+  return customs.get(schema)!(schema, context, fake)
 }

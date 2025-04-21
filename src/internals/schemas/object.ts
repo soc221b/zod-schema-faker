@@ -6,8 +6,8 @@ import { Infer } from '../type'
 
 export function fakeObject<T extends core.$ZodObject>(
   schema: T,
-  fake: typeof internalFake,
   context: Context,
+  fake: typeof internalFake,
 ): Infer<T> {
   return Object.fromEntries(
     Object.entries(schema._zod.def.shape)
