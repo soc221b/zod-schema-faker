@@ -51,10 +51,11 @@ if (process.env.NODE_ENV === 'development') {
 ### Core APIs
 
 - `function fake<T extends core.$ZodType>(schema: T): core.infer<T>`: Generate fake data based on schema.
-- `function seed(value?: number): void`: Sets the seed to use.
 
 ### Random Utility APIs
 
+- `function seed(value?: number): void`: Sets the seed or generates a new one. This method is intended to allow for
+  consistent values in tests, so you might want to use hardcoded values as the seed.
 - `function setFaker(faker: Faker): void`: Set the faker instance to use.
 - `function getFaker(): Faker`: Get the faker instance.
 - `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
