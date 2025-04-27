@@ -142,6 +142,17 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     })(),
     description: 'enum',
   },
+  {
+    schema: (() => {
+      enum Fish {
+        Salmon = 'Salmon',
+        Tuna = 'Tuna',
+        Trout = 'Trout',
+      }
+      return z.nativeEnum(Fish)
+    })(),
+    description: 'nativeEnum (deprecated)',
+  },
 
   // instanceof
   {

@@ -152,6 +152,17 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     })(),
     description: 'enum',
   },
+  {
+    schema: (() => {
+      enum Fish {
+        Salmon = 'Salmon',
+        Tuna = 'Tuna',
+        Trout = 'Trout',
+      }
+      return z.nativeEnum(Fish)
+    })(),
+    description: 'nativeEnum (deprecated)',
+  },
 
   // instanceof
   {
