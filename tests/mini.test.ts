@@ -175,6 +175,30 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     schema: (() => {
       const Category = z.interface({
         name: z.string(),
+        get 'subcategory?'() {
+          return Category
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional key',
+  },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
+        get subcategory() {
+          return z.optional(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional value',
+  },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
         get subcategories() {
           return z.array(Category)
         },
@@ -314,59 +338,70 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   // object
   { schema: z.object() },
   { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
-  // TODO:
-  // {
-  //   schema: (() => {
-  //     interface Category {
-  //       name: string
-  //       subcategories: Category[]
-  //     }
-  //     const Category: z.ZodMiniType<Category> = z.object({
-  //       name: z.string(),
-  //       subcategories: z.lazy(() => z.array(Category)),
-  //     })
-  //     return Category
-  //   })(),
-  //   description: 'recursive array',
-  // },
-  // TODO:
-  // {
-  //   schema: (() => {
-  //     interface Category {
-  //       name: string
-  //       subcategories: Set<Category>
-  //     }
-  //     const Category: z.ZodMiniType<Category> = z.object({
-  //       name: z.string(),
-  //       subcategories: z.lazy(() => z.set(Category)),
-  //     })
-  //     return Category
-  //   })(),
-  //   description: 'recursive set',
-  // },
-  // TODO:
-  // {
-  //   schema: (() => {
-  //     interface User {
-  //       email: string
-  //       posts: Post[]
-  //     }
-  //     interface Post {
-  //       title: string
-  //       author: User
-  //     }
-  //     const User: z.ZodMiniType<User> = z.object({
-  //       email: z.string(),
-  //       posts: z.lazy(() => z.array(Post)),
-  //     })
-  //     const Post: z.ZodMiniType<Post> = z.object({
-  //       title: z.string(),
-  //       author: z.lazy(() => User),
-  //     })
-  //     return User
-  //   })(),
-  //   description: 'mutually recursive',
-  // },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategory?: Category
+      }
+      const Category: z.ZodMiniType<Category> = z.object({
+        name: z.string(),
+        subcategory: z.lazy(() => z.optional(Category)),
+      })
+      return Category
+    })(),
+    description: 'recursive optional',
+  },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategories: Category[]
+      }
+      const Category: z.ZodMiniType<Category> = z.object({
+        name: z.string(),
+        subcategories: z.lazy(() => z.array(Category)),
+      })
+      return Category
+    })(),
+    description: 'recursive array',
+  },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategories: Set<Category>
+      }
+      const Category: z.ZodMiniType<Category> = z.object({
+        name: z.string(),
+        subcategories: z.lazy(() => z.set(Category)),
+      })
+      return Category
+    })(),
+    description: 'recursive set',
+  },
+  {
+    schema: (() => {
+      interface User {
+        email: string
+        posts: Post[]
+      }
+      interface Post {
+        title: string
+        author: User
+      }
+      const User: z.ZodMiniType<User> = z.object({
+        email: z.string(),
+        posts: z.lazy(() => z.array(Post)),
+      })
+      const Post: z.ZodMiniType<Post> = z.object({
+        title: z.string(),
+        author: z.lazy(() => User),
+      })
+      return User
+    })(),
+    description: 'mutually recursive',
+  },
   // TODO:
   // {
   //   schema: z.object({ name: z.string(), age: z.number().default(18) }),

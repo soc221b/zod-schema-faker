@@ -165,6 +165,30 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     schema: (() => {
       const Category = z.interface({
         name: z.string(),
+        get 'subcategory?'() {
+          return Category
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional key',
+  },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
+        get subcategory() {
+          return Category.optional()
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional value',
+  },
+  {
+    schema: (() => {
+      const Category = z.interface({
+        name: z.string(),
         get subcategories() {
           return z.array(Category)
         },
@@ -293,6 +317,20 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   // object
   { schema: z.object() },
   { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  {
+    schema: (() => {
+      interface Category {
+        name: string
+        subcategory?: Category
+      }
+      const Category: z.ZodType<Category> = z.object({
+        name: z.string(),
+        subcategory: z.lazy(() => Category.optional()),
+      })
+      return Category
+    })(),
+    description: 'recursive optional',
+  },
   {
     schema: (() => {
       interface Category {

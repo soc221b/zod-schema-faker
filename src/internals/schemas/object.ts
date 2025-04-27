@@ -28,7 +28,7 @@ export function fakeObject<T extends core.$ZodObject>(
           value,
         ]) => [
           key,
-          rootFake(value, context),
+          rootFake(value, { ...context, depth: context.depth + 1 }),
         ],
       ),
   )
