@@ -9,6 +9,7 @@
 Features
 
 - Support almost all zod types
+- Support for custom zod types
 - Extensive tests
 
 ## Installation
