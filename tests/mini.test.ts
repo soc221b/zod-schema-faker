@@ -407,7 +407,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   //   schema: z.object({ name: z.string(), age: z.number().default(18) }),
   //   description: 'optional property with default',
   // },
-  // { schema: z.object({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
+  { schema: z.object({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
   // { schema: z.object({ name: z.string(), age: z.number() }).strip(), description: 'strip (deprecated)' },
   // { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
   { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict (top)' },
