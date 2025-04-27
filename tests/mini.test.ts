@@ -560,6 +560,12 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 ]
 
 const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
+  // array
+  { schema: z.array(z.number()).check(z.minLength(6), z.maxLength(4)), description: 'min > max' },
+  { schema: z.array(z.number()).check(z.minLength(6), z.length(5)), description: 'min > length' },
+  { schema: z.array(z.number()).check(z.maxLength(4), z.length(5)), description: 'max < length' },
+  { schema: z.array(z.number()).check(z.length(1), z.length(2)), description: 'length !== length' },
+
   // bigint
   { schema: z.bigint().check(z.minimum(6n), z.maximum(4n)), description: 'min > max' },
   {
