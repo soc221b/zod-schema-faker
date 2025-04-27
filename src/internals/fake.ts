@@ -126,5 +126,5 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     }
   }
 
-  throw Error(`Unsupported schema type: ${schema._zod.def.type}`)
+  throw TypeError()
 }) as RootFake
