@@ -74,6 +74,24 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   { schema: z.date() },
   { schema: z.date().min(new Date('3000-01-01')), description: 'min' },
   { schema: z.date().max(new Date('1000-01-01')), description: 'max' },
+  {
+    schema: z
+      .date()
+      .min(new Date('1111-01-01T00:00:00.000Z'))
+      .min(new Date('3333-01-01T00:00:00.000Z'))
+      .min(new Date('2222-01-01T00:00:00.000Z'))
+      .max(new Date('3333-01-01T00:00:00.000Z')),
+    description: 'multiple min',
+  },
+  {
+    schema: z
+      .date()
+      .max(new Date('2222-01-01T00:00:00.000Z'))
+      .max(new Date('1111-01-01T00:00:00.000Z'))
+      .max(new Date('3333-01-01T00:00:00.000Z'))
+      .min(new Date('1111-01-01T00:00:00.000Z')),
+    description: 'multiple max',
+  },
 
   // default
   { schema: z.string().default('tuna') },
@@ -582,6 +600,34 @@ const invalidSuits: { schema: z.ZodType; description?: string; only?: boolean; a
   // bigint
   { schema: z.bigint().min(6n).max(4n), description: 'min > max' },
   { schema: z.bigint().min(4n).max(6n).multipleOf(7n), description: 'multipleOf is not in range' },
+
+  // date
+  {
+    schema: z.date().min(new Date('3333-01-01T00:00:00.000Z')).max(new Date('2222-01-01T00:00:00.000Z')),
+    description: 'min > max',
+  },
+  {
+    schema: z.date().max(new Date('1111-01-01T00:00:00.000Z')).min(new Date('2222-01-01T00:00:00.000Z')),
+    description: 'max < min',
+  },
+  {
+    schema: z
+      .date()
+      .min(new Date('1111-01-01T00:00:00.000Z'))
+      .min(new Date('3333-01-01T00:00:00.000Z'))
+      .min(new Date('2222-01-01T00:00:00.000Z'))
+      .max(new Date('2222-01-01T00:00:00.000Z')),
+    description: 'multiple min',
+  },
+  {
+    schema: z
+      .date()
+      .max(new Date('2222-01-01T00:00:00.000Z'))
+      .max(new Date('1111-01-01T00:00:00.000Z'))
+      .max(new Date('3333-01-01T00:00:00.000Z'))
+      .min(new Date('2222-01-01T00:00:00.000Z')),
+    description: 'multiple max',
+  },
 
   // never
   { schema: z.never() },

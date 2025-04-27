@@ -82,6 +82,28 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   { schema: z.date() },
   { schema: z.date().check(z.minimum(new Date('3000-01-01'))), description: 'min' },
   { schema: z.date().check(z.maximum(new Date('1000-01-01'))), description: 'max' },
+  {
+    schema: z
+      .date()
+      .check(
+        z.minimum(new Date('1111-01-01T00:00:00.000Z')),
+        z.minimum(new Date('3333-01-01T00:00:00.000Z')),
+        z.minimum(new Date('2222-01-01T00:00:00.000Z')),
+        z.maximum(new Date('3333-01-01T00:00:00.000Z')),
+      ),
+    description: 'multiple min',
+  },
+  {
+    schema: z
+      .date()
+      .check(
+        z.maximum(new Date('2222-01-01T00:00:00.000Z')),
+        z.maximum(new Date('1111-01-01T00:00:00.000Z')),
+        z.maximum(new Date('3333-01-01T00:00:00.000Z')),
+        z.minimum(new Date('1111-01-01T00:00:00.000Z')),
+      ),
+    description: 'multiple max',
+  },
 
   // TODO: default
   // { schema: z.default('tuna', z.string()) },
@@ -571,6 +593,42 @@ const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolea
   {
     schema: z.bigint().check(z.minimum(4n), z.maximum(6n), z.multipleOf(7n)),
     description: 'multipleOf is not in range',
+  },
+
+  // date
+  {
+    schema: z
+      .date()
+      .check(z.minimum(new Date('3333-01-01T00:00:00.000Z')), z.maximum(new Date('2222-01-01T00:00:00.000Z'))),
+    description: 'min > max',
+  },
+  {
+    schema: z
+      .date()
+      .check(z.maximum(new Date('1111-01-01T00:00:00.000Z')), z.minimum(new Date('2222-01-01T00:00:00.000Z'))),
+    description: 'max < min',
+  },
+  {
+    schema: z
+      .date()
+      .check(
+        z.minimum(new Date('1111-01-01T00:00:00.000Z')),
+        z.minimum(new Date('3333-01-01T00:00:00.000Z')),
+        z.minimum(new Date('2222-01-01T00:00:00.000Z')),
+        z.maximum(new Date('2222-01-01T00:00:00.000Z')),
+      ),
+    description: 'multiple min',
+  },
+  {
+    schema: z
+      .date()
+      .check(
+        z.maximum(new Date('2222-01-01T00:00:00.000Z')),
+        z.maximum(new Date('1111-01-01T00:00:00.000Z')),
+        z.maximum(new Date('3333-01-01T00:00:00.000Z')),
+        z.minimum(new Date('2222-01-01T00:00:00.000Z')),
+      ),
+    description: 'multiple max',
   },
 
   // never
