@@ -8,5 +8,5 @@ export function fakeNever<T extends core.$ZodNever>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  throw Error('Never')
+  throw Error()
 }
