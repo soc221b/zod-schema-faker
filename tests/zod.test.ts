@@ -573,6 +573,10 @@ beforeAll(() => {
 })
 
 const invalidSuits: { schema: z.ZodType; description?: string; only?: boolean; async?: boolean }[] = [
+  // bigint
+  { schema: z.bigint().min(6n).max(4n), description: 'min > max' },
+  { schema: z.bigint().min(4n).max(6n).multipleOf(7n), description: 'multipleOf is not in range' },
+
   // never
   { schema: z.never() },
 ]
