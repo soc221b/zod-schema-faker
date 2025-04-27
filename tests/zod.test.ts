@@ -207,7 +207,7 @@ const suits: { schema: z.ZodType; description?: string; only?: boolean }[] = [
   //   description: 'complex',
   // },
 
-  // TODO: json
+  // json
   { schema: z.json() },
 
   // lazy
