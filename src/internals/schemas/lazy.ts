@@ -8,5 +8,5 @@ export function fakeLazy<T extends core.$ZodLazy>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  return rootFake(schema._zod.def.getter(), { ...context, depth: context.depth + 1 })
+  return rootFake(schema._zod.def.getter(), context)
 }
