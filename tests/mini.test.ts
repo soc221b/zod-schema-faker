@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
 import * as z from '@zod/mini'
-import { beforeAll, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { custom, fake, Fake, getFaker, setFaker } from '../src'
 
-const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] = [
+const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
   // any
   { schema: z.any() },
 
@@ -238,9 +238,6 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   // nan
   { schema: z.nan() },
 
-  // never
-  { schema: z.never() },
-
   // nonoptional
   { schema: z.nonoptional(z.null()) },
 
@@ -378,7 +375,7 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   // },
 
   // promise
-  { schema: z.promise(z.number()) },
+  { schema: z.promise(z.number()), async: true },
 
   // readonly
   { schema: z.readonly(z.object({ name: z.string() })), description: 'object' },
@@ -562,37 +559,50 @@ const suits: { schema: z.ZodMiniType; description?: string; only?: boolean }[] =
   { schema: z.void() },
 ]
 
+const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
+  // never
+  { schema: z.never() },
+]
+
 beforeAll(() => {
   setFaker(faker)
 })
 
-suits.forEach(({ schema, description, only }) => {
-  let name = schema._zod.def.type
-  if (description) {
-    name += ` ${description}`
-  }
+describe('valid', () => {
+  validSuits.forEach(({ schema, description, only, async }) => {
+    let name = schema._zod.def.type
+    if (description) {
+      name += ` ${description}`
+    }
 
-  const t = only ? test.only : test
-  t(name, async () => {
-    switch (schema._zod.def.type) {
-      case 'never': {
-        expect(() => fake(schema)).toThrowErrorMatchingInlineSnapshot(`[Error: Never]`)
-        break
-      }
-      case 'promise': {
+    const t = only ? test.only : test
+    t(name, async () => {
+      if (async) {
         const result = fake(schema)
         await schema.parseAsync(result)
-        break
-      }
-      default: {
+      } else {
+        expect(() => fake(schema)).not.toThrow()
         const result = fake(schema)
-        try {
-          schema.parse(result)
-        } catch (e) {
-          console.log(result)
-          throw e
-        }
+        schema.parse(result)
       }
+    })
+  })
+})
+
+describe('invalid', () => {
+  invalidSuits.forEach(({ schema, description, only, async }) => {
+    let name = schema._zod.def.type
+    if (description) {
+      name += ` ${description}`
     }
+
+    const t = only ? test.only : test
+    t(name, async () => {
+      if (async) {
+        await expect(() => fake(schema)).rejects.toThrow()
+      } else {
+        expect(() => fake(schema)).toThrow()
+      }
+    })
   })
 })
