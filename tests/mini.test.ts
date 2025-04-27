@@ -560,6 +560,13 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 ]
 
 const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
+  // bigint
+  { schema: z.bigint().check(z.minimum(6n), z.maximum(4n)), description: 'min > max' },
+  {
+    schema: z.bigint().check(z.minimum(4n), z.maximum(6n), z.multipleOf(7n)),
+    description: 'multipleOf is not in range',
+  },
+
   // never
   { schema: z.never() },
 ]
