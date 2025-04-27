@@ -10,21 +10,24 @@ export function fakeArray<T extends core.$ZodArray>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  let min = 0
-  let max = Infinity
+  let min: undefined | number = undefined
+  let max: undefined | number = undefined
+  let length: undefined | number = undefined
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
     switch (check._zod.def.check) {
       case 'length_equals': {
-        min = check._zod.def.length
-        max = check._zod.def.length
+        if (length !== undefined && length !== check._zod.def.length) {
+          throw new RangeError()
+        }
+        length = check._zod.def.length
         break
       }
       case 'max_length': {
-        max = Math.min(max, check._zod.def.maximum)
+        max = Math.min(max ?? Infinity, check._zod.def.maximum)
         break
       }
       case 'min_length': {
-        min = Math.max(min, check._zod.def.minimum)
+        min = Math.max(min ?? 0, check._zod.def.minimum)
         break
       }
       default: {
@@ -47,7 +50,8 @@ export function fakeArray<T extends core.$ZodArray>(
     }
   }
 
-  max = max === Infinity ? min + getFaker().number.int({ min: 0, max: 10 }) : max
+  min = min ?? length ?? 0
+  max = max ?? length ?? min + 3
   if (context.depth > MAX_DEPTH) {
     max = min
   }
