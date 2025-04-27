@@ -445,7 +445,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   // },
 
   // promise
-  { schema: z.promise(z.number()), async: true },
+  { schema: z.promise(z.number()), async: true, description: '(deprecated)' },
 
   // readonly
   { schema: z.readonly(z.object({ name: z.string() })), description: 'object' },
