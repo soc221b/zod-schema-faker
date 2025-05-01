@@ -414,11 +414,10 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     })(),
     description: 'mutually recursive',
   },
-  // TODO:
-  // {
-  //   schema: z.object({ name: z.string(), age: z.number().default(18) }),
-  //   description: 'optional property with default',
-  // },
+  {
+    schema: z.object({ name: z.string(), age: z._default(z.number(), 18) }),
+    description: 'optional property with default',
+  },
   { schema: z.object({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
   // { schema: z.object({ name: z.string(), age: z.number() }).strict(), description: 'strict (deprecated)' },
   // { schema: z.object({ name: z.string(), age: z.number() }).strip(), description: 'strip (deprecated)' },
