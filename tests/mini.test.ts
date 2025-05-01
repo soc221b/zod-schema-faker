@@ -117,20 +117,22 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     ]),
     description: 'discriminated',
   },
-  // TODO:
-  // {
-  //   schema: (() => {
-  //     const BaseError = { status: z.literal('failed'), message: z.string() }
-  //     const MyErrors = z.discriminatedUnion([
-  //       z.interface({ ...BaseError, code: z.literal(400) }),
-  //       z.interface({ ...BaseError, code: z.literal(401) }),
-  //       z.interface({ ...BaseError, code: z.literal(500) }),
-  //     ])
-  //     const MyResult = z.discriminatedUnion([z.interface({ status: z.literal('success'), data: z.string() }), MyErrors])
-  //     return MyResult
-  //   })(),
-  //   description: 'discriminated nesting',
-  // },
+  {
+    schema: (() => {
+      const BaseError = { status: z.literal('failed'), message: z.string() }
+      const MyErrors = z.discriminatedUnion([
+        z.interface({ ...BaseError, code: z.literal(400) }),
+        z.interface({ ...BaseError, code: z.literal(401) }),
+        z.interface({ ...BaseError, code: z.literal(500) }),
+      ])
+      const MyResult = z.discriminatedUnion([
+        z.interface({ status: z.literal('success'), data: z.string() }),
+        MyErrors,
+      ])
+      return MyResult
+    })(),
+    description: 'discriminated nesting',
+  },
 
   // enum
   {
