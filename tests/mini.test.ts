@@ -105,9 +105,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     description: 'multiple max',
   },
 
-  // TODO: default
-  // { schema: z.default('tuna', z.string()) },
-  // { schema: z.default(Math.random, z.number()), description: 'function' },
+  // default
+  { schema: z._default(z.string(), 'tuna') },
+  { schema: z._default(z.number(), Math.random), description: 'function' },
 
   // discriminatedUnion
   {
