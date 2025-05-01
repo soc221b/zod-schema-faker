@@ -437,12 +437,18 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     ),
   },
 
-  // TODO:
   // partialRecord
-  // {
-  //   schema: z.record(z.union(z.enum(['id', 'name', 'email']), z.never()), z.string()),
-  //   description: 'partial',
-  // },
+  {
+    schema: z.partialRecord(
+      z.enum([
+        'id',
+        'name',
+        'email',
+      ]),
+      z.string(),
+    ),
+    description: 'partial',
+  },
 
   // promise
   { schema: z.promise(z.number()), async: true, description: '(deprecated)' },
