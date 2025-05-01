@@ -415,13 +415,11 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   // partialRecord
   {
     schema: z.partialRecord(
-      z
-        .enum([
-          'id',
-          'name',
-          'email',
-        ])
-        .or(z.never()),
+      z.enum([
+        'id',
+        'name',
+        'email',
+      ]),
       z.string(),
     ),
     description: 'partial',
