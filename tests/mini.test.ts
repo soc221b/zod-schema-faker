@@ -251,11 +251,10 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     description: 'mutually recursive',
   },
   { schema: z.interface({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
-  // TODO:
-  // {
-  //   schema: z.default(18, z.interface({ name: z.string(), 'age?': z.number() })),
-  //   description: 'optional property with default',
-  // },
+  {
+    schema: z.interface({ name: z.string(), 'age?': z._default(z.number(), 18) }),
+    description: 'optional property with default',
+  },
   { schema: z.interface({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
   // TODO:
   // { schema: z.interface({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
