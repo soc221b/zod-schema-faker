@@ -509,12 +509,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   // string
   { schema: z.string() },
   { schema: z.base64(), description: 'base64' },
-  // TODO:
-  // { schema: z.base64url(), description: 'base64url' },
-  // TODO:
-  // { schema: z.cidrv4(), description: 'cidrv4' },
-  // TODO:
-  // { schema: z.cidrv6(), description: 'cidrv6' },
+  { schema: z.base64url(), description: 'base64url' },
+  { schema: z.cidrv4(), description: 'cidrv4' },
+  { schema: z.cidrv6(), description: 'cidrv6' },
   { schema: z.cuid(), description: 'cuid' },
   { schema: z.cuid2(), description: 'cuid2' },
   { schema: z.e164(), description: 'e164' },
@@ -527,11 +524,10 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   { schema: z.guid(), description: 'guid' },
   { schema: z.ipv4(), description: 'ipv4' },
   { schema: z.ipv6(), description: 'ipv6' },
-  // TODO:
-  // { schema: z.iso.date(), description: 'date' },
-  // { schema: z.iso.datetime(), description: 'datetime' },
-  // { schema: z.iso.duration(), description: 'duration' },
-  // { schema: z.iso.time(), description: 'time' },
+  { schema: z.iso.date(), description: 'date' },
+  { schema: z.iso.datetime(), description: 'datetime' },
+  { schema: z.iso.duration(), description: 'duration' },
+  { schema: z.iso.time(), description: 'time' },
   { schema: z.jwt(), description: 'jwt' },
   { schema: z.ksuid(), description: 'ksuid' },
   { schema: z.nanoid(), description: 'naoid' },
