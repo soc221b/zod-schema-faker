@@ -48,7 +48,7 @@
   "devDependencies": {
     "@types/node": "22.15.3",
     "@vitest/coverage-v8": "3.1.2",
-    "@zod/core": "0.10.0",
+    "@zod/core": "0.10.1",
     "@zod/mini": "4.0.0-beta.20250503T014749",
     "prettier": "3.5.3",
     "prettier-plugin-multiline-arrays": "4.0.3",
