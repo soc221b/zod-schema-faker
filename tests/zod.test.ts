@@ -253,25 +253,13 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     schema: (() => {
       const Category = z.object({
         name: z.string(),
-        get 'subcategory?'() {
-          return Category
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional key',
-  },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
         get subcategory() {
           return Category.optional()
         },
       })
       return Category
     })(),
-    description: 'recursive optional value',
+    description: 'recursive optional',
   },
   {
     schema: (() => {

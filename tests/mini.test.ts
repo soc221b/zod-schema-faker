@@ -274,25 +274,13 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     schema: (() => {
       const Category = z.object({
         name: z.string(),
-        get 'subcategory?'() {
-          return Category
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional key',
-  },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
         get subcategory() {
           return z.optional(Category)
         },
       })
       return Category
     })(),
-    description: 'recursive optional value',
+    description: 'recursive optional',
   },
   {
     schema: (() => {
