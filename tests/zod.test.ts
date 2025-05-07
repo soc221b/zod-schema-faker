@@ -169,85 +169,6 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     })(),
   },
 
-  // interface
-  { schema: z.object({}) },
-  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
-        get 'subcategory?'() {
-          return Category
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional key',
-  },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
-        get subcategory() {
-          return Category.optional()
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional value',
-  },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
-        get subcategories() {
-          return z.array(Category)
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive array',
-  },
-  {
-    schema: (() => {
-      const Category = z.object({
-        name: z.string(),
-        get subcategories() {
-          return z.set(Category)
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive set',
-  },
-  {
-    schema: (() => {
-      const User = z.object({
-        email: z.email(),
-        get posts() {
-          return z.array(Post)
-        },
-      })
-      const Post = z.object({
-        title: z.string(),
-        get author() {
-          return User
-        },
-      })
-      return User
-    })(),
-    description: 'mutually recursive',
-  },
-  { schema: z.object({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
-  {
-    schema: z.object({ name: z.string(), 'age?': z.number().default(18) }),
-    description: 'optional property with default',
-  },
-  { schema: z.object({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
-  { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
-  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict' },
-  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose' },
-
   // TODO: intersection
   // { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
   // {
@@ -326,6 +247,83 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   { schema: z.number().multipleOf(7).multipleOf(11), description: 'multipleOf float (multiple)' },
 
   // object
+  { schema: z.object({}) },
+  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get 'subcategory?'() {
+          return Category
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional key',
+  },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategory() {
+          return Category.optional()
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional value',
+  },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategories() {
+          return z.array(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive array',
+  },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategories() {
+          return z.set(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive set',
+  },
+  {
+    schema: (() => {
+      const User = z.object({
+        email: z.email(),
+        get posts() {
+          return z.array(Post)
+        },
+      })
+      const Post = z.object({
+        title: z.string(),
+        get author() {
+          return User
+        },
+      })
+      return User
+    })(),
+    description: 'mutually recursive',
+  },
+  { schema: z.object({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
+  {
+    schema: z.object({ name: z.string(), 'age?': z.number().default(18) }),
+    description: 'optional property with default',
+  },
+  { schema: z.object({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
+  { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
+  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict' },
+  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose' },
   { schema: z.object() },
   { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
   {
