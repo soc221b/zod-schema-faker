@@ -100,8 +100,8 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   // discriminatedUnion
   {
     schema: z.discriminatedUnion([
-      z.interface({ status: z.literal('success'), data: z.string() }),
-      z.interface({ status: z.literal('failed'), error: z.string() }),
+      z.object({ status: z.literal('success'), data: z.string() }),
+      z.object({ status: z.literal('failed'), error: z.string() }),
     ]),
     description: 'discriminated',
   },
@@ -109,12 +109,12 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     schema: (() => {
       const BaseError = { status: z.literal('failed'), message: z.string() }
       const MyErrors = z.discriminatedUnion([
-        z.interface({ ...BaseError, code: z.literal(400) }),
-        z.interface({ ...BaseError, code: z.literal(401) }),
-        z.interface({ ...BaseError, code: z.literal(500) }),
+        z.object({ ...BaseError, code: z.literal(400) }),
+        z.object({ ...BaseError, code: z.literal(401) }),
+        z.object({ ...BaseError, code: z.literal(500) }),
       ])
       const MyResult = z.discriminatedUnion([
-        z.interface({ status: z.literal('success'), data: z.string() }),
+        z.object({ status: z.literal('success'), data: z.string() }),
         MyErrors,
       ])
       return MyResult
@@ -169,91 +169,12 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     })(),
   },
 
-  // interface
-  { schema: z.interface({}) },
-  { schema: z.interface({ name: z.string(), age: z.number() }), description: 'nesting' },
-  {
-    schema: (() => {
-      const Category = z.interface({
-        name: z.string(),
-        get 'subcategory?'() {
-          return Category
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional key',
-  },
-  {
-    schema: (() => {
-      const Category = z.interface({
-        name: z.string(),
-        get subcategory() {
-          return Category.optional()
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive optional value',
-  },
-  {
-    schema: (() => {
-      const Category = z.interface({
-        name: z.string(),
-        get subcategories() {
-          return z.array(Category)
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive array',
-  },
-  {
-    schema: (() => {
-      const Category = z.interface({
-        name: z.string(),
-        get subcategories() {
-          return z.set(Category)
-        },
-      })
-      return Category
-    })(),
-    description: 'recursive set',
-  },
-  {
-    schema: (() => {
-      const User = z.interface({
-        email: z.email(),
-        get posts() {
-          return z.array(Post)
-        },
-      })
-      const Post = z.interface({
-        title: z.string(),
-        get author() {
-          return User
-        },
-      })
-      return User
-    })(),
-    description: 'mutually recursive',
-  },
-  { schema: z.interface({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
-  {
-    schema: z.interface({ name: z.string(), 'age?': z.number().default(18) }),
-    description: 'optional property with default',
-  },
-  { schema: z.interface({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
-  { schema: z.interface({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
-  { schema: z.strictInterface({ name: z.string(), age: z.number() }), description: 'strict' },
-  { schema: z.looseInterface({ name: z.string(), age: z.number() }), description: 'loose' },
-
   // TODO: intersection
   // { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
   // {
   //   schema: (() => {
-  //     const Person = z.interface({ name: z.string() })
-  //     const Employee = z.interface({ role: z.string() })
+  //     const Person = z.object({ name: z.string() })
+  //     const Employee = z.object({ role: z.string() })
   //     const EmployedPerson = z.intersection(Person, Employee)
   //     return EmployedPerson
   //   })(),
@@ -326,6 +247,71 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   { schema: z.number().multipleOf(7).multipleOf(11), description: 'multipleOf float (multiple)' },
 
   // object
+  { schema: z.object({}) },
+  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategory() {
+          return Category.optional()
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive optional',
+  },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategories() {
+          return z.array(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive array',
+  },
+  {
+    schema: (() => {
+      const Category = z.object({
+        name: z.string(),
+        get subcategories() {
+          return z.set(Category)
+        },
+      })
+      return Category
+    })(),
+    description: 'recursive set',
+  },
+  {
+    schema: (() => {
+      const User = z.object({
+        email: z.email(),
+        get posts() {
+          return z.array(Post)
+        },
+      })
+      const Post = z.object({
+        title: z.string(),
+        get author() {
+          return User
+        },
+      })
+      return User
+    })(),
+    description: 'mutually recursive',
+  },
+  { schema: z.object({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
+  {
+    schema: z.object({ name: z.string(), 'age?': z.number().default(18) }),
+    description: 'optional property with default',
+  },
+  { schema: z.object({ name: z.string(), age: z.number().optional() }), description: 'optional value' },
+  { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
+  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict' },
+  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose' },
   { schema: z.object() },
   { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
   {
