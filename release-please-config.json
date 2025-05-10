@@ -5,5 +5,7 @@
   "packages": {
     ".": {}
   },
+  "prerelease": true,
+  "prerelease-type": "beta",
   "release-type": "node"
 }
