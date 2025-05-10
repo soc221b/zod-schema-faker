@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1-beta.4](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.4...2.0.1-beta.4) (2025-05-10)
+
+
+### Bug Fixes
+
+* **deps:** update dependency zod to v4.0.0-beta.20250503t014749 ([#471](https://github.com/soc221b/zod-schema-faker/issues/471)) ([170d824](https://github.com/soc221b/zod-schema-faker/commit/170d8249a5aa8780f9cf42496d64a1b1670f4c40))
+* **deps:** update dependency zod to v4.0.0-beta.20250505t195954 ([#474](https://github.com/soc221b/zod-schema-faker/issues/474)) ([316da90](https://github.com/soc221b/zod-schema-faker/commit/316da90d714d211298ded2780f86ec124c437f98))
+
 ## [2.0.0-beta.4](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.3...2.0.0-beta.4) (2025-05-01)
 
 
