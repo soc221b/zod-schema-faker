@@ -42,7 +42,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@faker-js/faker": "9.7.0",
+    "@faker-js/faker": "9.8.0",
     "randexp": "0.5.3"
   },
   "devDependencies": {
