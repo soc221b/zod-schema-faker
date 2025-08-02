@@ -53,7 +53,7 @@ jobs:
 
       - uses: JS-DevTools/npm-publish@v3
         id: publish
-        if: ${{ github.ref == 'refs/heads/main' }}
+        if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/v1' }}
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: ./package.json
