@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.5](https://github.com/soc221b/zod-schema-faker/compare/1.5.4...1.5.5) (2025-08-02)
+
+
+### Bug Fixes
+
+* [#520](https://github.com/soc221b/zod-schema-faker/issues/520) ([a4f751b](https://github.com/soc221b/zod-schema-faker/commit/a4f751b3f77bad2ad84d3a7481cdf5d20cb75a1a))
+* generate JSON-compatible data for z.any ([a4f751b](https://github.com/soc221b/zod-schema-faker/commit/a4f751b3f77bad2ad84d3a7481cdf5d20cb75a1a))
+
 ## [1.5.4](https://github.com/soc221b/zod-schema-faker/compare/1.5.3...1.5.4) (2025-04-16)
 
 
