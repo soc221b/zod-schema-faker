@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [2.0.1-beta.5](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.5...2.0.1-beta.5) (2025-08-02)
+## [2.0.0-beta.6](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.5...2.0.0-beta.6) (2025-08-02)
 
 
 ### Bug Fixes
