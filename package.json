@@ -62,7 +62,7 @@
     "vite": "7.1.6",
     "vite-plugin-dts": "4.5.4",
     "vitest": "3.2.4",
-    "zod": "4.0.0-beta.20250505T195954"
+    "zod": "4.1.9"
   },
   "peerDependencies": {
     "@zod/core": "*"
