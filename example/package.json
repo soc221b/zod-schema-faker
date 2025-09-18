@@ -14,7 +14,7 @@
   "devDependencies": {
     "@types/node": "22.18.6",
     "typescript": "5.9.2",
-    "vite": "7.1.5",
+    "vite": "7.1.6",
     "zod-schema-faker": "2.0.0-beta.6"
   }
 }
