@@ -9,5 +9,5 @@ export function fakeDefault<T extends core.$ZodDefault>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  return getFaker().datatype.boolean() ? rootFake(schema._zod.def.innerType, context) : schema._zod.def.defaultValue()
+  return getFaker().datatype.boolean() ? rootFake(schema._zod.def.innerType, context) : schema._zod.def.defaultValue
 }
