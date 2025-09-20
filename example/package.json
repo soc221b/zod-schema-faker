@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "zod": "^4.1.9"
+    "zod": "4.1.9"
   },
   "devDependencies": {
     "@types/node": "22.18.6",
