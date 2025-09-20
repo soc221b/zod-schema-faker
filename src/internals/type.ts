@@ -1,9 +1,8 @@
+import * as core from 'zod/v4/core'
 import { Context } from './context'
 
-export type ZodType<O = unknown> = { _zod: { output: O } } // TODO: use core.$ZodType
+export type Infer<T extends core.$ZodType> = T['_zod']['output']
 
-export type Infer<T extends ZodType> = T['_zod']['output']
+export type Fake<T extends core.$ZodType> = (schema: T, context: Context, fake: RootFake) => Infer<T>
 
-export type Fake<T extends ZodType> = (schema: T, context: Context, fake: RootFake) => Infer<T>
-
-export type RootFake = <T extends ZodType>(schema: T, context: Context) => Infer<T>
+export type RootFake = <T extends core.$ZodType>(schema: T, context: Context) => Infer<T>
