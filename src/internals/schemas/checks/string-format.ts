@@ -7,7 +7,8 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
   rootFake: typeof internalFake,
 ): undefined | string {
   let data = undefined
-  switch (schema._zod.def.format) {
+  const format = schema._zod.def.format as core.$ZodStringFormats
+  switch (format) {
     case 'base64': {
       data = randexp(core.regexes.base64)
       break
@@ -122,8 +123,7 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     default: {
-      const _: 'ends_with' | 'includes' | 'json_string' | 'lowercase' | 'starts_with' | 'uppercase' =
-        schema._zod.def.format
+      const _: 'ends_with' | 'includes' | 'json_string' | 'lowercase' | 'starts_with' | 'uppercase' = format
       break
     }
   }

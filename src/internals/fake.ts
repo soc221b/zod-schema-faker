@@ -124,7 +124,7 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'void':
       return fakeVoid(schema as any, context, rootFake)
     default: {
-      const _: 'interface' = schema._zod.def.type
+      const _: never = schema._zod.def.type
       break
     }
   }
