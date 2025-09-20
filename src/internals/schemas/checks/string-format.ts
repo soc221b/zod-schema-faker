@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { rootFake as internalFake } from '../../fake'
 import { getFaker, randexp } from '../../random'
 

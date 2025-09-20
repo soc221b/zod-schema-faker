@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { fakeAny } from './schemas/any'
 import { fakeArray } from './schemas/array'
 import { fakeBigInt } from './schemas/big-int'
