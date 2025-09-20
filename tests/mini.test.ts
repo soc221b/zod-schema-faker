@@ -111,7 +111,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // discriminatedUnion
   {
-    schema: z.discriminatedUnion([
+    schema: z.discriminatedUnion('status', [
       z.object({ status: z.literal('success'), data: z.string() }),
       z.object({ status: z.literal('failed'), error: z.string() }),
     ]),
@@ -120,12 +120,12 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   {
     schema: (() => {
       const BaseError = { status: z.literal('failed'), message: z.string() }
-      const MyErrors = z.discriminatedUnion([
+      const MyErrors = z.discriminatedUnion('code', [
         z.object({ ...BaseError, code: z.literal(400) }),
         z.object({ ...BaseError, code: z.literal(401) }),
         z.object({ ...BaseError, code: z.literal(500) }),
       ])
-      const MyResult = z.discriminatedUnion([
+      const MyResult = z.discriminatedUnion('status', [
         z.object({ status: z.literal('success'), data: z.string() }),
         MyErrors,
       ])
