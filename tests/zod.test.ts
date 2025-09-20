@@ -408,6 +408,14 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   // pipe
   { schema: z.string().pipe(z.transform(val => val.length)) },
 
+  // prefault
+  {
+    schema: z
+      .string()
+      .transform(val => val.length)
+      .prefault('tuna'),
+  },
+
   // partialRecord
   {
     schema: z.partialRecord(
