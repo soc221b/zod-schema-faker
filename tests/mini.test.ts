@@ -433,6 +433,17 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     ),
   },
 
+  // prefault
+  {
+    schema: z.prefault(
+      z.pipe(
+        z.string(),
+        z.transform(val => val.length),
+      ),
+      'tuna',
+    ),
+  },
+
   // partialRecord
   {
     schema: z.partialRecord(

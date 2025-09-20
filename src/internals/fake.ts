@@ -21,6 +21,7 @@ import { fakeNumber } from './schemas/number'
 import { fakeObject } from './schemas/object'
 import { fakeOptional } from './schemas/optional'
 import { fakePipe } from './schemas/pipe'
+import { fakePrefault } from './schemas/prefault'
 import { fakePromise } from './schemas/promise'
 import { fakeReadonly } from './schemas/readonly'
 import { fakeRecord } from './schemas/record'
@@ -90,6 +91,8 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
       return fakeOptional(schema as any, context, rootFake)
     case 'pipe':
       return fakePipe(schema as any, context, rootFake)
+    case 'prefault':
+      return fakePrefault(schema as any, context, rootFake)
     case 'promise':
       return fakePromise(schema as any, context, rootFake)
     case 'readonly':
