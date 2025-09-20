@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { fakeAny } from './schemas/any'
 import { fakeArray } from './schemas/array'
 import { fakeBigInt } from './schemas/big-int'
@@ -8,6 +8,7 @@ import { fakeCustom } from './schemas/custom'
 import { fakeDate } from './schemas/date'
 import { fakeDefault } from './schemas/default'
 import { fakeEnum } from './schemas/enum'
+import { fakeFunction } from './schemas/function'
 import { fakeLazy } from './schemas/lazy'
 import { fakeLiteral } from './schemas/literal'
 import { fakeMap } from './schemas/map'
@@ -20,6 +21,7 @@ import { fakeNumber } from './schemas/number'
 import { fakeObject } from './schemas/object'
 import { fakeOptional } from './schemas/optional'
 import { fakePipe } from './schemas/pipe'
+import { fakePrefault } from './schemas/prefault'
 import { fakePromise } from './schemas/promise'
 import { fakeReadonly } from './schemas/readonly'
 import { fakeRecord } from './schemas/record'
@@ -54,6 +56,8 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
       return fakeDefault(schema as any, context, rootFake)
     case 'enum':
       return fakeEnum(schema as any, context, rootFake)
+    case 'function':
+      return fakeFunction(schema as any, context, rootFake)
     case 'file':
       // TODO
       break
@@ -87,6 +91,8 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
       return fakeOptional(schema as any, context, rootFake)
     case 'pipe':
       return fakePipe(schema as any, context, rootFake)
+    case 'prefault':
+      return fakePrefault(schema as any, context, rootFake)
     case 'promise':
       return fakePromise(schema as any, context, rootFake)
     case 'readonly':
@@ -118,7 +124,7 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'void':
       return fakeVoid(schema as any, context, rootFake)
     default: {
-      const _: 'interface' = schema._zod.def.type
+      const _: never = schema._zod.def.type
       break
     }
   }

@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { Context } from '../context'
 import { rootFake as internalFake } from '../fake'
 import { getFaker } from '../random'
@@ -9,5 +9,5 @@ export function fakeDefault<T extends core.$ZodDefault>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  return getFaker().datatype.boolean() ? rootFake(schema._zod.def.innerType, context) : schema._zod.def.defaultValue()
+  return getFaker().datatype.boolean() ? rootFake(schema._zod.def.innerType, context) : schema._zod.def.defaultValue
 }

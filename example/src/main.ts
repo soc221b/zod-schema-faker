@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
-import { z } from '@zod/mini'
 import { fake, setFaker } from 'zod-schema-faker'
+import { z } from 'zod/mini'
 
 const main = async () => {
   const schema = z.uuid()

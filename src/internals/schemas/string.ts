@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { Context } from '../context'
 import { rootFake as internalFake } from '../fake'
 import { getFaker } from '../random'
@@ -38,7 +38,8 @@ export function fakeString<T extends core.$ZodString>(
       case 'string_format': {
         data = fakeStringFormat(check as any, rootFake) ?? data
         const checkStringFormat = check as core.$ZodCheckStringFormat
-        switch (checkStringFormat._zod.def.format) {
+        const format = checkStringFormat._zod.def.format as core.$ZodStringFormats
+        switch (format) {
           case 'ends_with': {
             endsWith = unescape(checkStringFormat._zod.def.pattern?.source ?? '')
               .replace(/^\.\*/, '')
@@ -90,7 +91,7 @@ export function fakeString<T extends core.$ZodString>(
               | 'url'
               | 'uuid'
               | 'xid'
-              | never = checkStringFormat._zod.def.format
+              | never = format
             break
           }
         }

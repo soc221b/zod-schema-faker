@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { Context } from '../context'
 import { Fake, Infer, RootFake, ZodType } from '../type'
 

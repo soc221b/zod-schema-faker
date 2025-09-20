@@ -23,7 +23,7 @@ npm install --save-dev zod-schema-faker@beta
 Built-in zod types:
 
 ```ts
-import * as z from 'zod' // or import * as z from '@zod/mini'
+import * as z from 'zod' // or import * as z from 'zod/mini'
 import { faker } from '@faker-js/faker'
 import { fake, fakeSchema, setFaker } from 'zod-schema-faker'
 
@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'development') {
 Custom zod types:
 
 ```ts
-import * as z from 'zod' // or import * as z from '@zod/mini'
+import * as z from 'zod' // or import * as z from 'zod/mini'
 import { faker } from '@faker-js/faker'
 import { custom, fake, Fake, getFaker, setFaker } from 'zod-schema-faker'
 

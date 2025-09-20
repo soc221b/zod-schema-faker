@@ -1,4 +1,4 @@
-import * as core from '@zod/core'
+import * as core from 'zod/v4/core'
 import { rootFake as internalFake } from '../../fake'
 import { getFaker, randexp } from '../../random'
 
@@ -7,13 +7,17 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
   rootFake: typeof internalFake,
 ): undefined | string {
   let data = undefined
-  switch (schema._zod.def.format) {
+  const format = schema._zod.def.format as core.$ZodStringFormats
+  switch (format) {
     case 'base64': {
       data = randexp(core.regexes.base64)
       break
     }
     case 'base64url': {
-      data = randexp(core.regexes.base64url)
+      // the regex itself is insufficient to validate a base64url, see https://github.com/colinhacks/zod/blob/923af801fde9f033cfd7e0e753b421a554fe3be8/packages/zod/src/v4/core/schemas.ts#L903-L905
+      // data = randexp(core.regexes.base64url)
+      // TODO: generate random base64url
+      data = 'Zm9vK2Jhci9iYXo'
       break
     }
     case 'cidrv4': {
@@ -119,8 +123,7 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     default: {
-      const _: 'ends_with' | 'includes' | 'json_string' | 'lowercase' | 'starts_with' | 'uppercase' =
-        schema._zod.def.format
+      const _: 'ends_with' | 'includes' | 'json_string' | 'lowercase' | 'starts_with' | 'uppercase' = format
       break
     }
   }

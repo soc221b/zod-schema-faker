@@ -99,7 +99,7 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
 
   // discriminatedUnion
   {
-    schema: z.discriminatedUnion([
+    schema: z.discriminatedUnion('status', [
       z.object({ status: z.literal('success'), data: z.string() }),
       z.object({ status: z.literal('failed'), error: z.string() }),
     ]),
@@ -108,12 +108,12 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   {
     schema: (() => {
       const BaseError = { status: z.literal('failed'), message: z.string() }
-      const MyErrors = z.discriminatedUnion([
+      const MyErrors = z.discriminatedUnion('code', [
         z.object({ ...BaseError, code: z.literal(400) }),
         z.object({ ...BaseError, code: z.literal(401) }),
         z.object({ ...BaseError, code: z.literal(500) }),
       ])
-      const MyResult = z.discriminatedUnion([
+      const MyResult = z.discriminatedUnion('status', [
         z.object({ status: z.literal('success'), data: z.string() }),
         MyErrors,
       ])
@@ -152,6 +152,16 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
       return z.nativeEnum(Fish)
     })(),
     description: 'nativeEnum (deprecated)',
+  },
+
+  // function
+  {
+    schema: z.function({
+      input: [
+        z.string(),
+      ],
+      output: z.number(),
+    }),
   },
 
   // instanceof
@@ -397,6 +407,14 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
 
   // pipe
   { schema: z.string().pipe(z.transform(val => val.length)) },
+
+  // prefault
+  {
+    schema: z
+      .string()
+      .transform(val => val.length)
+      .prefault('tuna'),
+  },
 
   // partialRecord
   {
