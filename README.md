@@ -25,17 +25,18 @@ Built-in zod types:
 ```ts
 import * as z from 'zod' // or import * as z from 'zod/mini'
 import { faker } from '@faker-js/faker'
-import { fake, fakeSchema, setFaker } from 'zod-schema-faker'
+import { fake, setFaker } from 'zod-schema-faker'
 
-const User = z.interface({
-  name: z.string(),
-  age: z.uint32(),
+const Player = z.object({
+  username: z.string(),
+  xp: z.number(),
 })
 
 // enable tree shaking
 if (process.env.NODE_ENV === 'development') {
-  setFaker(faker) // or setFaker(your faker instance)
-  fake(z.string()) // { name: 'lorem', age: 42 }
+  setFaker(faker)
+  const data = fake(Player)
+  console.log(data) // { username: "billie", xp: 100 }
 }
 ```
 
