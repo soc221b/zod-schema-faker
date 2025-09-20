@@ -88,7 +88,6 @@ fake(px) // '100px'
 ## Unsupported
 
 - .file 🚧
-- .function 🚧
 - .intersection 🚧
 - .refine ❌
 - .superRefine ❌

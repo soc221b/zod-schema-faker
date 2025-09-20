@@ -166,6 +166,16 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     description: 'nativeEnum (deprecated)',
   },
 
+  // function
+  {
+    schema: z.function({
+      input: [
+        z.string(),
+      ],
+      output: z.number(),
+    }),
+  },
+
   // instanceof
   {
     schema: (() => {
