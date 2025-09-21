@@ -1,6 +1,6 @@
+import * as core from 'zod/v4/core'
 import { rootFake } from './internals/fake'
-import { ZodType } from './internals/type'
 
-export function fake<T extends ZodType>(schema: T): T['_zod']['output'] {
+export function fake<T extends core.$ZodType>(schema: T): core.infer<T> {
   return rootFake(schema, { depth: 0 })
 }
