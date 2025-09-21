@@ -596,8 +596,14 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     description: 'refinement',
   },
 
-  // TODO: transform
-  // { schema: z.transform(val => String(val)) },
+  // transform
+  {
+    schema: z.pipe(
+      z.string(),
+      z.transform(val => val.length),
+    ),
+    description: 'transform',
+  },
 
   // tuple
   {

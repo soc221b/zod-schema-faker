@@ -598,7 +598,10 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
   },
 
   // TODO: transform
-  // { schema: z.transform(val => String(val)) },
+  {
+    schema: z.string().pipe(z.transform(val => val.length)),
+    description: 'transform',
+  },
 
   // tuple
   {

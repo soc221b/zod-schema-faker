@@ -92,7 +92,6 @@ fake(px) // '100px'
 - .intersection 🚧
 - .refine ❌
 - .superRefine ❌
-- .transform 🚧
 
 ## About
 
