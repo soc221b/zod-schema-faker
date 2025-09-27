@@ -189,6 +189,20 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       custom(TestSchema, fakeTest)
       return TestSchema
     })(),
+    description: 'instanceof',
+  },
+  {
+    schema: (() => {
+      const TestSchema = z
+        .instanceof(URL)
+        .check(z.property('protocol', z.literal('https:' as string, 'Only HTTPS allowed')))
+      const fakeTest: Fake<typeof TestSchema> = () => {
+        return new URL(fake(z.url({ protocol: /^https$/ })))
+      }
+      custom(TestSchema, fakeTest)
+      return TestSchema
+    })(),
+    description: 'instanceof property',
   },
 
   // TODO: intersection
