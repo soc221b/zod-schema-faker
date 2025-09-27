@@ -88,9 +88,13 @@ fake(px) // '100px'
 
 ## Unsupported
 
+- .codec 🚧
 - .file 🚧
 - .intersection 🚧
+- .preprocess 🚧
 - .refine ❌
+- .stringbool custom 🚧
+- .stringFormat custom 🚧
 - .superRefine ❌
 
 ## About
