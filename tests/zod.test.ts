@@ -646,6 +646,12 @@ const validSuits: { schema: z.ZodType; description?: string; only?: boolean; asy
     ]) as any,
     description: 'refinement',
   },
+  {
+    schema: z.templateLiteral([
+      z.literal('grassy').nullable(),
+    ]),
+    description: 'nullable',
+  },
 
   // TODO: transform
   {

@@ -8,5 +8,8 @@ export function fakeTemplateLiteral<T extends core.$ZodTemplateLiteral>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  return schema._zod.def.parts.map(part => (part instanceof core.$ZodType ? rootFake(part, context) : part)).join('')
+  return schema._zod.def.parts
+    .map(part => (part instanceof core.$ZodType ? rootFake(part, context) : part))
+    .map(part => part + '')
+    .join('')
 }
