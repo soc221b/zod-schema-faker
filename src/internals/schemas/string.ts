@@ -121,7 +121,7 @@ export function fakeString<T extends core.$ZodString>(
     data = data.padEnd(min, ' ')
   }
   if (max !== undefined && data.length > max) {
-    data = data.slice(0, max)
+    data = data.slice(0, getFaker().number.int({ min, max }))
   }
   if (uppercase) {
     data = data.toUpperCase()

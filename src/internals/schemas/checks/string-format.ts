@@ -1,4 +1,5 @@
 import * as core from 'zod/v4/core'
+import { HashFormat } from 'zod/v4/core/util'
 import { rootFake as internalFake } from '../../fake'
 import { getFaker, randexp } from '../../random'
 
@@ -7,7 +8,7 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
   rootFake: typeof internalFake,
 ): undefined | string {
   let data = undefined
-  const format = schema._zod.def.format as core.$ZodStringFormats
+  const format = schema._zod.def.format as core.$ZodStringFormats | 'hex' | 'hostname' | 'httpUrl' | HashFormat
   switch (format) {
     case 'base64': {
       data = randexp(core.regexes.base64)
@@ -41,7 +42,14 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     case 'datetime': {
-      data = randexp(core.regexes.datetime({}))
+      const def = schema._zod.def as core.$ZodISODateTimeDef
+      data = randexp(
+        core.regexes.datetime({
+          local: def.local,
+          offset: def.offset,
+          precision: def.precision,
+        }),
+      )
       break
     }
     case 'duration': {
@@ -67,11 +75,23 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     case 'email': {
-      data = getFaker().internet.email()
+      data = randexp(new RegExp(schema._zod.def.pattern ?? core.regexes.email.source))
       break
     }
     case 'emoji': {
       data = '☘'
+      break
+    }
+    case 'hex': {
+      data = randexp(core.regexes.hex)
+      break
+    }
+    case 'hostname': {
+      data = getFaker().internet.domainName()
+      break
+    }
+    case 'httpUrl': {
+      data = getFaker().internet.url()
       break
     }
     case 'guid': {
@@ -87,11 +107,29 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     case 'jwt': {
-      data = getFaker().internet.jwt()
+      const def = schema._zod.def as core.$ZodJWTDef
+      data = getFaker().internet.jwt({
+        header: {
+          alg: def.alg || getFaker().internet.jwtAlgorithm(),
+          typ: 'JWT',
+        },
+      })
       break
     }
     case 'ksuid': {
       data = randexp(core.regexes.ksuid)
+      break
+    }
+    case 'md5_base64': {
+      data = randexp(core.regexes.md5_base64)
+      break
+    }
+    case 'md5_base64url': {
+      data = randexp(core.regexes.md5_base64url)
+      break
+    }
+    case 'md5_hex': {
+      data = randexp(core.regexes.md5_hex)
       break
     }
     case 'nanoid': {
@@ -102,8 +140,61 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       data = randexp(schema._zod.def.pattern!)
       break
     }
+    case 'sha1_base64': {
+      data = randexp(core.regexes.sha1_base64)
+      break
+    }
+    case 'sha1_base64url': {
+      data = randexp(core.regexes.sha1_base64url)
+      break
+    }
+    case 'sha1_hex': {
+      data = randexp(core.regexes.sha1_hex)
+      break
+    }
+    case 'sha256_base64': {
+      data = randexp(core.regexes.sha256_base64)
+      break
+    }
+    case 'sha256_base64url': {
+      data = randexp(core.regexes.sha256_base64url)
+      break
+    }
+    case 'sha256_hex': {
+      data = randexp(core.regexes.sha256_hex)
+      break
+    }
+    case 'sha384_base64': {
+      data = randexp(core.regexes.sha384_base64)
+      break
+    }
+    case 'sha384_base64url': {
+      data = randexp(core.regexes.sha384_base64url)
+      break
+    }
+    case 'sha384_hex': {
+      data = randexp(core.regexes.sha384_hex)
+      break
+    }
+    case 'sha512_base64': {
+      data = randexp(core.regexes.sha512_base64)
+      break
+    }
+    case 'sha512_base64url': {
+      data = randexp(core.regexes.sha512_base64url)
+      break
+    }
+    case 'sha512_hex': {
+      data = randexp(core.regexes.sha512_hex)
+      break
+    }
     case 'time': {
-      data = randexp(core.regexes.time({}))
+      const def = schema._zod.def as core.$ZodISOTimeDef
+      data = randexp(
+        core.regexes.time({
+          precision: def.precision,
+        }),
+      )
       break
     }
     case 'ulid': {
@@ -111,11 +202,51 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     case 'url': {
-      data = getFaker().internet.url()
+      const protocol = (schema as core.$ZodURL)._zod.def.protocol
+      const hostname = (schema as core.$ZodURL)._zod.def.hostname
+      if (protocol && hostname) {
+        data = randexp(protocol) + '://' + randexp(hostname)
+      } else if (protocol) {
+        data = randexp(protocol) + '://' + getFaker().internet.domainName()
+      } else if (hostname) {
+        data = 'https://' + randexp(hostname)
+      } else {
+        data = getFaker().internet.url()
+      }
       break
     }
     case 'uuid': {
-      data = randexp(core.regexes.uuid())
+      const version = (schema as core.$ZodUUID)._zod.def.version
+      switch (version) {
+        case 'v1':
+          data = randexp(core.regexes.uuid(1))
+          break
+        case 'v2':
+          data = randexp(core.regexes.uuid(2))
+          break
+        case 'v3':
+          data = randexp(core.regexes.uuid(3))
+          break
+        case 'v4':
+          data = randexp(core.regexes.uuid(4))
+          break
+        case 'v5':
+          data = randexp(core.regexes.uuid(5))
+          break
+        case 'v6':
+          data = randexp(core.regexes.uuid(6))
+          break
+        case 'v7':
+          data = randexp(core.regexes.uuid(7))
+          break
+        case 'v8':
+          data = randexp(core.regexes.uuid(8))
+          break
+        default: {
+          const _: undefined = version
+          data = randexp(core.regexes.uuid())
+        }
+      }
       break
     }
     case 'xid': {
