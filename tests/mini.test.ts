@@ -611,6 +611,20 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // string bool
   { schema: z.stringbool() },
+  // TODO
+  // {
+  //   schema: z.stringbool({
+  //     truthy: [
+  //       'true',
+  //       'enabled',
+  //     ],
+  //     falsy: [
+  //       'false',
+  //       'disabled',
+  //     ],
+  //   }),
+  //   description: 'custom',
+  // },
 
   // symbol
   { schema: z.symbol() },
