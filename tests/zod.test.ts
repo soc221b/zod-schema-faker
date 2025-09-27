@@ -796,6 +796,19 @@ describe('valid', () => {
       }
     })
   })
+
+  test('function input', () => {
+    const schema = z.function({
+      input: [
+        z.string(),
+      ],
+      output: z.number(),
+    })
+    const fn = fake(schema)
+
+    const data = fn('')
+    expect(data).toBeTypeOf('number')
+  })
 })
 
 describe('invalid', () => {
@@ -813,5 +826,17 @@ describe('invalid', () => {
         expect(() => fake(schema)).toThrow()
       }
     })
+  })
+
+  test('function input', () => {
+    const schema = z.function({
+      input: [
+        z.string(),
+      ],
+      output: z.number(),
+    })
+    const fn = fake(schema)
+
+    expect(() => fn(0 as any)).toThrow()
   })
 })
