@@ -645,6 +645,12 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
     ]) as any,
     description: 'refinement',
   },
+  {
+    schema: z.templateLiteral([
+      z.nullable(z.literal('grassy')),
+    ]),
+    description: 'nullable',
+  },
 
   // transform
   {
