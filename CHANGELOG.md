@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.8](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.7...2.0.0-beta.8) (2025-09-27)
+
+
+### Bug Fixes
+
+* **function:** validate input ([b7fb80e](https://github.com/soc221b/zod-schema-faker/commit/b7fb80e84fffb4e944a9050f6e69ba71757a2e9f))
+* **string:** add missing implementation ([#580](https://github.com/soc221b/zod-schema-faker/issues/580)) ([da92afc](https://github.com/soc221b/zod-schema-faker/commit/da92afc0c2321433333d219668a66f209a4a0aa5))
+* **templateLiteral:** nullable ([871754d](https://github.com/soc221b/zod-schema-faker/commit/871754de392fc0048f90c2a663912f25d7ebd3f9))
+
 ## [2.0.0-beta.7](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.6...2.0.0-beta.7) (2025-09-21)
 
 
