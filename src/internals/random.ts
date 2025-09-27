@@ -14,7 +14,11 @@ export function setFaker(faker: Faker): void {
  * Get the faker instance.
  */
 export function getFaker(): Faker {
-  return _faker!
+  if (_faker) {
+    return _faker
+  } else {
+    throw ReferenceError('Faker instance not set. Use `setFaker` to set it.')
+  }
 }
 
 const _simpleFaker = new SimpleFaker()

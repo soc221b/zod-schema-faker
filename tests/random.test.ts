@@ -6,9 +6,7 @@ import { getFaker, randexp, seed, setFaker } from '../src/internals/random'
 
 describe('@faker-js/faker', () => {
   it('does not have a default faker', () => {
-    const faker = getFaker()
-
-    expect(faker).toBeUndefined()
+    expect(() => getFaker()).toThrow()
   })
 
   it('can set a faker', () => {
