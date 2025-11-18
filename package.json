@@ -60,7 +60,10 @@
     "vite": "7.2.2",
     "vite-plugin-dts": "4.5.4",
     "vitest": "4.0.9",
-    "zod": "4.1.9"
+    "zod": "4.1.12"
+  },
+  "peerDependencies": {
+    "zod": "^3.25.0 || ^4.0.0"
   },
   "publishConfig": {
     "tag": "beta"

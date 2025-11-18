@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { beforeAll, describe, expect, test } from 'vitest'
-import * as z from 'zod/mini'
+import * as z from 'zod/v4-mini'
 import { custom, fake, Fake, getFaker, setFaker } from '../../src/v4'
 
 const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean; async?: boolean }[] = [
