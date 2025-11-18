@@ -1,8 +1,8 @@
 import { Faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
 import * as z from 'zod'
-import { fake } from '../src'
-import { getFaker, randexp, seed, setFaker } from '../src/internals/random'
+import { fake } from '../../src/v4'
+import { getFaker, randexp, seed, setFaker } from '../../src/v4/internals/random'
 
 describe('@faker-js/faker', () => {
   it('does not have a default faker', () => {
