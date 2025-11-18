@@ -3,6 +3,9 @@ import { HashFormat } from 'zod/v4/core/util'
 import { rootFake as internalFake } from '../../fake'
 import { getFaker, randexp } from '../../random'
 
+const practicalEmailRegex =
+  /^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$/
+
 export function fakeStringFormat<T extends core.$ZodStringFormat>(
   schema: T,
   rootFake: typeof internalFake,
@@ -75,7 +78,11 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       break
     }
     case 'email': {
-      data = randexp(new RegExp(schema._zod.def.pattern ?? core.regexes.email.source))
+      const regex = schema._zod.def.pattern ? schema._zod.def.pattern : core.regexes.email
+      data = randexp(regex)
+      if (practicalEmailRegex.source === regex.source) {
+        data = data.replace(/\.\./g, '.').replace(/^\./, 'a')
+      }
       break
     }
     case 'emoji': {
