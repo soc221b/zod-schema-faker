@@ -1,6 +1,6 @@
 import { beforeEach, expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { fake, installCustom, ZodTypeFaker, getFaker, install } from '../../src/v3'
+import { fake, getFaker, install, installCustom, ZodTypeFaker } from '../../src/v3'
 
 interface UserLike {
   name: string

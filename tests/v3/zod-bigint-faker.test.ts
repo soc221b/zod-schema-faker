@@ -1,9 +1,9 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodBigIntFaker } from '../../src/v3/zod-bigint-faker'
-import { expectType, TypeEqual } from 'ts-expect'
-import { testMultipleTimes } from './util'
 import { getFaker } from '../../src/v3'
+import { ZodBigIntFaker } from '../../src/v3/zod-bigint-faker'
+import { testMultipleTimes } from './util'
 
 test('ZodBigIntFaker should assert parameters', () => {
   const invalidSchema = void 0 as any

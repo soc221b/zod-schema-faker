@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodVoidFaker } from '../../src/v3/zod-void-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../../src/v3'
+import { ZodVoidFaker } from '../../src/v3/zod-void-faker'
 
 test('ZodVoidFaker should assert parameters', () => {
   const invalidSchema = void 0 as any

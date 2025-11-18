@@ -1,7 +1,7 @@
 import { z } from 'zod/v3'
 import { getFaker } from './random'
-import { ZodTypeFaker } from './zod-type-faker'
 import { lcm } from './utils'
+import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodNumberFaker extends ZodTypeFaker<z.ZodNumber> {
   fake(): z.infer<z.ZodNumber> {

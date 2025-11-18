@@ -1,10 +1,11 @@
 import { z } from 'zod/v3'
-import { zodFirstPartyTypeKindToZodTypeFaker, zodTypeToZodTypeFaker } from './fake'
+import { zodFirstPartyTypeKindToZodTypeFaker, zodTypeToZodTypeFaker, type fake } from './fake'
 import { ZodAnyFaker } from './zod-any-faker'
 import { ZodArrayFaker } from './zod-array-faker'
 import { ZodBigIntFaker } from './zod-bigint-faker'
 import { ZodBooleanFaker } from './zod-boolean-faker'
 import { ZodBrandedFaker } from './zod-branded-faker'
+import { ZodCatchFaker } from './zod-catch-faker'
 import { ZodDateFaker } from './zod-date-faker'
 import { ZodDefaultFaker } from './zod-default-faker'
 import { ZodDiscriminatedUnionFaker } from './zod-discriminated-union-faker'
@@ -36,8 +37,6 @@ import { ZodUndefinedFaker } from './zod-undefined-faker'
 import { ZodUnionFaker } from './zod-union-faker'
 import { ZodUnknownFaker } from './zod-unknown-faker'
 import { ZodVoidFaker } from './zod-void-faker'
-import { ZodCatchFaker } from './zod-catch-faker'
-import { type fake } from './fake'
 
 /**
  * Install fakers for built-in types, must be called before using {@link fake}.

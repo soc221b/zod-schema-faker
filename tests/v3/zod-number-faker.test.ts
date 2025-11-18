@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodNumberFaker } from '../../src/v3/zod-number-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { getFaker } from '../../src/v3'
+import { ZodNumberFaker } from '../../src/v3/zod-number-faker'
 import { testMultipleTimes } from './util'
 
 test('ZodNumberFaker should assert parameters', () => {

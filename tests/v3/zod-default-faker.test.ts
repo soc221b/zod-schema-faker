@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodDefaultFaker } from '../../src/v3/zod-default-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../../src/v3'
+import { ZodDefaultFaker } from '../../src/v3/zod-default-faker'
 
 const defaultData = { foo: 'bar' }
 

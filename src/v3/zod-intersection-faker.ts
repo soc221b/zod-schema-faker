@@ -1,7 +1,7 @@
 import { UnknownKeysParam, z, ZodString } from 'zod/v3'
 import { fake } from './fake'
-import { ZodTypeFaker } from './zod-type-faker'
 import { getFaker } from './random'
+import { ZodTypeFaker } from './zod-type-faker'
 
 type Intersect = (left: z.ZodType, right: z.ZodType) => IntersectReturnType
 
@@ -577,7 +577,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
     }
 
     let schema = z.number()
-    for (const check of [...left._def.checks, ...right._def.checks]) {
+    for (const check of [
+      ...left._def.checks,
+      ...right._def.checks,
+    ]) {
       switch (check.kind) {
         case 'min':
           schema = schema.min(check.value)
@@ -628,7 +631,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
         : leftCatchall instanceof z.ZodNever
           ? rightCatchall
           : leftCatchall
-    const keys = new Set([...Object.keys(left.shape), ...Object.keys(right.shape)])
+    const keys = new Set([
+      ...Object.keys(left.shape),
+      ...Object.keys(right.shape),
+    ])
     for (const key of keys) {
       const leftValue = left.shape[key]
       const rightValue = right.shape[key]
@@ -801,7 +807,10 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       success: true,
       schema: new ZodString({
         coerce: left._def.coerce || right._def.coerce,
-        checks: [...left._def.checks, ...right._def.checks],
+        checks: [
+          ...left._def.checks,
+          ...right._def.checks,
+        ],
         typeName: left._def.typeName,
       }),
     }
@@ -892,7 +901,13 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
       for (const rightOption of right._def.options) {
         const result = this.findIntersectedSchema(leftOption, rightOption)
         if (result.success) {
-          schema = schema === undefined ? result.schema : z.union([schema, result.schema])
+          schema =
+            schema === undefined
+              ? result.schema
+              : z.union([
+                  schema,
+                  result.schema,
+                ])
         }
       }
     }
@@ -905,7 +920,13 @@ export class ZodIntersectionFaker<T extends z.ZodIntersection<any, any>> extends
 
   private findIntersectedSchemaForUnionAndNonUnion: Intersect = (left, right) => {
     if (right instanceof z.ZodUnion && left instanceof z.ZodUnion === false) {
-      return this.findIntersectedSchema(z.union([left, z.never()]), right)
+      return this.findIntersectedSchema(
+        z.union([
+          left,
+          z.never(),
+        ]),
+        right,
+      )
     }
 
     if (left instanceof z.ZodUnion && right instanceof z.ZodUnion === false) {

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { install, fake } from 'zod-schema-faker'
+import { fake, install } from 'zod-schema-faker'
 
 const main = async () => {
   const schema = z.string().uuid()

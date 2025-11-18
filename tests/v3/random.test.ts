@@ -1,7 +1,7 @@
+import { fakerAR, fakerEN, fakerJA } from '@faker-js/faker'
 import { describe, expect, test, vi } from 'vitest'
 import { z } from 'zod/v3'
-import { install, fake, seed, getFaker, randexp, setFaker, runFake, installFaker } from '../../src/v3'
-import { fakerAR, fakerEN, fakerJA } from '@faker-js/faker'
+import { fake, getFaker, install, installFaker, randexp, runFake, seed, setFaker } from '../../src/v3'
 
 describe('@faker-js/faker', () => {
   test('default', () => {

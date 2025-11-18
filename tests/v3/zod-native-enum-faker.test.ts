@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodNativeEnumFaker } from '../../src/v3/zod-native-enum-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../../src/v3'
+import { ZodNativeEnumFaker } from '../../src/v3/zod-native-enum-faker'
 
 enum NativeEnum {
   Foo,

@@ -1,6 +1,6 @@
-import { z } from 'zod'
-import { install, fake } from 'zod-schema-faker'
 import { expectType, TypeEqual } from 'ts-expect'
+import { z } from 'zod'
+import { fake, install } from 'zod-schema-faker'
 
 const schema = z.number()
 

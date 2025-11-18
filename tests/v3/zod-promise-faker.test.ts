@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { afterEach, beforeEach, expect, test, vitest } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodPromiseFaker } from '../../src/v3/zod-promise-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../../src/v3'
+import { ZodPromiseFaker } from '../../src/v3/zod-promise-faker'
 
 beforeEach(() => {
   vitest.useFakeTimers()

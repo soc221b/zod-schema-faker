@@ -1,8 +1,8 @@
 import { z } from 'zod/v3'
-import { getFaker } from './random'
-import { ZodTypeFaker } from './zod-type-faker'
 import { fake } from './fake'
+import { getFaker } from './random'
 import { ZodNeverFaker } from './zod-never-faker'
+import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodCatchFaker<T extends z.ZodCatch<z.ZodTypeAny>> extends ZodTypeFaker<T> {
   fake(): z.infer<z.ZodCatch<T>> {

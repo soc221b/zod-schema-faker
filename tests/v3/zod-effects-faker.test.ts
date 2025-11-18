@@ -1,8 +1,8 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { expect, test, vi } from 'vitest'
 import { z } from 'zod/v3'
-import { ZodEffectsFaker } from '../../src/v3/zod-effects-faker'
-import { expectType, TypeEqual } from 'ts-expect'
 import { install } from '../../src/v3'
+import { ZodEffectsFaker } from '../../src/v3/zod-effects-faker'
 
 test('type', () => {
   install()

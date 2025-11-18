@@ -1,6 +1,6 @@
 import { z } from 'zod/v3'
-import { ZodTypeFaker } from './zod-type-faker'
 import { fake } from './fake'
+import { ZodTypeFaker } from './zod-type-faker'
 
 export class ZodUnknownFaker extends ZodTypeFaker<z.ZodUnknown> {
   fake(): z.infer<z.ZodUnknown> {

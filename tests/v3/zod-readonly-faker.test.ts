@@ -1,7 +1,7 @@
+import { expectType, TypeEqual } from 'ts-expect'
 import { expect, test } from 'vitest'
 import { z } from 'zod/v3'
-import { install, fake } from '../../src/v3'
-import { expectType, TypeEqual } from 'ts-expect'
+import { fake, install } from '../../src/v3'
 
 test('freeze', () => {
   const schema = z.object({ key: z.string() }).readonly()
@@ -36,7 +36,12 @@ test('array', () => {
 })
 
 test('tuple', () => {
-  const schema = z.tuple([z.string(), z.number()]).readonly()
+  const schema = z
+    .tuple([
+      z.string(),
+      z.number(),
+    ])
+    .readonly()
 
   install()
   const data = fake(schema)
