@@ -11,6 +11,7 @@
     "zod": "4.1.9"
   },
   "devDependencies": {
+    "@faker-js/faker": "10.1.0",
     "@types/node": "22.14.1",
     "typescript": "5.8.3",
     "vite": "6.3.2"
