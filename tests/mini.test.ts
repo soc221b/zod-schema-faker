@@ -3,42 +3,43 @@ import { beforeAll, describe, expect, test } from 'vitest'
 import * as z from 'zod/mini'
 import { custom, fake, Fake, getFaker, setFaker } from '../src'
 
-const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
+const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean; async?: boolean }[] = [
   // any
   { schema: z.any() },
 
   // array
   { schema: z.array(z.string()) },
-  { schema: z.array(z.string()).check(z.minLength(1)), description: 'min' },
-  { schema: z.array(z.string()).check(z.maxLength(10)), description: 'max' },
-  { schema: z.array(z.string()).check(z.length(5)), description: 'length' },
-  { schema: z.array(z.string()).check(z.minLength(3), z.minLength(1), z.minLength(2)), description: 'min (multiple)' },
-  { schema: z.array(z.string()).check(z.maxLength(1), z.maxLength(3), z.maxLength(2)), description: 'max (multiple)' },
+  { description: 'min', schema: z.array(z.string()).check(z.minLength(1)) },
+  { description: 'max', schema: z.array(z.string()).check(z.maxLength(10)) },
+  { description: 'length', schema: z.array(z.string()).check(z.length(5)) },
+  { description: 'nonempty', schema: z.array(z.string()).check(z.minLength(0)) },
+  { description: 'min (multiple)', schema: z.array(z.string()).check(z.minLength(3), z.minLength(1), z.minLength(2)) },
+  { description: 'max (multiple)', schema: z.array(z.string()).check(z.maxLength(1), z.maxLength(3), z.maxLength(2)) },
 
   // bigint
   { schema: z.bigint() },
-  { schema: z.bigint().check(z.gt(5n)), description: 'gt' },
-  { schema: z.bigint().check(z.gte(5n)), description: 'gte' },
-  { schema: z.bigint().check(z.lt(5n)), description: 'lt' },
-  { schema: z.bigint().check(z.lte(5n)), description: 'lte' },
-  { schema: z.bigint().check(z.positive()), description: 'positive' },
-  { schema: z.bigint().check(z.nonnegative()), description: 'nonnegative' },
-  { schema: z.bigint().check(z.negative()), description: 'negative' },
-  { schema: z.bigint().check(z.nonpositive()), description: 'nonpositive' },
-  { schema: z.bigint().check(z.multipleOf(5n)), description: 'multipleOf' },
-  { schema: z.int64(), description: 'int64' },
-  { schema: z.uint64(), description: 'uint64' },
+  { description: 'gt', schema: z.bigint().check(z.gt(5n)) },
+  { description: 'gte', schema: z.bigint().check(z.gte(5n)) },
+  { description: 'lt', schema: z.bigint().check(z.lt(5n)) },
+  { description: 'lte', schema: z.bigint().check(z.lte(5n)) },
+  { description: 'positive', schema: z.bigint().check(z.positive()) },
+  { description: 'nonnegative', schema: z.bigint().check(z.nonnegative()) },
+  { description: 'negative', schema: z.bigint().check(z.negative()) },
+  { description: 'nonpositive', schema: z.bigint().check(z.nonpositive()) },
+  { description: 'multipleOf', schema: z.bigint().check(z.multipleOf(5n)) },
+  { description: 'int64', schema: z.int64() },
+  { description: 'uint64', schema: z.uint64() },
   {
-    schema: z.bigint().check(z.minimum(200n), z.minimum(300n), z.minimum(100n), z.maximum(300n)),
     description: 'min (multiple)',
+    schema: z.bigint().check(z.minimum(200n), z.minimum(300n), z.minimum(100n), z.maximum(300n)),
   },
   {
-    schema: z.bigint().check(z.maximum(100n), z.maximum(300n), z.maximum(200n), z.minimum(100n)),
     description: 'max (multiple)',
+    schema: z.bigint().check(z.maximum(100n), z.maximum(300n), z.maximum(200n), z.minimum(100n)),
   },
   {
-    schema: z.bigint().check(z.multipleOf(2n), z.multipleOf(3n), z.minimum(2n), z.maximum(6n)),
     description: 'multipleOf (multiple)',
+    schema: z.bigint().check(z.multipleOf(2n), z.multipleOf(3n), z.minimum(2n), z.maximum(6n)),
   },
 
   // boolean
@@ -50,11 +51,11 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   // catch
   { schema: z.catch(z.number(), 42) },
   {
+    description: 'function',
     schema: z.catch(z.number(), ctx => {
       ctx.error // the caught ZodError
       return Math.random()
     }),
-    description: 'function',
   },
 
   // coerce
@@ -80,9 +81,10 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // date
   { schema: z.date() },
-  { schema: z.date().check(z.minimum(new Date('3000-01-01'))), description: 'min' },
-  { schema: z.date().check(z.maximum(new Date('1000-01-01'))), description: 'max' },
+  { description: 'min', schema: z.date().check(z.minimum(new Date('3000-01-01'))) },
+  { description: 'max', schema: z.date().check(z.maximum(new Date('1000-01-01'))) },
   {
+    description: 'multiple min',
     schema: z
       .date()
       .check(
@@ -91,9 +93,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
         z.minimum(new Date('2222-01-01T00:00:00.000Z')),
         z.maximum(new Date('3333-01-01T00:00:00.000Z')),
       ),
-    description: 'multiple min',
   },
   {
+    description: 'multiple max',
     schema: z
       .date()
       .check(
@@ -102,22 +104,22 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
         z.maximum(new Date('3333-01-01T00:00:00.000Z')),
         z.minimum(new Date('1111-01-01T00:00:00.000Z')),
       ),
-    description: 'multiple max',
   },
 
   // default
   { schema: z._default(z.string(), 'tuna') },
-  { schema: z._default(z.number(), Math.random), description: 'function' },
+  { description: 'function', schema: z._default(z.number(), Math.random) },
 
   // discriminatedUnion
   {
+    description: 'discriminated',
     schema: z.discriminatedUnion('status', [
       z.object({ status: z.literal('success'), data: z.string() }),
       z.object({ status: z.literal('failed'), error: z.string() }),
     ]),
-    description: 'discriminated',
   },
   {
+    description: 'discriminated nesting',
     schema: (() => {
       const BaseError = { status: z.literal('failed'), message: z.string() }
       const MyErrors = z.discriminatedUnion('code', [
@@ -131,19 +133,19 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ])
       return MyResult
     })(),
-    description: 'discriminated nesting',
   },
 
   // enum
   {
+    description: 'string',
     schema: z.enum([
       'Salmon',
       'Tuna',
       'Trout',
     ]),
-    description: 'string',
   },
   {
+    description: 'enum',
     schema: (() => {
       enum Fish {
         Salmon = 'Salmon',
@@ -152,9 +154,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       }
       return z.enum(Fish)
     })(),
-    description: 'enum',
   },
   {
+    description: 'nativeEnum (deprecated)',
     schema: (() => {
       enum Fish {
         Salmon = 'Salmon',
@@ -163,7 +165,6 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       }
       return z.nativeEnum(Fish)
     })(),
-    description: 'nativeEnum (deprecated)',
   },
 
   // function
@@ -178,6 +179,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // instanceof
   {
+    description: 'instanceof',
     schema: (() => {
       class Test {
         name: string = ''
@@ -189,9 +191,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       custom(TestSchema, fakeTest)
       return TestSchema
     })(),
-    description: 'instanceof',
   },
   {
+    description: 'instanceof property',
     schema: (() => {
       const TestSchema = z
         .instanceof(URL)
@@ -202,7 +204,6 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       custom(TestSchema, fakeTest)
       return TestSchema
     })(),
-    description: 'instanceof property',
   },
 
   // TODO: intersection
@@ -226,12 +227,12 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   // literal
   { schema: z.literal('literal') },
   {
+    description: 'multiple',
     schema: z.literal([
       'red',
       'green',
       'blue',
     ]),
-    description: 'multiple',
   },
 
   // map
@@ -254,47 +255,51 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // number
   { schema: z.number() },
-  { schema: z.number().check(z.int()), description: 'int' },
-  { schema: z.number().check(z.gt(5)), description: 'gt' },
-  { schema: z.number().check(z.gte(5)), description: 'gte' },
-  { schema: z.number().check(z.lt(5)), description: 'lt' },
-  { schema: z.number().check(z.lte(5)), description: 'lte' },
-  { schema: z.number().check(z.positive()), description: 'positive' },
-  { schema: z.number().check(z.nonnegative()), description: 'nonnegative' },
-  { schema: z.number().check(z.negative()), description: 'negative' },
-  { schema: z.number().check(z.nonpositive()), description: 'nonpositive' },
-  { schema: z.number().check(z.multipleOf(5)), description: 'multipleOf' },
-  { schema: z.int(), description: 'int (top)' },
-  { schema: z.float32(), description: 'float32' },
-  { schema: z.float64(), description: 'float64' },
-  { schema: z.int32(), description: 'int32' },
-  { schema: z.uint32(), description: 'uint32' },
-  { schema: z.number().check(z.positive(), z.int(), z.lte(1)), description: 'positive + int' },
-  { schema: z.number().check(z.nonpositive(), z.int(), z.gte(0)), description: 'nonpositive + int' },
-  { schema: z.number().check(z.negative(), z.int(), z.gte(-1)), description: 'negative + int' },
-  { schema: z.number().check(z.nonnegative(), z.int(), z.lte(0)), description: 'nonnegative + int' },
-  { schema: z.number().check(z.positive(), z.lte(0.000000000000001)), description: 'positive + float' },
-  { schema: z.number().check(z.negative(), z.gte(-0.000000000000001)), description: 'negative + float' },
-  { schema: z.number().check(z.multipleOf(0.000001)), description: 'multipleOf small' },
-  { schema: z.number().check(z.multipleOf(1_234_567_890)), description: 'multipleOf large' },
+  { description: 'int', schema: z.number().check(z.int()) },
+  { description: 'gt', schema: z.number().check(z.gt(5)) },
+  { description: 'gte', schema: z.number().check(z.gte(5)) },
+  { description: 'lt', schema: z.number().check(z.lt(5)) },
+  { description: 'lte', schema: z.number().check(z.lte(5)) },
+  { description: 'positive', schema: z.number().check(z.positive()) },
+  { description: 'nonnegative', schema: z.number().check(z.nonnegative()) },
+  { description: 'negative', schema: z.number().check(z.negative()) },
+  { description: 'nonpositive', schema: z.number().check(z.nonpositive()) },
+  { description: 'multipleOf', schema: z.number().check(z.multipleOf(5)) },
+  { description: 'int (top)', schema: z.int() },
+  { description: 'float32', schema: z.float32() },
+  { description: 'float64', schema: z.float64() },
+  { description: 'int32', schema: z.int32() },
+  { description: 'uint32', schema: z.uint32() },
+  { description: 'positive + int', schema: z.number().check(z.positive(), z.int(), z.lte(1)) },
+  { description: 'nonpositive + int', schema: z.number().check(z.nonpositive(), z.int(), z.gte(0)) },
+  { description: 'negative + int', schema: z.number().check(z.negative(), z.int(), z.gte(-1)) },
+  { description: 'nonnegative + int', schema: z.number().check(z.nonnegative(), z.int(), z.lte(0)) },
+  { description: 'positive + float', schema: z.number().check(z.positive(), z.lte(0.000000000000001)) },
+  { description: 'negative + float', schema: z.number().check(z.negative(), z.gte(-0.000000000000001)) },
+  { description: 'multipleOf small', schema: z.number().check(z.multipleOf(0.000001)) },
+  { description: 'multipleOf large', schema: z.number().check(z.multipleOf(1_234_567_890)) },
   {
-    schema: z.number().check(z.int(), z.minimum(5), z.minimum(3), z.minimum(4), z.maximum(5)),
     description: 'min (multiple)',
+    schema: z.number().check(z.int(), z.minimum(5), z.minimum(3), z.minimum(4), z.maximum(5)),
   },
   {
-    schema: z.number().check(z.int(), z.maximum(3), z.maximum(5), z.maximum(4), z.minimum(3)),
     description: 'max (multiple)',
+    schema: z.number().check(z.int(), z.maximum(3), z.maximum(5), z.maximum(4), z.minimum(3)),
   },
   {
-    schema: z.number().check(z.int(), z.multipleOf(2), z.multipleOf(3), z.minimum(2), z.maximum(6)),
     description: 'multipleOf (multiple)',
+    schema: z.number().check(z.int(), z.multipleOf(2), z.multipleOf(3), z.minimum(2), z.maximum(6)),
   },
-  { schema: z.number().check(z.multipleOf(7), z.multipleOf(11)), description: 'multipleOf float (multiple)' },
+  {
+    description: 'multipleOf float (multiple)',
+    schema: z.number().check(z.multipleOf(7), z.multipleOf(11)),
+  },
 
   // object
   { schema: z.object({}) },
-  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  { description: 'nesting', schema: z.object({ name: z.string(), age: z.number() }) },
   {
+    description: 'recursive optional',
     schema: (() => {
       const Category = z.object({
         name: z.string(),
@@ -304,9 +309,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive optional',
   },
   {
+    description: 'recursive array',
     schema: (() => {
       const Category = z.object({
         name: z.string(),
@@ -316,9 +321,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive array',
   },
   {
+    description: 'recursive set',
     schema: (() => {
       const Category = z.object({
         name: z.string(),
@@ -328,9 +333,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive set',
   },
   {
+    description: 'mutually recursive',
     schema: (() => {
       const User = z.object({
         email: z.email({ pattern: z.core.regexes.idnEmail }),
@@ -346,21 +351,20 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return User
     })(),
-    description: 'mutually recursive',
   },
-  { schema: z.object({ name: z.string(), 'age?': z.number() }), description: 'optional property' },
+  { description: 'optional property', schema: z.object({ name: z.string(), 'age?': z.number() }) },
   {
-    schema: z.object({ name: z.string(), 'age?': z._default(z.number(), 18) }),
     description: 'optional property with default',
+    schema: z.object({ name: z.string(), 'age?': z._default(z.number(), 18) }),
   },
-  { schema: z.object({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
-  // TODO:
-  // { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
-  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict' },
-  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose' },
+  { description: 'optional value', schema: z.object({ name: z.string(), age: z.optional(z.number()) }) },
+  // { description: 'catchall', schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()) }, // TODO:
+  { description: 'strict', schema: z.strictObject({ name: z.string(), age: z.number() }) },
+  { description: 'loose', schema: z.looseObject({ name: z.string(), age: z.number() }) },
   { schema: z.object() },
-  { schema: z.object({ name: z.string(), age: z.number() }), description: 'nesting' },
+  { description: 'nesting', schema: z.object({ name: z.string(), age: z.number() }) },
   {
+    description: 'recursive optional',
     schema: (() => {
       interface Category {
         name: string
@@ -372,9 +376,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive optional',
   },
   {
+    description: 'recursive array',
     schema: (() => {
       interface Category {
         name: string
@@ -386,9 +390,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive array',
   },
   {
+    description: 'recursive set',
     schema: (() => {
       interface Category {
         name: string
@@ -400,9 +404,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return Category
     })(),
-    description: 'recursive set',
   },
   {
+    description: 'mutually recursive',
     schema: (() => {
       interface User {
         email: string
@@ -422,19 +426,20 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       })
       return User
     })(),
-    description: 'mutually recursive',
   },
   {
-    schema: z.object({ name: z.string(), age: z._default(z.number(), 18) }),
     description: 'optional property with default',
+    schema: z.object({ name: z.string(), age: z._default(z.number(), 18) }),
   },
-  { schema: z.object({ name: z.string(), age: z.optional(z.number()) }), description: 'optional value' },
-  // { schema: z.object({ name: z.string(), age: z.number() }).strict(), description: 'strict (deprecated)' },
-  // { schema: z.object({ name: z.string(), age: z.number() }).strip(), description: 'strip (deprecated)' },
-  // { schema: z.object({ name: z.string(), age: z.number() }).passthrough(), description: 'passthrough (deprecated)' },
-  // { schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()), description: 'catchall' },
-  { schema: z.strictObject({ name: z.string(), age: z.number() }), description: 'strict (top)' },
-  { schema: z.looseObject({ name: z.string(), age: z.number() }), description: 'loose (top)' },
+  { description: 'optional value', schema: z.object({ name: z.string(), age: z.optional(z.number()) }) },
+  // { description: 'strict (deprecated)', schema: z.object({ name: z.string(), age: z.number() }).strict() },
+  // { description: 'strip (deprecated)', schema: z.object({ name: z.string(), age: z.number() }).strip() },
+  // { description: 'passthrough (deprecated)', schema: z.object({ name: z.string(), age: z.number() }).passthrough() },
+  // { description: 'catchall', schema: z.object({ name: z.string(), age: z.number() }).catchall(z.any()) },
+
+  { description: 'strict (top)', schema: z.strictObject({ name: z.string(), age: z.number() }) },
+
+  { description: 'loose (top)', schema: z.looseObject({ name: z.string(), age: z.number() }) },
 
   // optional
   { schema: z.optional(z.literal('optional')) },
@@ -460,6 +465,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // partialRecord
   {
+    description: 'partial',
     schema: z.partialRecord(
       z.enum([
         'id',
@@ -468,30 +474,30 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ]),
       z.string(),
     ),
-    description: 'partial',
   },
 
   // promise
-  { schema: z.promise(z.number()), async: true, description: '(deprecated)' },
+  { description: '(deprecated)', schema: z.promise(z.number()), async: true },
 
   // readonly
-  { schema: z.readonly(z.object({ name: z.string() })), description: 'object' },
-  { schema: z.readonly(z.array(z.string())), description: 'array' },
+  { description: 'object', schema: z.readonly(z.object({ name: z.string() })) },
+  { description: 'array', schema: z.readonly(z.array(z.string())) },
   {
+    description: 'tuple',
     schema: z.readonly(
       z.tuple([
         z.string(),
         z.number(),
       ]),
     ),
-    description: 'tuple',
   },
-  { schema: z.readonly(z.map(z.string(), z.date())), description: 'map' },
-  { schema: z.readonly(z.set(z.string())), description: 'set' },
+  { description: 'map', schema: z.readonly(z.map(z.string(), z.date())) },
+  { description: 'set', schema: z.readonly(z.set(z.string())) },
 
   // record
   { schema: z.record(z.string(), z.string()) },
   {
+    description: 'union',
     schema: z.record(
       z.union([
         z.string(),
@@ -500,9 +506,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ]),
       z.unknown(),
     ),
-    description: 'union',
   },
   {
+    description: 'enum',
     schema: z.record(
       z.enum([
         'id',
@@ -511,9 +517,9 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ]),
       z.string(),
     ),
-    description: 'enum',
   },
   {
+    description: 'literal',
     schema: z.record(
       z.literal([
         'id',
@@ -522,106 +528,140 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ]),
       z.string(),
     ),
-    description: 'literal',
   },
 
   // set
   { schema: z.set(z.number()) },
-  { schema: z.set(z.number()).check(z.minSize(1)), description: 'min' },
-  { schema: z.set(z.number()).check(z.maxSize(10)), description: 'max' },
-  { schema: z.set(z.number()).check(z.size(5)), description: 'size' },
-  { schema: z.set(z.number()).check(z.minSize(3), z.minSize(1), z.minSize(2)), description: 'min (multiple)' },
-  { schema: z.set(z.number()).check(z.maxSize(1), z.maxSize(3), z.maxSize(2)), description: 'max (multiple)' },
+  { description: 'min', schema: z.set(z.number()).check(z.minSize(1)) },
+  { description: 'max', schema: z.set(z.number()).check(z.maxSize(10)) },
+  { description: 'size', schema: z.set(z.number()).check(z.size(5)) },
+  { description: 'min (multiple)', schema: z.set(z.number()).check(z.minSize(3), z.minSize(1), z.minSize(2)) },
+  { description: 'max (multiple)', schema: z.set(z.number()).check(z.maxSize(1), z.maxSize(3), z.maxSize(2)) },
 
   // string
   { schema: z.string() },
-  { schema: z.base64(), description: 'base64' },
-  { schema: z.base64url(), description: 'base64url' },
-  { schema: z.cidrv4(), description: 'cidrv4' },
-  { schema: z.cidrv6(), description: 'cidrv6' },
-  { schema: z.cuid(), description: 'cuid' },
-  { schema: z.cuid2(), description: 'cuid2' },
-  { schema: z.e164(), description: 'e164' },
-  { schema: z.email(), description: 'email' },
-  { schema: z.email({ pattern: z.regexes.browserEmail }), description: 'email browser' },
-  { schema: z.email({ pattern: z.regexes.email }), description: 'email email' },
-  { schema: z.email({ pattern: z.regexes.idnEmail }), description: 'email idnEmail' },
-  { schema: z.email({ pattern: z.regexes.html5Email }), description: 'email html5' },
-  { schema: z.email({ pattern: z.regexes.rfc5322Email }), description: 'email rfc5322' },
-  { schema: z.email({ pattern: z.regexes.unicodeEmail }), description: 'email unicode' },
-  { schema: z.emoji(), description: 'emoji' },
-  { schema: z.guid(), description: 'guid' },
-  { schema: z.hash('md5'), description: 'hash md5' },
-  { schema: z.hash('md5', { enc: 'hex' }), description: 'hash md5 hex' },
-  { schema: z.hash('md5', { enc: 'base64' }), description: 'hash md5 base64' },
-  { schema: z.hash('md5', { enc: 'base64url' }), description: 'hash md5 base64url' },
-  { schema: z.hash('sha1'), description: 'hash sha1' },
-  { schema: z.hash('sha1', { enc: 'hex' }), description: 'hash sha1 hex' },
-  { schema: z.hash('sha1', { enc: 'base64' }), description: 'hash sha1 base64' },
-  { schema: z.hash('sha1', { enc: 'base64url' }), description: 'hash sha1 base64url' },
-  { schema: z.hash('sha256'), description: 'hash sha256' },
-  { schema: z.hash('sha256', { enc: 'hex' }), description: 'hash sha256 hex' },
-  { schema: z.hash('sha256', { enc: 'base64' }), description: 'hash sha256 base64' },
-  { schema: z.hash('sha256', { enc: 'base64url' }), description: 'hash sha256 base64url' },
-  { schema: z.hash('sha384'), description: 'hash sha384' },
-  { schema: z.hash('sha384', { enc: 'hex' }), description: 'hash sha384 hex' },
-  { schema: z.hash('sha384', { enc: 'base64' }), description: 'hash sha384 base64' },
-  { schema: z.hash('sha384', { enc: 'base64url' }), description: 'hash sha384 base64url' },
-  { schema: z.hash('sha512'), description: 'hash sha512' },
-  { schema: z.hash('sha512', { enc: 'hex' }), description: 'hash sha512 hex' },
-  { schema: z.hash('sha512', { enc: 'base64' }), description: 'hash sha512 base64' },
-  { schema: z.hash('sha512', { enc: 'base64url' }), description: 'hash sha512 base64url' },
-  { schema: z.hex(), description: 'hex' },
-  { schema: z.hostname(), description: 'hostname' },
-  { schema: z.httpUrl(), description: 'httpUrl' },
-  { schema: z.ipv4(), description: 'ipv4' },
-  { schema: z.ipv6(), description: 'ipv6' },
-  { schema: z.iso.date(), description: 'date' },
-  { schema: z.iso.datetime(), description: 'datetime' },
-  { schema: z.iso.datetime({ local: true }), description: 'datetime local' },
-  { schema: z.iso.datetime({ offset: true }), description: 'datetime offset' },
-  { schema: z.iso.datetime({ precision: 3 }), description: 'datetime precision' },
-  { schema: z.iso.duration(), description: 'duration' },
-  { schema: z.iso.time(), description: 'time' },
-  { schema: z.iso.time({ precision: 9 }), description: 'time precision' },
-  { schema: z.jwt(), description: 'jwt' },
-  { schema: z.jwt({ alg: 'HS256' }), description: 'jwt alg' },
-  { schema: z.ksuid(), description: 'ksuid' },
-  { schema: z.nanoid(), description: 'naoid' },
-  { schema: z.ulid(), description: 'ulid' },
-  { schema: z.url(), description: 'url' },
-  { schema: z.url({ hostname: /^example\.com$/ }), description: 'url hostname' },
-  { schema: z.url({ protocol: /^https$/ }), description: 'url protocol' },
+  { description: 'min', schema: z.string().check(z.minLength(1)) },
+  { description: 'max', schema: z.string().check(z.maxLength(10)) },
+  { description: 'length', schema: z.string().check(z.length(5)) },
+  { description: 'regex', schema: z.string().check(z.regex(/regex/)) },
+  { description: 'startsWith', schema: z.string().check(z.startsWith('start')) },
+  { description: 'endsWith', schema: z.string().check(z.endsWith('end')) },
+  { description: 'includes', schema: z.string().check(z.includes('includes')) },
+  { description: 'uppercase', schema: z.string().check(z.uppercase()) },
+  { description: 'lowercase', schema: z.string().check(z.lowercase()) },
+  { description: 'trim', schema: z.string().check(z.trim()) },
+  { description: 'toUpperCaae', schema: z.string().check(z.toUpperCase()) },
+  { description: 'toLowerCase', schema: z.string().check(z.toLowerCase()) },
+  { description: 'base64', schema: z.string().check(z.base64()) },
+  { description: 'base64url', schema: z.string().check(z.base64url()) },
+  { description: 'cidrv4', schema: z.string().check(z.cidrv4()) },
+  { description: 'cidrv6', schema: z.string().check(z.cidrv6()) },
+  { description: 'cuid', schema: z.string().check(z.cuid()) },
+  { description: 'cuid2', schema: z.string().check(z.cuid2()) },
+  // { description: 'date', schema: z.string().check(z.date()) },
+  // { description: 'datetime', schema: z.string().check(z.datetime()) },
+  // { description: 'duration', schema: z.string().check(z.duration()) },
+  { description: 'e164', schema: z.string().check(z.e164()) },
+  { description: 'email', schema: z.string().check(z.email()) },
+  { description: 'emoji', schema: z.string().check(z.emoji()) },
+  { description: 'guid', schema: z.string().check(z.guid()) },
+  { description: 'ipv4', schema: z.string().check(z.ipv4()) },
+  { description: 'ipv6', schema: z.string().check(z.ipv6()) },
+  { description: 'jwt', schema: z.string().check(z.jwt()) },
+  { description: 'ksuid', schema: z.string().check(z.ksuid()) },
+  { description: 'naoid', schema: z.string().check(z.nanoid()) },
+  // { description: 'time', schema: z.string().check(z.time()) },
+  { description: 'ulid', schema: z.string().check(z.ulid()) },
+  { description: 'url', schema: z.string().check(z.url()) },
+  { description: 'uuid', schema: z.string().check(z.uuid()) },
+  { description: 'xid', schema: z.string().check(z.xid()) },
+  { description: 'base64', schema: z.base64() },
+  { description: 'base64url', schema: z.base64url() },
+  { description: 'cidrv4', schema: z.cidrv4() },
+  { description: 'cidrv6', schema: z.cidrv6() },
+  { description: 'cuid', schema: z.cuid() },
+  { description: 'cuid2', schema: z.cuid2() },
+  { description: 'e164', schema: z.e164() },
+  { description: 'email', schema: z.email() },
+  { description: 'email browser', schema: z.email({ pattern: z.regexes.browserEmail }) },
+  { description: 'email email', schema: z.email({ pattern: z.regexes.email }) },
+  { description: 'email idnEmail', schema: z.email({ pattern: z.regexes.idnEmail }) },
+  { description: 'email html5', schema: z.email({ pattern: z.regexes.html5Email }) },
+  { description: 'email rfc5322', schema: z.email({ pattern: z.regexes.rfc5322Email }) },
+  { description: 'email unicode', schema: z.email({ pattern: z.regexes.unicodeEmail }) },
+  { description: 'emoji', schema: z.emoji() },
+  { description: 'guid', schema: z.guid() },
+  { description: 'hash md5', schema: z.hash('md5') },
+  { description: 'hash md5 hex', schema: z.hash('md5', { enc: 'hex' }) },
+  { description: 'hash md5 base64', schema: z.hash('md5', { enc: 'base64' }) },
+  { description: 'hash md5 base64url', schema: z.hash('md5', { enc: 'base64url' }) },
+  { description: 'hash sha1', schema: z.hash('sha1') },
+  { description: 'hash sha1 hex', schema: z.hash('sha1', { enc: 'hex' }) },
+  { description: 'hash sha1 base64', schema: z.hash('sha1', { enc: 'base64' }) },
+  { description: 'hash sha1 base64url', schema: z.hash('sha1', { enc: 'base64url' }) },
+  { description: 'hash sha256', schema: z.hash('sha256') },
+  { description: 'hash sha256 hex', schema: z.hash('sha256', { enc: 'hex' }) },
+  { description: 'hash sha256 base64', schema: z.hash('sha256', { enc: 'base64' }) },
+  { description: 'hash sha256 base64url', schema: z.hash('sha256', { enc: 'base64url' }) },
+  { description: 'hash sha384', schema: z.hash('sha384') },
+  { description: 'hash sha384 hex', schema: z.hash('sha384', { enc: 'hex' }) },
+  { description: 'hash sha384 base64', schema: z.hash('sha384', { enc: 'base64' }) },
+  { description: 'hash sha384 base64url', schema: z.hash('sha384', { enc: 'base64url' }) },
+  { description: 'hash sha512', schema: z.hash('sha512') },
+  { description: 'hash sha512 hex', schema: z.hash('sha512', { enc: 'hex' }) },
+  { description: 'hash sha512 base64', schema: z.hash('sha512', { enc: 'base64' }) },
+  { description: 'hash sha512 base64url', schema: z.hash('sha512', { enc: 'base64url' }) },
+  { description: 'hex', schema: z.hex() },
+  { description: 'hostname', schema: z.hostname() },
+  { description: 'httpUrl', schema: z.httpUrl() },
+  { description: 'ipv4', schema: z.ipv4() },
+  { description: 'ipv6', schema: z.ipv6() },
+  { description: 'date', schema: z.iso.date() },
+  { description: 'datetime', schema: z.iso.datetime() },
+  { description: 'datetime local', schema: z.iso.datetime({ local: true }) },
+  { description: 'datetime offset', schema: z.iso.datetime({ offset: true }) },
+  { description: 'datetime precision', schema: z.iso.datetime({ precision: 3 }) },
+  { description: 'duration', schema: z.iso.duration() },
+  { description: 'time', schema: z.iso.time() },
+  { description: 'time precision', schema: z.iso.time({ precision: 9 }) },
+  { description: 'jwt', schema: z.jwt() },
+  { description: 'jwt alg', schema: z.jwt({ alg: 'HS256' }) },
+  { description: 'ksuid', schema: z.ksuid() },
+  { description: 'naoid', schema: z.nanoid() },
+  { description: 'ulid', schema: z.ulid() },
+  { description: 'url', schema: z.url() },
+  { description: 'url hostname', schema: z.url({ hostname: /^example\.com$/ }) },
+  { description: 'url protocol', schema: z.url({ protocol: /^https$/ }) },
   {
+    description: 'url protocol hostname',
     schema: z.url({
       protocol: /^https?$/,
       hostname: z.regexes.domain,
     }),
-    description: 'url protocol hostname',
   },
-  { schema: z.uuid(), description: 'uuid' },
-  { schema: z.uuid({ version: 'v1' }), description: 'uuid v1' },
-  { schema: z.uuid({ version: 'v2' }), description: 'uuid v2' },
-  { schema: z.uuid({ version: 'v3' }), description: 'uuid v3' },
-  { schema: z.uuid({ version: 'v4' }), description: 'uuid v4' },
-  { schema: z.uuid({ version: 'v5' }), description: 'uuid v5' },
-  { schema: z.uuid({ version: 'v6' }), description: 'uuid v6' },
-  { schema: z.uuid({ version: 'v7' }), description: 'uuid v7' },
-  { schema: z.uuid({ version: 'v8' }), description: 'uuid v8' },
-  { schema: z.uuidv4(), description: 'uuidv4' },
-  { schema: z.uuidv6(), description: 'uuidv6' },
-  { schema: z.uuidv7(), description: 'uuidv7' },
-  { schema: z.xid(), description: 'xid' },
+  { description: 'uuid', schema: z.uuid() },
+  { description: 'uuid v1', schema: z.uuid({ version: 'v1' }) },
+  { description: 'uuid v2', schema: z.uuid({ version: 'v2' }) },
+  { description: 'uuid v3', schema: z.uuid({ version: 'v3' }) },
+  { description: 'uuid v4', schema: z.uuid({ version: 'v4' }) },
+  { description: 'uuid v5', schema: z.uuid({ version: 'v5' }) },
+  { description: 'uuid v6', schema: z.uuid({ version: 'v6' }) },
+  { description: 'uuid v7', schema: z.uuid({ version: 'v7' }) },
+  { description: 'uuid v8', schema: z.uuid({ version: 'v8' }) },
+  { description: 'uuidv4', schema: z.uuidv4() },
+  { description: 'uuidv6', schema: z.uuidv6() },
+  { description: 'uuidv7', schema: z.uuidv7() },
+  { description: 'xid', schema: z.xid() },
   {
-    schema: z.string().check(z.minLength(5), z.minLength(3), z.minLength(4), z.maxLength(5)),
     description: 'min (multiple)',
+    schema: z.string().check(z.minLength(5), z.minLength(3), z.minLength(4), z.maxLength(5)),
   },
   {
-    schema: z.string().check(z.maxLength(3), z.maxLength(5), z.maxLength(4), z.minLength(3)),
     description: 'max (multiple)',
+    schema: z.string().check(z.maxLength(3), z.maxLength(5), z.maxLength(4), z.minLength(3)),
   },
-  { schema: z.string().check(z.length(5), z.minLength(4)), description: 'length + min' },
-  { schema: z.string().check(z.length(5), z.maxLength(6)), description: 'length + max' },
+  { description: 'length + min', schema: z.string().check(z.length(5), z.minLength(4)) },
+  { description: 'length + max', schema: z.string().check(z.length(5), z.maxLength(6)) },
 
   // string bool
   { schema: z.stringbool() },
@@ -645,6 +685,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // template literal
   {
+    description: 'enum',
     schema: z.templateLiteral([
       'hello, ',
       z.string(),
@@ -663,34 +704,34 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
         cssUnits,
       ]) as any
     })(),
-    description: 'enum',
   },
   {
+    description: 'refinement',
     schema: z.templateLiteral([
       z.string().check(z.minLength(1)),
       '@',
       z.string().check(z.maxLength(64)),
     ]) as any,
-    description: 'refinement',
   },
   {
+    description: 'nullable',
     schema: z.templateLiteral([
       z.nullable(z.literal('grassy')),
     ]),
-    description: 'nullable',
   },
 
   // transform
   {
+    description: 'transform',
     schema: z.pipe(
       z.string(),
       z.transform(val => val.length),
     ),
-    description: 'transform',
   },
 
   // tuple
   {
+    description: 'rest',
     schema: z.tuple([
       z.string(),
       z.number(),
@@ -704,7 +745,6 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       ],
       z.number(),
     ),
-    description: 'rest',
   },
 
   // undefined
@@ -712,6 +752,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
 
   // union
   {
+    description: 'never',
     schema: z.union([
       z.string(),
       z.number(),
@@ -722,7 +763,6 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
       z.string(),
       z.never(),
     ]),
-    description: 'never',
   },
 
   // unknown
@@ -732,34 +772,35 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   { schema: z.void() },
 ]
 
-const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolean; async?: boolean }[] = [
+const invalidSuits: { description?: string; schema: z.ZodMiniType; only?: boolean; async?: boolean }[] = [
   // array
-  { schema: z.array(z.number()).check(z.minLength(6), z.maxLength(4)), description: 'min > max' },
-  { schema: z.array(z.number()).check(z.minLength(6), z.length(5)), description: 'min > length' },
-  { schema: z.array(z.number()).check(z.maxLength(4), z.length(5)), description: 'max < length' },
-  { schema: z.array(z.number()).check(z.length(1), z.length(2)), description: 'length !== length' },
+  { description: 'min > max', schema: z.array(z.number()).check(z.minLength(6), z.maxLength(4)) },
+  { description: 'min > length', schema: z.array(z.number()).check(z.minLength(6), z.length(5)) },
+  { description: 'max < length', schema: z.array(z.number()).check(z.maxLength(4), z.length(5)) },
+  { description: 'length !== length', schema: z.array(z.number()).check(z.length(1), z.length(2)) },
 
   // bigint
-  { schema: z.bigint().check(z.minimum(6n), z.maximum(4n)), description: 'min > max' },
+  { description: 'min > max', schema: z.bigint().check(z.minimum(6n), z.maximum(4n)) },
   {
-    schema: z.bigint().check(z.minimum(4n), z.maximum(6n), z.multipleOf(7n)),
     description: 'multipleOf is not in range',
+    schema: z.bigint().check(z.minimum(4n), z.maximum(6n), z.multipleOf(7n)),
   },
 
   // date
   {
+    description: 'min > max',
     schema: z
       .date()
       .check(z.minimum(new Date('3333-01-01T00:00:00.000Z')), z.maximum(new Date('2222-01-01T00:00:00.000Z'))),
-    description: 'min > max',
   },
   {
+    description: 'max < min',
     schema: z
       .date()
       .check(z.maximum(new Date('1111-01-01T00:00:00.000Z')), z.minimum(new Date('2222-01-01T00:00:00.000Z'))),
-    description: 'max < min',
   },
   {
+    description: 'multiple min',
     schema: z
       .date()
       .check(
@@ -768,9 +809,9 @@ const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolea
         z.minimum(new Date('2222-01-01T00:00:00.000Z')),
         z.maximum(new Date('2222-01-01T00:00:00.000Z')),
       ),
-    description: 'multiple min',
   },
   {
+    description: 'multiple max',
     schema: z
       .date()
       .check(
@@ -779,7 +820,6 @@ const invalidSuits: { schema: z.ZodMiniType; description?: string; only?: boolea
         z.maximum(new Date('3333-01-01T00:00:00.000Z')),
         z.minimum(new Date('2222-01-01T00:00:00.000Z')),
       ),
-    description: 'multiple max',
   },
 
   // never
@@ -791,7 +831,7 @@ beforeAll(() => {
 })
 
 describe('valid', () => {
-  validSuits.forEach(({ schema, description, only, async }) => {
+  validSuits.forEach(({ description, schema, only, async }) => {
     let name = schema._zod.def.type
     if (description) {
       name += ` ${description}`
@@ -825,7 +865,7 @@ describe('valid', () => {
 })
 
 describe('invalid', () => {
-  invalidSuits.forEach(({ schema, description, only, async }) => {
+  invalidSuits.forEach(({ description, schema, only, async }) => {
     let name = schema._zod.def.type
     if (description) {
       name += ` ${description}`
