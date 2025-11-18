@@ -12,6 +12,7 @@ const validSuits: { schema: z.ZodMiniType; description?: string; only?: boolean;
   { schema: z.array(z.string()).check(z.minLength(1)), description: 'min' },
   { schema: z.array(z.string()).check(z.maxLength(10)), description: 'max' },
   { schema: z.array(z.string()).check(z.length(5)), description: 'length' },
+  { schema: z.array(z.string()).check(z.minLength(0)), description: 'nonempty' },
   { schema: z.array(z.string()).check(z.minLength(3), z.minLength(1), z.minLength(2)), description: 'min (multiple)' },
   { schema: z.array(z.string()).check(z.maxLength(1), z.maxLength(3), z.maxLength(2)), description: 'max (multiple)' },
 
