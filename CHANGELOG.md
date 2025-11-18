@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/soc221b/zod-schema-faker/compare/2.0.0...2.0.1) (2025-11-18)
+
+
+### Bug Fixes
+
+* **v4:** prevent generation of emails with consecutive or leading dots ([#622](https://github.com/soc221b/zod-schema-faker/issues/622)) ([67c82b1](https://github.com/soc221b/zod-schema-faker/commit/67c82b19d37ebd957f8ccd8be0dab1c275f51de8))
+
 ## [2.0.0](https://github.com/soc221b/zod-schema-faker/compare/2.0.0-beta.8...2.0.0) (2025-11-18)
 
 
