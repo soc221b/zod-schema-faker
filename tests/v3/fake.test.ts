@@ -1,0 +1,24 @@
+import { describe, expect, test } from 'vitest'
+import { z } from 'zod/v3'
+import { fake, install } from '../../src/v3'
+import { uninstall } from '../../src/v3/installation'
+
+describe('fake', () => {
+  test('fake is a function', () => {
+    expect(typeof fake).toBe('function')
+  })
+
+  test('fake should assert parameters', () => {
+    expect(() => fake(undefined as any)).toThrow()
+  })
+
+  test('fake should accepts a ZodType schema', () => {
+    install()
+    expect(() => fake(z.number())).not.toThrow()
+    uninstall()
+  })
+
+  test('fake should throw an error if not installed', () => {
+    expect(() => fake(z.number())).toThrow()
+  })
+})
