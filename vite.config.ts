@@ -1,32 +1,53 @@
 /// <reference types="vitest/config" />
-import { resolve } from 'path'
+import { renameSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import dts from 'vite-plugin-dts'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: {
+        '.': resolve(__dirname, 'src/v3/index.ts'),
+        v3: resolve(__dirname, 'src/v3/index.ts'),
+        v4: resolve(__dirname, 'src/v4/index.ts'),
+      },
       name: 'ZodSchemaFaker',
       fileName: 'zod-schema-faker',
+      formats: [
+        'es',
+        'cjs',
+      ],
     },
     rollupOptions: {
       external: [
-        'zod',
+        'zod/v3',
+        'zod/v4/core',
       ],
       output: {
-        globals: {
-          zod: 'Zod',
-        },
+        entryFileNames: '[name]/zod-schema-faker.[format].js',
       },
     },
   },
   plugins: [
     dts({
-      include: [
-        'src',
-      ],
       rollupTypes: true,
+      afterBuild() {
+        const map = {
+          'dist/..d.ts': 'dist/zod-schema-faker.d.ts',
+          'dist/v3.d.ts': 'dist/v3/zod-schema-faker.d.ts',
+          'dist/v4.d.ts': 'dist/v4/zod-schema-faker.d.ts',
+        }
+        for (const [
+          key,
+          value,
+        ] of Object.entries(map)) {
+          renameSync(resolve(__dirname, key), resolve(__dirname, value))
+        }
+      },
     }),
   ],
   test: {

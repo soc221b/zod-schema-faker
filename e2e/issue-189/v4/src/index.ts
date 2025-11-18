@@ -1,19 +1,18 @@
 import { faker } from '@faker-js/faker'
-import { expectType, TypeEqual } from 'ts-expect'
+import { expectType, type TypeEqual } from 'ts-expect'
 import { z } from 'zod'
-import { fake, setFaker } from 'zod-schema-faker'
+import { fake, setFaker } from 'zod-schema-faker/v4'
 
-const Player = z.object({
-  username: z.string(),
-  xp: z.number(),
-})
+const schema = z.number()
 
 // enable tree shaking
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV !== 'production') {
   setFaker(faker)
-  const data = fake(Player)
-  console.log(data) // { username: "billie", xp: 100 }
+
+  const data = fake(schema)
+
+  console.log(data) // => -2556.9
 
   expectType<TypeEqual<typeof data, any>>(false)
-  expectType<TypeEqual<typeof data, { username: string; xp: number }>>(true)
+  expectType<TypeEqual<typeof data, number>>(true)
 }

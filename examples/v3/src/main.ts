@@ -1,11 +1,11 @@
-import { z } from 'zod'
 import { fake, install } from 'zod-schema-faker'
+import { z } from 'zod/v3'
 
 const main = async () => {
   const schema = z.string().uuid()
   let data: string
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     install()
 
     data = fake(schema)

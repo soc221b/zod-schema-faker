@@ -1,13 +1,14 @@
 import { faker } from '@faker-js/faker'
-import { fake, setFaker } from 'zod-schema-faker'
+import { fake, setFaker } from 'zod-schema-faker/v4'
 import { z } from 'zod/mini'
 
 const main = async () => {
   const schema = z.uuid()
   let data: string
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     setFaker(faker)
+
     data = fake(schema)
   } else {
     data = await fetch('https://httpbin.org/uuid')

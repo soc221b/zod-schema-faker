@@ -26,19 +26,31 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/zod-schema-faker.js",
-      "require": "./dist/zod-schema-faker.umd.cjs"
+      "types": "./dist/zod-schema-faker.d.ts",
+      "import": "./dist/zod-schema-faker.es.js",
+      "require": "./dist/zod-schema-faker.cjs.js"
+    },
+    "./v3": {
+      "types": "./dist/v3/zod-schema-faker.d.ts",
+      "import": "./dist/v3/zod-schema-faker.es.js",
+      "require": "./dist/v3/zod-schema-faker.cjs.js"
+    },
+    "./v4": {
+      "types": "./dist/v4/zod-schema-faker.d.ts",
+      "import": "./dist/v4/zod-schema-faker.es.js",
+      "require": "./dist/v4/zod-schema-faker.cjs.js"
     }
   },
-  "main": "./dist/zod-schema-faker.umd.cjs",
-  "module": "./dist/zod-schema-faker.js",
-  "types": "dist/zod-schema-faker.d.ts",
+  "main": "./dist/zod-schema-faker.cjs.js",
+  "module": "./dist/zod-schema-faker.es.js",
+  "types": "./dist/zod-schema-faker.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc && vite build",
     "format": "prettier --write .",
+    "pack": "rm -f *.tgz && npm pack && mv zod-schema-faker* zod-schema-faker.tgz",
     "test": "vitest"
   },
   "dependencies": {
