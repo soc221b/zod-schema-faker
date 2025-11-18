@@ -1,6 +1,6 @@
 {
   "name": "zod-schema-faker",
-  "version": "2.0.0-beta.8",
+  "version": "1.5.5",
   "description": "Generates mock data from zod schema. Powered by @faker-js/faker and randexp.js",
   "keywords": [
     "zod",
@@ -26,19 +26,31 @@
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/zod-schema-faker.js",
-      "require": "./dist/zod-schema-faker.umd.cjs"
+      "types": "./dist/zod-schema-faker.d.ts",
+      "import": "./dist/zod-schema-faker.es.js",
+      "require": "./dist/zod-schema-faker.cjs.js"
+    },
+    "./v3": {
+      "types": "./dist/v3/zod-schema-faker.d.ts",
+      "import": "./dist/v3/zod-schema-faker.es.js",
+      "require": "./dist/v3/zod-schema-faker.cjs.js"
+    },
+    "./v4": {
+      "types": "./dist/v4/zod-schema-faker.d.ts",
+      "import": "./dist/v4/zod-schema-faker.es.js",
+      "require": "./dist/v4/zod-schema-faker.cjs.js"
     }
   },
-  "main": "./dist/zod-schema-faker.umd.cjs",
-  "module": "./dist/zod-schema-faker.js",
-  "types": "dist/zod-schema-faker.d.ts",
+  "main": "./dist/zod-schema-faker.cjs.js",
+  "module": "./dist/zod-schema-faker.es.js",
+  "types": "./dist/zod-schema-faker.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "build": "tsc && vite build",
     "format": "prettier --write .",
+    "pack": "rm -f *.tgz && npm pack && mv zod-schema-faker* zod-schema-faker.tgz",
     "test": "vitest"
   },
   "dependencies": {
@@ -60,7 +72,10 @@
     "vite": "7.2.2",
     "vite-plugin-dts": "4.5.4",
     "vitest": "4.0.9",
-    "zod": "4.1.9"
+    "zod": "4.1.12"
+  },
+  "peerDependencies": {
+    "zod": "^3.25.0 || ^4.0.0"
   },
   "publishConfig": {
     "tag": "beta"

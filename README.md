@@ -8,6 +8,7 @@
 
 Features
 
+- Support zod v3, v4 and mini
 - Support almost all zod types
 - Support for custom zod types
 - Extensive tests
@@ -15,63 +16,123 @@ Features
 ## Installation
 
 ```sh
-npm install --save-dev zod-schema-faker@beta
+npm install --save-dev zod-schema-faker
 ```
 
 ## Usage
 
-Built-in zod types:
+### Setup
+
+v3:
 
 ```ts
-import * as z from 'zod' // or import * as z from 'zod/mini'
+import { install, fake } from 'zod-schema-faker' // alias: 'zod-schema-faker/v3'
+
+install()
+```
+
+v4 or mini:
+
+```ts
+import { setFaker, fake } from 'zod-schema-faker/v4'
 import { faker } from '@faker-js/faker'
-import { fake, setFaker } from 'zod-schema-faker'
+
+setFaker(faker)
+```
+
+### Fake Built-in types
+
+```ts
+import { fake } from 'zod-schema-faker'
 
 const Player = z.object({
   username: z.string(),
   xp: z.number(),
 })
 
-// enable tree shaking
-if (process.env.NODE_ENV === 'development') {
-  setFaker(faker)
-  const data = fake(Player)
-  console.log(data) // { username: "billie", xp: 100 }
-}
+const data = fake(Player)
+console.log(data) // { username: "billie", xp: 100 }
 ```
 
-Custom zod types:
+### Fake Custom types
+
+v3:
 
 ```ts
-import * as z from 'zod' // or import * as z from 'zod/mini'
-import { faker } from '@faker-js/faker'
-import { custom, fake, Fake, getFaker, setFaker } from 'zod-schema-faker'
+import { installCustom, fake, getFaker, ZodTypeFaker } from 'zod-schema-faker'
 
-const px = z.custom<`${number}px`>(val => {
+// define a custom zod schema
+const pxSchema = z.custom<`${number}px`>(val => {
   return typeof val === 'string' ? /^\d+px$/.test(val) : false
 })
 
-const fakePx: Fake<any> = () => {
-  return getFaker().number.int({ min: 1, max: 100 }) + 'px'
+// define a custom faker
+class ZodPxFaker extends ZodTypeFaker<typeof pxSchema> {
+  fake(): `${number}px` {
+    return `${getFaker().number.int({ min: 0 })}px`
+  }
 }
-custom(px, fakePx)
 
-setFaker(faker) // or setFaker(your faker instance)
-fake(px) // '100px'
+// call installCustom() to register custom faker
+installCustom(pxSchema, ZodPxFaker)
+
+// generate fake data based on schema
+const data = fake(pxSchema) // '100px'
 ```
 
-## Migration from v1(zod@3) to v2(zod@4)
+v4 or mini:
 
-- No need to invoke `install` anymore.
-- Need to set the faker instance using `setFaker` before using `fake`.
+```ts
+import { custom, fake, Fake, getFaker } from 'zod-schema-faker/v4'
+
+// define a custom zod schema
+const pxSchema = z.custom<`${number}px`>(val => {
+  return typeof val === 'string' ? /^\d+px$/.test(val) : false
+})
+
+// define a custom faker
+const fakePxSchema: Fake<typeof pxSchema> = () => {
+  return (getFaker().number.int({ min: 1, max: 100 }) + 'px') as `${number}px`
+}
+
+// call custom() to register custom faker
+custom(pxSchema, fakePxSchema)
+
+// generate fake data based on schema
+const data = fake(pxSchema) // '100px'
+```
 
 ## API
 
-### Core APIs
+### v3
+
+#### Core APIs
+
+- `function install(): void`: Install fakers for built-in types, must be called before using `fake`.
+- `function fake<T extends z.ZodType>(schema: T): z.infer<T>`: Generate fake data based on schema.
+- `class ZodSchemaFakerError`
+
+#### Random Utility APIs
+
+- `function seed(value?: number): void`: Sets the seed to use.
+- `function setFaker(faker: Faker): void`: Use given faker instance instead of the default one.
+- `function getFaker(): Faker`: Get the faker instance. Defaults to `fakerEN`.
+- `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
+  expression.
+
+#### Customization APIs - see [example](./tests/zod-custom-faker.test.ts) for details
+
+- `class ZodTypeFaker`: Base class for fakers.
+- `function installCustom<T extends z.ZodTypeAny>(schema: T, faker: typeof ZodTypeFakerConcrete<T>): void`: Install
+  fakers for custom schemas, must be called before using `fake`.
+
+### v4
+
+#### Core APIs
 
 - `function fake<T extends core.$ZodType>(schema: T): core.infer<T>`: Generate fake data based on schema.
 
-### Random Utility APIs
+#### Random Utility APIs
 
 - `function seed(value?: number): void`: Sets the seed or generates a new one. This method is intended to allow for
   consistent values in tests, so you might want to use hardcoded values as the seed.
@@ -80,13 +141,20 @@ fake(px) // '100px'
 - `function randexp(pattern: string | RegExp, flags?: string): string`: Create random strings that match a given regular
   expression.
 
-### Customization APIs
+#### Customization APIs
 
 - `function custom<T extends core.$ZodType>(schema: T, fake: Fake<T>): void`: Generate fake data based on schema.
 - `type Fake<T extends core.$ZodType> = (schema: T, context: Context, rootFake: RootFake) => core.infer<T>`: Custom fake
   function.
 
 ## Unsupported
+
+### v3
+
+- .refine ❌
+- .superRefine ❌
+
+### v4
 
 - .codec 🚧
 - .file 🚧

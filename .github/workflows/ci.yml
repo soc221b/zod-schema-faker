@@ -32,8 +32,11 @@ jobs:
       - run: |
           npx vitest run
           npm run build
-          cd e2e/issue-189 && npm ci && npm run test && cd -
-          cd example && npm ci && npm run build && cd -
+          npm run pack
+          cd e2e/issue-189/v3 && npm ci && npm i ../../../zod-schema-faker.tgz && npm run test && cd -
+          cd e2e/issue-189/v4 && npm ci && npm i ../../../zod-schema-faker.tgz && npm run test && cd -
+          cd examples/v3 && npm ci && npm i ../../zod-schema-faker.tgz && npm run build && cd -
+          cd examples/v4 && npm ci && npm i ../../zod-schema-faker.tgz && npm run build && cd -
 
   build:
     runs-on: ubuntu-latest
