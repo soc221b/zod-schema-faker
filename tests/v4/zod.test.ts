@@ -68,11 +68,12 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
   // custom
   {
     schema: (() => {
-      const px = z.custom<`${number}px`>(val => {
+      type Px = `${number}px`
+      const px = z.custom<Px>(val => {
         return typeof val === 'string' ? /^\d+px$/.test(val) : false
       })
-      const fakePx: Fake<any> = () => {
-        return getFaker().number.int({ min: 1, max: 100 }) + 'px'
+      const fakePx: Fake<typeof px> = () => {
+        return (getFaker().number.int({ min: 1, max: 100 }) + 'px') as Px
       }
       custom(px, fakePx)
       return px
