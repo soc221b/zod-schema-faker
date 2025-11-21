@@ -26,7 +26,7 @@ npm install --save-dev zod-schema-faker
 v3:
 
 ```ts
-import { install, fake } from 'zod-schema-faker' // alias: 'zod-schema-faker/v3'
+import { install } from 'zod-schema-faker' // alias: 'zod-schema-faker/v3'
 
 install()
 ```
@@ -34,7 +34,7 @@ install()
 v4 or mini:
 
 ```ts
-import { setFaker, fake } from 'zod-schema-faker/v4'
+import { setFaker } from 'zod-schema-faker/v4'
 import { faker } from '@faker-js/faker'
 
 setFaker(faker)
