@@ -28,20 +28,20 @@
     ".": {
       "types": "./dist/zod-schema-faker.d.ts",
       "import": "./dist/zod-schema-faker.es.js",
-      "require": "./dist/zod-schema-faker.cjs.js"
+      "require": "./dist/zod-schema-faker.cjs"
     },
     "./v3": {
       "types": "./dist/v3/zod-schema-faker.d.ts",
       "import": "./dist/v3/zod-schema-faker.es.js",
-      "require": "./dist/v3/zod-schema-faker.cjs.js"
+      "require": "./dist/v3/zod-schema-faker.cjs"
     },
     "./v4": {
       "types": "./dist/v4/zod-schema-faker.d.ts",
       "import": "./dist/v4/zod-schema-faker.es.js",
-      "require": "./dist/v4/zod-schema-faker.cjs.js"
+      "require": "./dist/v4/zod-schema-faker.cjs"
     }
   },
-  "main": "./dist/zod-schema-faker.cjs.js",
+  "main": "./dist/zod-schema-faker.cjs",
   "module": "./dist/zod-schema-faker.es.js",
   "types": "./dist/zod-schema-faker.d.ts",
   "files": [

@@ -27,9 +27,16 @@ export default defineConfig({
         'zod/v3',
         'zod/v4/core',
       ],
-      output: {
-        entryFileNames: '[name]/zod-schema-faker.[format].js',
-      },
+      output: [
+        {
+          format: 'es',
+          entryFileNames: '[name]/zod-schema-faker.es.js',
+        },
+        {
+          format: 'cjs',
+          entryFileNames: '[name]/zod-schema-faker.cjs',
+        },
+      ],
     },
   },
   plugins: [
