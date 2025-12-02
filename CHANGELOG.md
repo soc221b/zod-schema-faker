@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.2](https://github.com/soc221b/zod-schema-faker/compare/2.0.1...2.0.2) (2025-12-02)
+
+
+### Bug Fixes
+
+* CJS being interpreted as ESM ([#634](https://github.com/soc221b/zod-schema-faker/issues/634)) ([8bbeefe](https://github.com/soc221b/zod-schema-faker/commit/8bbeefed98358ab3294dfdd4e60410439e584afa))
+
 ## [2.0.1](https://github.com/soc221b/zod-schema-faker/compare/2.0.0...2.0.1) (2025-11-18)
 
 
