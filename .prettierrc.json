@@ -2,13 +2,7 @@
   "arrowParens": "avoid",
   "bracketSpacing": true,
   "endOfLine": "lf",
-  "multilineArraysWrapThreshold": 0,
-  "plugins": [
-    "prettier-plugin-sort-json",
-    "prettier-plugin-packagejson",
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-multiline-arrays"
-  ],
+  "plugins": ["prettier-plugin-sort-json", "prettier-plugin-packagejson", "prettier-plugin-organize-imports"],
   "printWidth": 120,
   "proseWrap": "always",
   "quoteProps": "as-needed",

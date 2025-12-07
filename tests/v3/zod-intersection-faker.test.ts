@@ -42,13 +42,7 @@ describe('TODO', () => {
     install()
 
     const left = z.object({ name: z.object({ first: z.string() }) })
-    const right = z.record(
-      z.enum([
-        'a',
-        'b',
-      ]),
-      z.object({ sub: z.string() }),
-    )
+    const right = z.record(z.enum(['a', 'b']), z.object({ sub: z.string() }))
     const schema = z.intersection(left, right)
     type T = z.infer<typeof schema>
     const data: T = {
@@ -86,30 +80,13 @@ describe('TODO', () => {
   test('intersection 3', () => {
     install()
 
-    const left = z.record(
-      z.union([
-        z.literal('one'),
-        z.literal('two'),
-        z.literal('three'),
-      ]),
-      z.string(),
-    )
-    const right = z.record(
-      z.union([
-        z.literal('ones'),
-        z.literal('twos'),
-        z.literal('threes'),
-      ]),
-      z.string().array(),
-    )
+    const left = z.record(z.union([z.literal('one'), z.literal('two'), z.literal('three')]), z.string())
+    const right = z.record(z.union([z.literal('ones'), z.literal('twos'), z.literal('threes')]), z.string().array())
     const schema = z.intersection(left, right)
     type T = z.infer<typeof schema>
     const data: T = {
       one: 'foo',
-      ones: [
-        'bar',
-        'baz',
-      ],
+      ones: ['bar', 'baz'],
     }
     expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
       [ZodError: [
@@ -296,12 +273,7 @@ describe('N/A', () => {
 
     const innerSchema = z.map(z.string(), z.number())
     const schema = z.intersection(innerSchema, innerSchema)
-    const data = new Map([
-      [
-        'a',
-        1,
-      ],
-    ])
+    const data = new Map([['a', 1]])
 
     expect(innerSchema.safeParse(data).success).toEqual(true)
     expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
@@ -320,9 +292,7 @@ describe('N/A', () => {
 
     const innerSchema = z.set(z.number())
     const schema = z.intersection(innerSchema, innerSchema)
-    const data = new Set([
-      1,
-    ])
+    const data = new Set([1])
 
     expect(innerSchema.safeParse(data).success).toEqual(true)
     expect(schema.safeParse(data).error).toMatchInlineSnapshot(`
@@ -2116,12 +2086,8 @@ describe('tuple', () => {
   test('tuple [date] + tuple [date]', () => {
     install()
 
-    const left = z.tuple([
-      z.date().min(new Date(123)),
-    ])
-    const right = z.tuple([
-      z.date().max(new Date(456)),
-    ])
+    const left = z.tuple([z.date().min(new Date(123))])
+    const right = z.tuple([z.date().max(new Date(456))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2148,15 +2114,8 @@ describe('tuple', () => {
   test('tuple [date, number] + tuple [date, ...number]', () => {
     install()
 
-    const left = z.tuple([
-      z.date().min(new Date(123)),
-      z.number().min(321),
-    ])
-    const right = z
-      .tuple([
-        z.date().max(new Date(456)),
-      ])
-      .rest(z.number().max(654))
+    const left = z.tuple([z.date().min(new Date(123)), z.number().min(321)])
+    const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2189,15 +2148,8 @@ describe('tuple', () => {
   test('tuple [date, ...number] + tuple [date, number]', () => {
     install()
 
-    const left = z
-      .tuple([
-        z.date().min(new Date(123)),
-      ])
-      .rest(z.number().min(321))
-    const right = z.tuple([
-      z.date().max(new Date(456)),
-      z.number().max(654),
-    ])
+    const left = z.tuple([z.date().min(new Date(123))]).rest(z.number().min(321))
+    const right = z.tuple([z.date().max(new Date(456)), z.number().max(654)])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2230,16 +2182,8 @@ describe('tuple', () => {
   test('tuple [date, ...number] + tuple [date, ...number]', () => {
     install()
 
-    const left = z
-      .tuple([
-        z.date().min(new Date(123)),
-      ])
-      .rest(z.number().min(321))
-    const right = z
-      .tuple([
-        z.date().max(new Date(456)),
-      ])
-      .rest(z.number().max(654))
+    const left = z.tuple([z.date().min(new Date(123))]).rest(z.number().min(321))
+    const right = z.tuple([z.date().max(new Date(456))]).rest(z.number().max(654))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2273,11 +2217,7 @@ describe('array and tuple', () => {
     install()
 
     const left = z.array(z.string())
-    const right = z.tuple([
-      z.literal(1),
-      z.literal(2),
-      z.literal(3),
-    ])
+    const right = z.tuple([z.literal(1), z.literal(2), z.literal(3)])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
@@ -2286,12 +2226,7 @@ describe('array and tuple', () => {
   test('tuple [date, date] + array [date]', () => {
     install()
 
-    const left = z
-      .tuple([
-        z.date().min(new Date(123)),
-        z.date().min(new Date(456)),
-      ])
-      .rest(z.date().min(new Date(789)))
+    const left = z.tuple([z.date().min(new Date(123)), z.date().min(new Date(456))]).rest(z.date().min(new Date(789)))
     const right = z.array(z.date().max(new Date(789)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
@@ -2339,12 +2274,7 @@ describe('array and tuple', () => {
     install()
 
     const left = z.array(z.date().max(new Date(789)))
-    const right = z
-      .tuple([
-        z.date().min(new Date(123)),
-        z.date().min(new Date(456)),
-      ])
-      .rest(z.date().min(new Date(789)))
+    const right = z.tuple([z.date().min(new Date(123)), z.date().min(new Date(456))]).rest(z.date().min(new Date(789)))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2393,10 +2323,7 @@ describe('union/or', () => {
     install()
 
     const schema = z.intersection(
-      z.union([
-        z.number(),
-        z.date().min(new Date(123)),
-      ]),
+      z.union([z.number(), z.date().min(new Date(123))]),
       z.date().max(new Date(321)).or(z.string()),
     )
     const faker = new ZodIntersectionFaker(schema)
@@ -2407,14 +2334,8 @@ describe('union/or', () => {
   test('union [date min 1, date min 2] + union [date max 1, date max 2]', () => {
     install()
 
-    const left = z.union([
-      z.date().min(new Date(123)),
-      z.date().min(new Date(321)),
-    ])
-    const right = z.union([
-      z.date().max(new Date(456)),
-      z.date().max(new Date(654)),
-    ])
+    const left = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
+    const right = z.union([z.date().max(new Date(456)), z.date().max(new Date(654))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2492,10 +2413,7 @@ describe('non-union and union', () => {
     install()
 
     const left = z.string()
-    const right = z.union([
-      z.number(),
-      z.date(),
-    ])
+    const right = z.union([z.number(), z.date()])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
@@ -2504,10 +2422,7 @@ describe('non-union and union', () => {
   test('union [date min, number] + date max', () => {
     install()
 
-    const left = z.union([
-      z.date().min(new Date(123)),
-      z.number(),
-    ])
+    const left = z.union([z.date().min(new Date(123)), z.number()])
     const right = z.date().max(new Date(321))
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
@@ -2530,10 +2445,7 @@ describe('non-union and union', () => {
     install()
 
     const left = z.date().max(new Date(456))
-    const right = z.union([
-      z.date().min(new Date(123)),
-      z.date().min(new Date(321)),
-    ])
+    const right = z.union([z.date().min(new Date(123)), z.date().min(new Date(321))])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2573,12 +2485,8 @@ describe('discriminatedUnion', () => {
       install()
 
       const schema = z.intersection(
-        z.discriminatedUnion('foo', [
-          z.object({ foo: z.literal('a'), a: z.date() }),
-        ]),
-        z.discriminatedUnion('bar', [
-          z.object({ bar: z.literal('a'), a: z.date() }),
-        ]),
+        z.discriminatedUnion('foo', [z.object({ foo: z.literal('a'), a: z.date() })]),
+        z.discriminatedUnion('bar', [z.object({ bar: z.literal('a'), a: z.date() })]),
       )
       const faker = new ZodIntersectionFaker(schema)
       expect(() => faker.fake()).toThrow(TypeError)
@@ -2588,12 +2496,8 @@ describe('discriminatedUnion', () => {
       install()
 
       const schema = z.intersection(
-        z.discriminatedUnion('type', [
-          z.object({ type: z.literal('a'), a: z.date() }),
-        ]),
-        z.discriminatedUnion('type', [
-          z.object({ type: z.literal('b'), b: z.date() }),
-        ]),
+        z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })]),
+        z.discriminatedUnion('type', [z.object({ type: z.literal('b'), b: z.date() })]),
       )
       const faker = new ZodIntersectionFaker(schema)
       expect(() => faker.fake()).toThrow(TypeError)
@@ -2603,12 +2507,8 @@ describe('discriminatedUnion', () => {
   test('discriminated union + discriminated union', () => {
     install()
 
-    const left = z.discriminatedUnion('type', [
-      z.object({ type: z.literal('a'), a: z.date().min(new Date(123)) }),
-    ])
-    const right = z.discriminatedUnion('type', [
-      z.object({ type: z.literal('a'), a: z.date().max(new Date(987)) }),
-    ])
+    const left = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date().min(new Date(123)) })])
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date().max(new Date(987)) })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     const result = faker.findIntersectedSchema(left, right)
@@ -2640,9 +2540,7 @@ describe('object and discriminated union', () => {
     install()
 
     const left = z.object({ a: z.date() })
-    const right = z.discriminatedUnion('type', [
-      z.object({ type: z.literal('a'), a: z.date() }),
-    ])
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
@@ -2746,9 +2644,7 @@ describe('record and discriminated union', () => {
     install()
 
     const left = z.record(z.date())
-    const right = z.discriminatedUnion('type', [
-      z.object({ type: z.literal('a'), a: z.date() }),
-    ])
+    const right = z.discriminatedUnion('type', [z.object({ type: z.literal('a'), a: z.date() })])
     const schema = z.intersection(left, right)
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
@@ -3434,16 +3330,7 @@ describe('enum', () => {
   test('unrelated', () => {
     install()
 
-    const schema = z.intersection(
-      z.enum([
-        'foo',
-        'bar',
-      ]),
-      z.enum([
-        'baz',
-        'qux',
-      ]),
-    )
+    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['baz', 'qux']))
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
   })
@@ -3451,16 +3338,7 @@ describe('enum', () => {
   test('enum + enum', () => {
     install()
 
-    const schema = z.intersection(
-      z.enum([
-        'foo',
-        'bar',
-      ]),
-      z.enum([
-        'foo',
-        'baz',
-      ]),
-    )
+    const schema = z.intersection(z.enum(['foo', 'bar']), z.enum(['foo', 'baz']))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -3471,13 +3349,7 @@ describe('non-enum and enum', () => {
   test('unrelated', () => {
     install()
 
-    const schema = z.intersection(
-      z.number(),
-      z.enum([
-        'foo',
-        'bar',
-      ]),
-    )
+    const schema = z.intersection(z.number(), z.enum(['foo', 'bar']))
     const faker = new ZodIntersectionFaker(schema)
     expect(() => faker.fake()).toThrow(TypeError)
   })
@@ -3485,14 +3357,7 @@ describe('non-enum and enum', () => {
   test('enum + string', () => {
     install()
 
-    const schema = z.intersection(
-      z.enum([
-        'foo',
-        'barbaz',
-        'qux',
-      ]),
-      z.string().max(3),
-    )
+    const schema = z.intersection(z.enum(['foo', 'barbaz', 'qux']), z.string().max(3))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })
@@ -3501,14 +3366,7 @@ describe('non-enum and enum', () => {
   test('string + enum', () => {
     install()
 
-    const schema = z.intersection(
-      z.string().min(6),
-      z.enum([
-        'foo',
-        'barbaz',
-        'qux',
-      ]),
-    )
+    const schema = z.intersection(z.string().min(6), z.enum(['foo', 'barbaz', 'qux']))
     const faker = new ZodIntersectionFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data)).toEqual({ success: true, data })

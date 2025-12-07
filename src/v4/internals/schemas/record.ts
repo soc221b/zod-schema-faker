@@ -18,10 +18,7 @@ export function fakeRecord<T extends core.$ZodRecord>(
     )
   } else if (schema._zod.def.keyType instanceof core.$ZodLiteral) {
     return Object.fromEntries(
-      schema._zod.def.keyType._zod.def.values.map(key => [
-        key,
-        rootFake(schema._zod.def.valueType, context),
-      ]),
+      schema._zod.def.keyType._zod.def.values.map(key => [key, rootFake(schema._zod.def.valueType, context)]),
     )
   } else {
     return Object.fromEntries(
