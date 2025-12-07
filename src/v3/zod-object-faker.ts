@@ -15,9 +15,15 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
           Object.assign(
             result,
             Object.fromEntries(
-              getFaker().helpers.multiple(() => [fake(z.string().regex(/^extra_[a-z]{5}$/)), fake(z.any())], {
-                count: { min: 0, max: 5 },
-              }),
+              getFaker().helpers.multiple(
+                () => [
+                  fake(z.string().regex(/^extra_[a-z]{5}$/)),
+                  fake(z.any()),
+                ],
+                {
+                  count: { min: 0, max: 5 },
+                },
+              ),
             ),
           )
           break
@@ -30,9 +36,15 @@ export class ZodObjectFaker<T extends z.ZodObject<any, any, any, any, any>> exte
       Object.assign(
         result,
         Object.fromEntries(
-          getFaker().helpers.multiple(() => [fake(z.string().regex(/^extra_[a-z]{5}$/)), fake(catchall)], {
-            count: { min: 0, max: 5 },
-          }),
+          getFaker().helpers.multiple(
+            () => [
+              fake(z.string().regex(/^extra_[a-z]{5}$/)),
+              fake(catchall),
+            ],
+            {
+              count: { min: 0, max: 5 },
+            },
+          ),
         ),
       )
     }

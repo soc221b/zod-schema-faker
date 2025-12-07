@@ -10,25 +10,43 @@ test('ZodTupleFaker should assert parameters', () => {
 })
 
 test('ZodTupleFaker should accepts a ZodTuple schema', () => {
-  const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
+  const schema = z
+    .tuple([
+      z.number(),
+      z.string(),
+    ])
+    .rest(z.boolean())
   expect(() => new ZodTupleFaker(schema)).not.toThrow()
 })
 
 test('ZodTupleFaker should return a ZodTupleFaker instance', () => {
-  const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
+  const schema = z
+    .tuple([
+      z.number(),
+      z.string(),
+    ])
+    .rest(z.boolean())
   const faker = new ZodTupleFaker(schema)
   expect(faker instanceof ZodTupleFaker).toBe(true)
 })
 
 test('ZodTupleFaker.fake should be a function', () => {
-  const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
+  const schema = z
+    .tuple([
+      z.number(),
+      z.string(),
+    ])
+    .rest(z.boolean())
   const faker = new ZodTupleFaker(schema)
   expect(typeof faker.fake).toBe('function')
 })
 
 describe('without rest', () => {
   test('ZodTupleFaker.fake should return tuple type', () => {
-    const schema = z.tuple([z.number(), z.string()])
+    const schema = z.tuple([
+      z.number(),
+      z.string(),
+    ])
     const faker = new ZodTupleFaker(schema)
     expectType<TypeEqual<ReturnType<typeof faker.fake>['0'], number>>(true)
     expectType<TypeEqual<ReturnType<typeof faker.fake>['1'], string>>(true)
@@ -37,7 +55,10 @@ describe('without rest', () => {
   test('ZodTupleFaker.fake should return a valid data', () => {
     install()
 
-    const schema = z.tuple([z.number(), z.string()])
+    const schema = z.tuple([
+      z.number(),
+      z.string(),
+    ])
     const faker = new ZodTupleFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)
@@ -46,7 +67,12 @@ describe('without rest', () => {
 
 describe('rest', () => {
   test('ZodTupleFaker.fake should return tuple type', () => {
-    const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
+    const schema = z
+      .tuple([
+        z.number(),
+        z.string(),
+      ])
+      .rest(z.boolean())
     const faker = new ZodTupleFaker(schema)
     expectType<TypeEqual<ReturnType<typeof faker.fake>, [number, string, ...boolean[]]>>(true)
   })
@@ -54,7 +80,12 @@ describe('rest', () => {
   test('ZodTupleFaker.fake should return a valid data', () => {
     install()
 
-    const schema = z.tuple([z.number(), z.string()]).rest(z.boolean())
+    const schema = z
+      .tuple([
+        z.number(),
+        z.string(),
+      ])
+      .rest(z.boolean())
     const faker = new ZodTupleFaker(schema)
     const data = faker.fake()
     expect(schema.safeParse(data).success).toBe(true)

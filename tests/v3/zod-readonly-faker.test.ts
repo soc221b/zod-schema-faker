@@ -36,7 +36,12 @@ test('array', () => {
 })
 
 test('tuple', () => {
-  const schema = z.tuple([z.string(), z.number()]).readonly()
+  const schema = z
+    .tuple([
+      z.string(),
+      z.number(),
+    ])
+    .readonly()
 
   install()
   const data = fake(schema)

@@ -17,10 +17,16 @@ export default defineConfig({
       },
       name: 'ZodSchemaFaker',
       fileName: 'zod-schema-faker',
-      formats: ['es', 'cjs'],
+      formats: [
+        'es',
+        'cjs',
+      ],
     },
     rollupOptions: {
-      external: ['zod/v3', 'zod/v4/core'],
+      external: [
+        'zod/v3',
+        'zod/v4/core',
+      ],
       output: [
         {
           format: 'es',
@@ -42,7 +48,10 @@ export default defineConfig({
           'dist/v3.d.ts': 'dist/v3/zod-schema-faker.d.ts',
           'dist/v4.d.ts': 'dist/v4/zod-schema-faker.d.ts',
         }
-        for (const [key, value] of Object.entries(map)) {
+        for (const [
+          key,
+          value,
+        ] of Object.entries(map)) {
           renameSync(resolve(__dirname, key), resolve(__dirname, value))
         }
       },
@@ -50,7 +59,9 @@ export default defineConfig({
   ],
   test: {
     coverage: {
-      include: ['src/**/*'],
+      include: [
+        'src/**/*',
+      ],
       thresholds: {
         '100': true,
       },

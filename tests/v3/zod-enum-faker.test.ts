@@ -10,24 +10,36 @@ test('ZodEnumFaker should assert parameters', () => {
 })
 
 test('ZodEnumFaker should accepts a ZodEnum schema', () => {
-  const schema = z.enum(['foo', 'bar'])
+  const schema = z.enum([
+    'foo',
+    'bar',
+  ])
   expect(() => new ZodEnumFaker(schema)).not.toThrow()
 })
 
 test('ZodEnumFaker should return a ZodEnumFaker instance', () => {
-  const schema = z.enum(['foo', 'bar'])
+  const schema = z.enum([
+    'foo',
+    'bar',
+  ])
   const faker = new ZodEnumFaker(schema)
   expect(faker instanceof ZodEnumFaker).toBe(true)
 })
 
 test('ZodEnumFaker.fake should be a function', () => {
-  const schema = z.enum(['foo', 'bar'])
+  const schema = z.enum([
+    'foo',
+    'bar',
+  ])
   const faker = new ZodEnumFaker(schema)
   expect(typeof faker.fake).toBe('function')
 })
 
 test('ZodEnumFaker.fake should return the given type', () => {
-  const schema = z.enum(['foo', 'bar'])
+  const schema = z.enum([
+    'foo',
+    'bar',
+  ])
   const faker = new ZodEnumFaker(schema)
   expectType<TypeEqual<ReturnType<typeof faker.fake>, 'foo' | 'bar'>>(true)
 })
@@ -35,7 +47,10 @@ test('ZodEnumFaker.fake should return the given type', () => {
 test('ZodEnumFaker.fake should return a valid data', () => {
   install()
 
-  const schema = z.enum(['foo', 'bar'])
+  const schema = z.enum([
+    'foo',
+    'bar',
+  ])
   const faker = new ZodEnumFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -44,7 +59,14 @@ test('ZodEnumFaker.fake should return a valid data', () => {
 test('ZodEnumFaker.fake.extract should return a valid data', () => {
   install()
 
-  const schema = z.enum(['foo', 'bar']).extract(['foo'])
+  const schema = z
+    .enum([
+      'foo',
+      'bar',
+    ])
+    .extract([
+      'foo',
+    ])
   const faker = new ZodEnumFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)
@@ -53,7 +75,14 @@ test('ZodEnumFaker.fake.extract should return a valid data', () => {
 test('ZodEnumFaker.fake.exclude should return a valid data', () => {
   install()
 
-  const schema = z.enum(['foo', 'bar']).exclude(['foo'])
+  const schema = z
+    .enum([
+      'foo',
+      'bar',
+    ])
+    .exclude([
+      'foo',
+    ])
   const faker = new ZodEnumFaker(schema)
   const data = faker.fake()
   expect(schema.safeParse(data).success).toBe(true)

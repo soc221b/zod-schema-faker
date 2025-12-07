@@ -11,9 +11,15 @@ export class ZodRecordFaker<T extends z.ZodRecord<any, any>> extends ZodTypeFake
     }
 
     return Object.fromEntries(
-      getFaker().helpers.multiple(() => [fake(this.schema._def.keyType), fake(this.schema._def.valueType)], {
-        count: { min: 0, max: 10 },
-      }),
+      getFaker().helpers.multiple(
+        () => [
+          fake(this.schema._def.keyType),
+          fake(this.schema._def.valueType),
+        ],
+        {
+          count: { min: 0, max: 10 },
+        },
+      ),
     )
   }
 }

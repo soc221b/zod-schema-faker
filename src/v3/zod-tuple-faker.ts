@@ -6,7 +6,11 @@ export class ZodTupleFaker<T extends z.ZodTuple<any, any>> extends ZodTypeFaker<
   fake(): z.infer<T> {
     return [
       ...this.schema._def.items.map((item: any) => fake(item)),
-      ...(this.schema._def.rest ? [fake(this.schema._def.rest)] : []),
+      ...(this.schema._def.rest
+        ? [
+            fake(this.schema._def.rest),
+          ]
+        : []),
     ] satisfies z.infer<T>
   }
 }
