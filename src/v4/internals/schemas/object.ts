@@ -16,20 +16,9 @@ export function fakeObject<T extends core.$ZodObject>(
           ? getFaker()
               .helpers.multiple(() => getFaker().string.uuid())
               .filter(key => !schema._zod.def.shape[key])
-              .map(key => [
-                key,
-                schema._zod.def.catchall!,
-              ])
+              .map(key => [key, schema._zod.def.catchall!])
           : [],
       )
-      .map(
-        ([
-          key,
-          value,
-        ]) => [
-          key,
-          rootFake(value, { ...context, depth: context.depth + 1 }),
-        ],
-      ),
+      .map(([key, value]) => [key, rootFake(value, { ...context, depth: context.depth + 1 })]),
   )
 }
