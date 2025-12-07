@@ -138,11 +138,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // enum
   {
     description: 'string',
-    schema: z.enum([
-      'Salmon',
-      'Tuna',
-      'Trout',
-    ]),
+    schema: z.enum(['Salmon', 'Tuna', 'Trout']),
   },
   {
     description: 'enum',
@@ -170,9 +166,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // function
   {
     schema: z.function({
-      input: [
-        z.string(),
-      ],
+      input: [z.string()],
       output: z.number(),
     }),
   },
@@ -228,11 +222,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { schema: z.literal('literal') },
   {
     description: 'multiple',
-    schema: z.literal([
-      'red',
-      'green',
-      'blue',
-    ]),
+    schema: z.literal(['red', 'green', 'blue']),
   },
 
   // map
@@ -466,14 +456,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // partialRecord
   {
     description: 'partial',
-    schema: z.partialRecord(
-      z.enum([
-        'id',
-        'name',
-        'email',
-      ]),
-      z.string(),
-    ),
+    schema: z.partialRecord(z.enum(['id', 'name', 'email']), z.string()),
   },
 
   // promise
@@ -484,12 +467,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { description: 'array', schema: z.readonly(z.array(z.string())) },
   {
     description: 'tuple',
-    schema: z.readonly(
-      z.tuple([
-        z.string(),
-        z.number(),
-      ]),
-    ),
+    schema: z.readonly(z.tuple([z.string(), z.number()])),
   },
   { description: 'map', schema: z.readonly(z.map(z.string(), z.date())) },
   { description: 'set', schema: z.readonly(z.set(z.string())) },
@@ -498,36 +476,15 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { schema: z.record(z.string(), z.string()) },
   {
     description: 'union',
-    schema: z.record(
-      z.union([
-        z.string(),
-        z.number(),
-        z.symbol(),
-      ]),
-      z.unknown(),
-    ),
+    schema: z.record(z.union([z.string(), z.number(), z.symbol()]), z.unknown()),
   },
   {
     description: 'enum',
-    schema: z.record(
-      z.enum([
-        'id',
-        'name',
-        'email',
-      ]),
-      z.string(),
-    ),
+    schema: z.record(z.enum(['id', 'name', 'email']), z.string()),
   },
   {
     description: 'literal',
-    schema: z.record(
-      z.literal([
-        'id',
-        'name',
-        'email',
-      ]),
-      z.string(),
-    ),
+    schema: z.record(z.literal(['id', 'name', 'email']), z.string()),
   },
 
   // set
@@ -686,38 +643,21 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // template literal
   {
     description: 'enum',
-    schema: z.templateLiteral([
-      'hello, ',
-      z.string(),
-    ]) as any,
+    schema: z.templateLiteral(['hello, ', z.string()]) as any,
   },
   {
     schema: (() => {
-      const cssUnits = z.enum([
-        'px',
-        'em',
-        'rem',
-        '%',
-      ])
-      return z.templateLiteral([
-        z.number(),
-        cssUnits,
-      ]) as any
+      const cssUnits = z.enum(['px', 'em', 'rem', '%'])
+      return z.templateLiteral([z.number(), cssUnits]) as any
     })(),
   },
   {
     description: 'refinement',
-    schema: z.templateLiteral([
-      z.string().check(z.minLength(1)),
-      '@',
-      z.string().check(z.maxLength(64)),
-    ]) as any,
+    schema: z.templateLiteral([z.string().check(z.minLength(1)), '@', z.string().check(z.maxLength(64))]) as any,
   },
   {
     description: 'nullable',
-    schema: z.templateLiteral([
-      z.nullable(z.literal('grassy')),
-    ]),
+    schema: z.templateLiteral([z.nullable(z.literal('grassy'))]),
   },
 
   // transform
@@ -732,19 +672,10 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // tuple
   {
     description: 'rest',
-    schema: z.tuple([
-      z.string(),
-      z.number(),
-      z.boolean(),
-    ]),
+    schema: z.tuple([z.string(), z.number(), z.boolean()]),
   },
   {
-    schema: z.tuple(
-      [
-        z.string(),
-      ],
-      z.number(),
-    ),
+    schema: z.tuple([z.string()], z.number()),
   },
 
   // undefined
@@ -753,16 +684,10 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // union
   {
     description: 'never',
-    schema: z.union([
-      z.string(),
-      z.number(),
-    ]),
+    schema: z.union([z.string(), z.number()]),
   },
   {
-    schema: z.union([
-      z.string(),
-      z.never(),
-    ]),
+    schema: z.union([z.string(), z.never()]),
   },
 
   // unknown
@@ -852,9 +777,7 @@ describe('valid', () => {
 
   test('function input', () => {
     const schema = z.function({
-      input: [
-        z.string(),
-      ],
+      input: [z.string()],
       output: z.number(),
     })
     const fn = fake(schema)
@@ -883,9 +806,7 @@ describe('invalid', () => {
 
   test('function input', () => {
     const schema = z.function({
-      input: [
-        z.string(),
-      ],
+      input: [z.string()],
       output: z.number(),
     })
     const fn = fake(schema)
