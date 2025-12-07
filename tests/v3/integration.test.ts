@@ -61,11 +61,7 @@ testMultipleTimes('integration', async () => {
     nan: z.nan(),
     boolean: z.boolean(),
     date: z.date(),
-    enum: z.enum([
-      'Salmon',
-      'Tuna',
-      'Trout',
-    ]),
+    enum: z.enum(['Salmon', 'Tuna', 'Trout']),
     nativeEnum: z.nativeEnum({
       Apple: 'apple',
       Banana: 'banana',
@@ -85,10 +81,7 @@ testMultipleTimes('integration', async () => {
         pointsScored: z.number(),
       }),
     ]),
-    union: z.union([
-      z.string(),
-      z.number(),
-    ]),
+    union: z.union([z.string(), z.number()]),
     discriminatedUnions: z.discriminatedUnion('type', [
       z.object({ type: z.literal('a'), a: z.string() }),
       z.object({ type: z.literal('b'), b: z.string() }),

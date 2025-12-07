@@ -10,28 +10,8 @@ const averageParagraphLength = averageWordLength * 200
 // https://github.com/colinhacks/zod/blob/main/src/types.ts
 const cuidRegex = /^c[^\s-]{8,}$/i
 const cuid2Regex = /^[0-9a-z]+$/
-const emojisLength1 = [
-  '☘',
-  '⚜',
-]
-const emojisLength2 = [
-  '😳',
-  '😀',
-  '😁',
-  '🤣',
-  '😃',
-  '😆',
-  '😉',
-  '😊',
-  '😋',
-  '😎',
-  '😍',
-  '😘',
-  '🥰',
-  '😗',
-  '😈',
-  '👿',
-]
+const emojisLength1 = ['☘', '⚜']
+const emojisLength2 = ['😳', '😀', '😁', '🤣', '😃', '😆', '😉', '😊', '😋', '😎', '😍', '😘', '🥰', '😗', '😈', '👿']
 const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/
 const base64UrlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/
 
