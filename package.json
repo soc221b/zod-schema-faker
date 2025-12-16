@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@types/node": "24.10.4",
-    "@vitest/coverage-v8": "4.0.15",
+    "@vitest/coverage-v8": "4.0.16",
     "prettier": "3.7.4",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "2.5.20",
@@ -70,7 +70,7 @@
     "typescript": "5.9.3",
     "vite": "7.3.0",
     "vite-plugin-dts": "4.5.4",
-    "vitest": "4.0.15",
+    "vitest": "4.0.16",
     "zod": "4.1.12"
   },
   "peerDependencies": {
