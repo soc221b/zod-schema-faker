@@ -157,8 +157,6 @@ const data = fake(pxSchema) // '100px'
 ### v4
 
 - .codec 🚧
-- .file 🚧
-- .intersection 🚧
 - .preprocess 🚧
 - .refine ❌
 - .stringbool custom 🚧

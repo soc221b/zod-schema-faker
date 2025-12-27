@@ -163,6 +163,20 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     })(),
   },
 
+  // file
+  { schema: z.file() },
+  { description: 'with size constraints', schema: z.file().check(z.minSize(100)).check(z.maxSize(1000)) },
+  { description: 'with MIME type', schema: z.file().check(z.mime(['text/plain'])) },
+  { description: 'with multiple MIME types', schema: z.file().check(z.mime(['image/jpeg', 'image/png'])) },
+  {
+    description: 'complex constraints',
+    schema: z
+      .file()
+      .check(z.minSize(1024))
+      .check(z.maxSize(10485760))
+      .check(z.mime(['application/pdf'])),
+  },
+
   // function
   {
     schema: z.function({
@@ -200,17 +214,25 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     })(),
   },
 
-  // TODO: intersection
-  // { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
-  // {
-  //   schema: (() => {
-  //     const Person = z.object({ name: z.string() })
-  //     const Employee = z.object({ role: z.string() })
-  //     const EmployedPerson = z.intersection(Person, Employee)
-  //     return EmployedPerson
-  //   })(),
-  //   description: 'complex',
-  // },
+  // intersection
+  { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
+  {
+    schema: (() => {
+      const Person = z.object({ name: z.string() })
+      const Employee = z.object({ role: z.string() })
+      const EmployedPerson = z.intersection(Person, Employee)
+      return EmployedPerson
+    })(),
+    description: 'complex',
+  },
+  {
+    schema: z.intersection(z.string().min(5), z.string().max(10)),
+    description: 'string constraints',
+  },
+  {
+    schema: z.intersection(z.number().min(1), z.number().max(100)),
+    description: 'number constraints',
+  },
 
   // json
   { schema: z.json() },
@@ -749,6 +771,13 @@ const invalidSuits: { description?: string; schema: z.ZodType; only?: boolean; a
 
   // never
   { schema: z.never() },
+
+  // file
+  { description: 'impossible size constraints', schema: z.file().check(z.minSize(1000)).check(z.maxSize(100)) },
+
+  // intersection
+  { description: 'incompatible types', schema: z.intersection(z.string(), z.number()) },
+  { description: 'conflicting constraints', schema: z.intersection(z.string().min(10), z.string().max(5)) },
 ]
 
 beforeAll(() => {
