@@ -35,9 +35,9 @@ export function fake{SchemaType}<T extends core.$Zod{SchemaType}>(
    (Requirements 3.1, 3.2, 3.3)
 2. **Schema Files**: Create individual implementation files in `src/v4/internals/schemas/`
 3. **Type System**: Leverage existing `Infer<T>`, `Context`, and `RootFake` types
-4. **Testing**: Follow existing test patterns in `tests/v4/zod.test.ts` (Requirements 5.5)
+4. **Testing**: Follow existing test patterns in `tests/v4/zod.test.ts` (Requirements 4.5)
 5. **Quality Compliance**: Ensure all implementations pass TypeScript compilation, Vite build, Prettier formatting, and
-   Vitest testing (Requirements 4.1-4.5)
+   Vitest testing (Requirements 4.1, 4.2, 4.3, 4.4)
 
 ## Components and Interfaces
 
@@ -228,15 +228,15 @@ The implementation will use both unit tests and property-based tests for compreh
 
 **Unit Tests**:
 
-- Test specific examples and edge cases for each schema type (Requirements 5.2)
-- Verify error conditions and boundary cases (Requirements 5.4)
+- Test specific examples and edge cases for each schema type (Requirements 4.2)
+- Verify error conditions and boundary cases (Requirements 4.4)
 - Test integration with existing schema types
-- Validate generated data against schema constraints (Requirements 5.3)
+- Validate generated data against schema constraints (Requirements 4.3)
 
 **Property-Based Tests**:
 
 - Test universal properties across randomly generated schema configurations
-- Verify correctness properties with minimum 100 iterations per test (Requirements 5.1)
+- Verify correctness properties with minimum 100 iterations per test (Requirements 4.1)
 - Use property-based testing library (Vitest with custom generators)
 - Tag each test with format: **Feature: v4-missing-schemas, Property {number}: {property_text}**
 
@@ -249,8 +249,8 @@ The implementation will use both unit tests and property-based tests for compreh
 
 ### Coverage Requirements
 
-- 100% test coverage threshold (existing project requirement) (Requirements 4.5)
+- 100% test coverage threshold (existing project requirement)
 - Test all new schema types in isolation and combination
 - Verify integration with existing v4 functionality
-- Test error conditions and edge cases comprehensively (Requirements 5.4)
-- Follow existing test patterns and naming conventions in the v4 test suite (Requirements 5.5)
+- Test error conditions and edge cases comprehensively (Requirements 4.4)
+- Follow existing test patterns and naming conventions in the v4 test suite (Requirements 4.5)
