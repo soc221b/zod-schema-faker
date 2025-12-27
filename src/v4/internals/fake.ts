@@ -8,7 +8,9 @@ import { fakeCustom } from './schemas/custom'
 import { fakeDate } from './schemas/date'
 import { fakeDefault } from './schemas/default'
 import { fakeEnum } from './schemas/enum'
+import { fakeFile } from './schemas/file'
 import { fakeFunction } from './schemas/function'
+import { fakeIntersection } from './schemas/intersection'
 import { fakeLazy } from './schemas/lazy'
 import { fakeLiteral } from './schemas/literal'
 import { fakeMap } from './schemas/map'
@@ -59,14 +61,12 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'function':
       return fakeFunction(schema as any, context, rootFake)
     case 'file':
-      // TODO
-      break
+      return fakeFile(schema as any, context, rootFake)
     case 'int':
       // TODO
       break
     case 'intersection':
-      // TODO
-      break
+      return fakeIntersection(schema as any, context, rootFake)
     case 'lazy':
       return fakeLazy(schema as any, context, rootFake)
     case 'literal':
