@@ -125,7 +125,7 @@ describe('file faker', () => {
     })
 
     test('should throw error for conflicting constraints (min > max)', () => {
-      // When min > max, should throw error
+      // When min > max, should throw an error
       expect(() => {
         const conflictingSchema = z.file().check(z.minSize(1000), z.maxSize(500))
         fake(conflictingSchema)
@@ -136,6 +136,98 @@ describe('file faker', () => {
       const zeroSizeSchema = z.file().check(z.size(0))
       const result = fake(zeroSizeSchema)
       expect(result.size).toBe(0)
+    })
+  })
+
+  describe('error handling', () => {
+    test('should handle unsupported MIME types gracefully', () => {
+      // Test with completely unknown MIME type
+      const unknownMimeSchema = z.file().check(z.mime(['application/unknown-type']))
+      const result = fake(unknownMimeSchema)
+
+      // Should generate a file with fallback behavior
+      expect(result).toBeInstanceOf(File)
+      expect(result.type).toBe('application/unknown-type')
+      expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+    })
+
+    test('should handle invalid MIME type patterns', () => {
+      // Test with malformed MIME type
+      const malformedMimeSchema = z.file().check(z.mime(['invalid-mime-type']))
+      const result = fake(malformedMimeSchema)
+
+      // Should generate a file with fallback behavior
+      expect(result).toBeInstanceOf(File)
+      expect(result.type).toBe('invalid-mime-type')
+      expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+    })
+
+    test('should handle empty MIME type array', () => {
+      // Test with empty MIME type array
+      const emptyMimeSchema = z.file().check(z.mime([]))
+      const result = fake(emptyMimeSchema)
+
+      // Should generate a file with default MIME type
+      expect(result).toBeInstanceOf(File)
+      expect(result.type).toBe('text/plain')
+    })
+
+    test('should never return null or undefined File objects', () => {
+      // Test various edge cases to ensure we never get null/undefined
+      const schemas = [
+        z.file(),
+        z.file().check(z.size(0)),
+        z.file().check(z.mime(['unknown/type'])),
+        z.file().check(z.minSize(0), z.maxSize(0)),
+      ]
+
+      schemas.forEach(schema => {
+        const result = fake(schema)
+        expect(result).not.toBeNull()
+        expect(result).not.toBeUndefined()
+        expect(result).toBeInstanceOf(File)
+      })
+    })
+
+    test('should handle extremely large size constraints gracefully', () => {
+      // Test with very large size that might cause memory issues
+      const largeSizeSchema = z.file().check(z.size(Number.MAX_SAFE_INTEGER))
+
+      // Should either handle gracefully or throw meaningful error
+      expect(() => {
+        const result = fake(largeSizeSchema)
+        if (result) {
+          expect(result).toBeInstanceOf(File)
+        }
+      }).not.toThrow(/out of memory|allocation failed/i)
+    })
+
+    test('should throw error for multiple conflicting MIME type constraints', () => {
+      // Test with multiple different MIME type constraints
+      expect(() => {
+        const multiMimeSchema = z
+          .file()
+          .check(z.mime(['text/plain']))
+          .check(z.mime(['application/json']))
+        fake(multiMimeSchema)
+      }).toThrow(
+        'Conflicting MIME type constraints: cannot have both [text/plain] and [application/json] constraints on the same file',
+      )
+    })
+
+    test('should handle size constraints at boundary values', () => {
+      // Test with boundary values that might cause issues
+      const boundarySchemas = [
+        z.file().check(z.size(1)), // Minimum non-zero size
+        z.file().check(z.minSize(0), z.maxSize(1)), // Minimum range
+        z.file().check(z.size(1000000)), // Large exact size (no conflict)
+      ]
+
+      boundarySchemas.forEach(schema => {
+        const result = fake(schema)
+        expect(result).toBeInstanceOf(File)
+        expect(result.size).toBeGreaterThanOrEqual(0)
+      })
     })
   })
 

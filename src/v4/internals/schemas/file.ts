@@ -17,6 +17,9 @@ export function fakeFile<T extends core.$ZodFile>(
   let exactSize: number | undefined = undefined
   let allowedMimeTypes: string[] = []
 
+  // Maximum reasonable file size (100MB) to prevent memory issues
+  const MAX_REASONABLE_SIZE = 100 * 1024 * 1024 // 100MB
+
   // Process schema checks for constraints
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
     switch (check._zod.def.check) {
@@ -25,7 +28,12 @@ export function fakeFile<T extends core.$ZodFile>(
         if (minimum < 0) {
           throw new Error(`Invalid file size constraint: minimum size cannot be negative (${minimum})`)
         }
-        minSize = Math.max(minSize, minimum)
+        // Cap at reasonable maximum to prevent memory issues
+        const cappedMinimum = Math.min(minimum, MAX_REASONABLE_SIZE)
+        if (cappedMinimum !== minimum) {
+          console.warn(`Large minimum size constraint (${minimum}) capped at ${MAX_REASONABLE_SIZE} bytes`)
+        }
+        minSize = Math.max(minSize, cappedMinimum)
         break
       }
       case 'max_size': {
@@ -33,7 +41,12 @@ export function fakeFile<T extends core.$ZodFile>(
         if (maximum < 0) {
           throw new Error(`Invalid file size constraint: maximum size cannot be negative (${maximum})`)
         }
-        maxSize = Math.min(maxSize, maximum)
+        // Cap at reasonable maximum to prevent memory issues
+        const cappedMaximum = Math.min(maximum, MAX_REASONABLE_SIZE)
+        if (cappedMaximum !== maximum) {
+          console.warn(`Large maximum size constraint (${maximum}) capped at ${MAX_REASONABLE_SIZE} bytes`)
+        }
+        maxSize = Math.min(maxSize, cappedMaximum)
         break
       }
       case 'size_equals': {
@@ -41,13 +54,28 @@ export function fakeFile<T extends core.$ZodFile>(
         if (size < 0) {
           throw new Error(`Invalid file size constraint: exact size cannot be negative (${size})`)
         }
-        exactSize = size
+        // Cap at reasonable maximum to prevent memory issues
+        const cappedSize = Math.min(size, MAX_REASONABLE_SIZE)
+        if (cappedSize !== size) {
+          console.warn(`Large exact size constraint (${size}) capped at ${MAX_REASONABLE_SIZE} bytes`)
+        }
+        exactSize = cappedSize
         break
       }
       case 'mime_type': {
         // Extract MIME type constraints from Zod v4 check
         const mimeCheck = check as any
         if (mimeCheck._zod?.def?.mime && Array.isArray(mimeCheck._zod.def.mime)) {
+          // Check for conflicting MIME type constraints
+          if (allowedMimeTypes.length > 0) {
+            // We already have MIME type constraints, this is a conflict
+            const existingTypes = allowedMimeTypes.join(', ')
+            const newTypes = mimeCheck._zod.def.mime.join(', ')
+            throw new Error(
+              `Conflicting MIME type constraints: cannot have both [${existingTypes}] and [${newTypes}] constraints on the same file`,
+            )
+          }
+          // First MIME type constraint, store it
           allowedMimeTypes = [...mimeCheck._zod.def.mime]
         }
         break
@@ -59,7 +87,7 @@ export function fakeFile<T extends core.$ZodFile>(
     }
   }
 
-  // Check for conflicting constraints (min > max)
+  // Handle conflicting constraints (min > max) by throwing error
   if (exactSize === undefined && minSize > maxSize) {
     throw new Error(
       `Conflicting file size constraints: minimum size (${minSize}) cannot be greater than maximum size (${maxSize})`,
@@ -72,8 +100,9 @@ export function fakeFile<T extends core.$ZodFile>(
   // Determine MIME type to use
   let mimeType: string
   if (allowedMimeTypes.length > 0) {
-    // Randomly select from allowed MIME types
-    mimeType = faker.helpers.arrayElement(allowedMimeTypes)
+    // Remove duplicates and randomly select from allowed MIME types
+    const uniqueMimeTypes = [...new Set(allowedMimeTypes)]
+    mimeType = faker.helpers.arrayElement(uniqueMimeTypes)
   } else {
     // Use default MIME type
     mimeType = 'text/plain'
@@ -179,12 +208,15 @@ function getExtensionForMimeType(mimeType: string): string {
   const parts = mimeType.split('/')
   if (parts.length === 2) {
     const subtype = parts[1]
-    if (subtype.length <= 5 && /^[a-z0-9]+$/.test(subtype)) {
-      return subtype
+    // Handle common patterns and clean up subtype
+    const cleanSubtype = subtype.replace(/[^a-z0-9]/gi, '').toLowerCase()
+    if (cleanSubtype.length > 0 && cleanSubtype.length <= 10) {
+      return cleanSubtype
     }
   }
 
-  return 'txt'
+  // Final fallback for completely unknown MIME types
+  return 'dat'
 }
 
 /**
@@ -222,6 +254,12 @@ function getMimeTypeCategory(mimeType: string): MimeTypeMapping['category'] {
 function generateFileContent(mimeType: string, targetSize: number): ArrayBuffer {
   if (targetSize === 0) {
     return new ArrayBuffer(0)
+  }
+
+  // For very large files, generate minimal content and pad efficiently
+  if (targetSize > 10 * 1024 * 1024) {
+    // 10MB threshold
+    return generateLargeFileContent(targetSize)
   }
 
   const faker = getFaker()
@@ -265,6 +303,24 @@ function generateFileContent(mimeType: string, targetSize: number): ArrayBuffer 
   }
 
   return encoded.buffer
+}
+
+/**
+ * Generate content for very large files efficiently
+ */
+function generateLargeFileContent(targetSize: number): ArrayBuffer {
+  const buffer = new ArrayBuffer(targetSize)
+  const view = new Uint8Array(buffer)
+
+  // Fill with a simple pattern to avoid memory issues
+  const pattern = new TextEncoder().encode('LARGE_FILE_CONTENT_PLACEHOLDER\n')
+
+  for (let i = 0; i < targetSize; i += pattern.length) {
+    const remaining = Math.min(pattern.length, targetSize - i)
+    view.set(pattern.slice(0, remaining), i)
+  }
+
+  return buffer
 }
 
 /**
