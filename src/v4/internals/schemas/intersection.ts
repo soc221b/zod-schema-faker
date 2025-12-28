@@ -114,11 +114,7 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     default:
       // If right schema has more specific handling, swap and recurse
       if (shouldSwap(left._zod.def.type, right._zod.def.type)) {
-        return fakeIntersection(
-          createIntersection(right, left),
-          context,
-          rootFake
-        )
+        return fakeIntersection(createIntersection(right, left), context, rootFake)
       }
       // Handle generic cases or throw error for impossible intersections
       return handleGenericIntersection(left, right, context, rootFake)
@@ -134,58 +130,58 @@ function getSpecificity(type: string): number {
   // Higher numbers = more specific (should be handled first)
   const specificityMap: Record<string, number> = {
     // Most specific
-    'never': 100,
+    never: 100,
 
     // Highly specific
-    'literal': 90,
-    'nan': 85,
-    'null': 85,
-    'undefined': 85,
-    'void': 85,
+    literal: 90,
+    nan: 85,
+    null: 85,
+    undefined: 85,
+    void: 85,
 
     // Constrained types
-    'enum': 80,
-    'template_literal': 75,
+    enum: 80,
+    template_literal: 75,
 
     // Primitives
-    'string': 70,
-    'number': 70,
-    'bigint': 70,
-    'boolean': 70,
-    'date': 70,
-    'symbol': 70,
+    string: 70,
+    number: 70,
+    bigint: 70,
+    boolean: 70,
+    date: 70,
+    symbol: 70,
 
     // Collections (tuple most specific)
-    'tuple': 65,
-    'object': 60,
-    'array': 55,
-    'record': 50,
-    'map': 50,
-    'set': 50,
+    tuple: 65,
+    object: 60,
+    array: 55,
+    record: 50,
+    map: 50,
+    set: 50,
 
     // Combinators
-    'union': 45,
-    'lazy': 40,
-    'pipe': 40,
+    union: 45,
+    lazy: 40,
+    pipe: 40,
 
     // Wrappers
-    'optional': 35,
-    'nullable': 35,
-    'default': 35,
-    'readonly': 35,
-    'nonoptional': 35,
-    'catch': 35,
-    'prefault': 35,
+    optional: 35,
+    nullable: 35,
+    default: 35,
+    readonly: 35,
+    nonoptional: 35,
+    catch: 35,
+    prefault: 35,
 
     // Advanced
-    'function': 30,
-    'promise': 30,
-    'file': 30,
-    'custom': 30,
+    function: 30,
+    promise: 30,
+    file: 30,
+    custom: 30,
 
     // Most general
-    'unknown': 20,
-    'any': 10,
+    unknown: 20,
+    any: 10,
   }
 
   return specificityMap[type] || 0
@@ -223,7 +219,9 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
       return intersection[0]
     } else {
       // No common values - impossible intersection
-      throw new TypeError(`Cannot intersect literal values [${leftValues.join(', ')}] with literal values [${rightValues.join(', ')}] - no common values`)
+      throw new TypeError(
+        `Cannot intersect literal values [${leftValues.join(', ')}] with literal values [${rightValues.join(', ')}] - no common values`,
+      )
     }
   }
 
@@ -263,11 +261,104 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
   }
 
   // If we get here, the literal is incompatible with the right schema
-  throw new TypeError(`Cannot intersect literal values [${leftValues.join(', ')}] with ${right._zod.def.type} type - types are incompatible`)
+  throw new TypeError(
+    `Cannot intersect literal values [${leftValues.join(', ')}] with ${right._zod.def.type} type - types are incompatible`,
+  )
 }
 
 function handleConstantIntersection(left: any, right: any, context: Context, rootFake: any): any {
-  throw new Error('handleConstantIntersection not yet implemented')
+  const leftType = left._zod.def.type
+
+  // Handle swapping - if right side is more specific, swap and recurse
+  if (shouldSwap(leftType, right._zod.def.type)) {
+    return fakeIntersection(createIntersection(right, left), context, rootFake)
+  }
+
+  // Get the constant value for the left schema
+  let constantValue: any
+  switch (leftType) {
+    case 'nan':
+      constantValue = NaN
+      break
+    case 'null':
+      constantValue = null
+      break
+    case 'undefined':
+      constantValue = undefined
+      break
+    case 'void':
+      constantValue = undefined // void returns undefined
+      break
+    default:
+      throw new TypeError(`Unknown constant type: ${leftType}`)
+  }
+
+  // Handle intersection with right schema
+  const rightType = right._zod.def.type
+
+  // If right is the same constant type, return the constant value
+  if (rightType === leftType) {
+    return constantValue
+  }
+
+  // Handle intersection with compatible types
+  switch (rightType) {
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept any constant value
+      return constantValue
+
+    case 'number':
+      // Only NaN can intersect with number (NaN is a number in JavaScript)
+      if (leftType === 'nan') {
+        // Check if NaN satisfies any number constraints
+        // For now, we assume NaN is valid for any number schema
+        // TODO: When implementing number intersection, check constraints
+        return constantValue
+      }
+      break
+
+    case 'string':
+      // Constants cannot intersect with string
+      throw new TypeError(`Cannot intersect ${leftType} with string`)
+
+    case 'boolean':
+      // Constants cannot intersect with boolean
+      throw new TypeError(`Cannot intersect ${leftType} with boolean`)
+
+    case 'object':
+      // Constants cannot intersect with object
+      throw new TypeError(`Cannot intersect ${leftType} with object`)
+
+    case 'array':
+      // Constants cannot intersect with array
+      throw new TypeError(`Cannot intersect ${leftType} with array`)
+
+    case 'literal':
+      // Check if the constant value matches any of the literal values
+      const literalValues = right._zod.def.values
+      if (literalValues.includes(constantValue)) {
+        return constantValue
+      }
+      throw new TypeError(
+        `Cannot intersect ${leftType} with literal values [${literalValues.join(', ')}] - constant value not in literal set`,
+      )
+
+    // For other constant types, check compatibility
+    case 'nan':
+    case 'null':
+    case 'undefined':
+    case 'void':
+      // Different constant types cannot intersect
+      throw new TypeError(`Cannot intersect ${leftType} with ${rightType}`)
+
+    default:
+      // For unhandled types, assume incompatible
+      throw new TypeError(`Cannot intersect ${leftType} with ${rightType}`)
+  }
+
+  // If we reach here, the intersection is incompatible
+  throw new TypeError(`Cannot intersect ${leftType} with ${rightType}`)
 }
 
 function handleEnumIntersection(left: any, right: any, context: Context, rootFake: any): any {

@@ -40,6 +40,74 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('constant type intersection handlers', () => {
+    it('should handle nan intersections', () => {
+      // nan & nan should return NaN
+      const nanSchema1 = z.nan()
+      const nanSchema2 = z.nan()
+      const intersection = z.intersection(nanSchema1, nanSchema2)
+
+      const result = fake(intersection)
+      expect(Number.isNaN(result)).toBe(true)
+
+      // nan & number should check if NaN satisfies number constraints
+      const numberSchema = z.number()
+      const nanNumberIntersection = z.intersection(nanSchema1, numberSchema)
+      const nanNumberResult = fake(nanNumberIntersection)
+      expect(Number.isNaN(nanNumberResult)).toBe(true)
+
+      // nan & string should be impossible
+      const stringSchema = z.string()
+      const nanStringIntersection = z.intersection(nanSchema1, stringSchema)
+      expect(() => fake(nanStringIntersection)).toThrow('Cannot intersect nan with string')
+    })
+
+    it('should handle null intersections', () => {
+      // null & null should return null
+      const nullSchema1 = z.null()
+      const nullSchema2 = z.null()
+      const intersection = z.intersection(nullSchema1, nullSchema2)
+
+      const result = fake(intersection)
+      expect(result).toBe(null)
+
+      // null & string should be impossible
+      const stringSchema = z.string()
+      const nullStringIntersection = z.intersection(nullSchema1, stringSchema)
+      expect(() => fake(nullStringIntersection)).toThrow('Cannot intersect null with string')
+    })
+
+    it('should handle undefined intersections', () => {
+      // undefined & undefined should return undefined
+      const undefinedSchema1 = z.undefined()
+      const undefinedSchema2 = z.undefined()
+      const intersection = z.intersection(undefinedSchema1, undefinedSchema2)
+
+      const result = fake(intersection)
+      expect(result).toBe(undefined)
+
+      // undefined & string should be impossible
+      const stringSchema = z.string()
+      const undefinedStringIntersection = z.intersection(undefinedSchema1, stringSchema)
+      expect(() => fake(undefinedStringIntersection)).toThrow('Cannot intersect undefined with string')
+    })
+
+    it('should handle void intersections', () => {
+      // void & void should return undefined (void returns undefined)
+      const voidSchema1 = z.void()
+      const voidSchema2 = z.void()
+      const intersection = z.intersection(voidSchema1, voidSchema2)
+
+      const result = fake(intersection)
+      expect(result).toBe(undefined)
+
+      // void & string should be impossible
+      const stringSchema = z.string()
+      const voidStringIntersection = z.intersection(voidSchema1, stringSchema)
+      expect(() => fake(voidStringIntersection)).toThrow('Cannot intersect void with string')
+    })
+  })
+
   describe('literal intersection handler', () => {
     it('should handle identical literals by returning the literal value', () => {
       // Same literal values should intersect to that value
@@ -138,15 +206,10 @@ describe('v4 intersection faker', () => {
       // This should also result in an impossible intersection
       expect(() => fake(intersectionSchema)).toThrow()
 
-      // Let's check what error we actually get
-      try {
-        fake(intersectionSchema)
-      } catch (error) {
-        console.log('Actual error:', error.message)
-      }
-
       // The error should be from the never handler, not the string handler
-      expect(() => fake(intersectionSchema)).toThrow('Cannot generate fake data for intersection with never type - intersection is impossible')
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
     })
   })
 
@@ -154,12 +217,16 @@ describe('v4 intersection faker', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers
       const testCases = [
-        { left: z.never(), right: z.string(), expectedError: 'Cannot generate fake data for intersection with never type - intersection is impossible' },
+        {
+          left: z.never(),
+          right: z.string(),
+          expectedError: 'Cannot generate fake data for intersection with never type - intersection is impossible',
+        },
         { left: z.literal('test'), right: z.string(), expectedResult: 'test' }, // Should return the literal value
-        { left: z.nan(), right: z.number(), expectedError: 'handleConstantIntersection not yet implemented' },
-        { left: z.null(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
-        { left: z.undefined(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
-        { left: z.void(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
+        { left: z.nan(), right: z.number(), expectedResult: NaN }, // NaN intersects with number
+        { left: z.null(), right: z.string(), expectedError: 'Cannot intersect null with string' },
+        { left: z.undefined(), right: z.string(), expectedError: 'Cannot intersect undefined with string' },
+        { left: z.void(), right: z.string(), expectedError: 'Cannot intersect void with string' },
       ]
 
       testCases.forEach(({ left, right, expectedError, expectedResult }) => {
@@ -167,7 +234,11 @@ describe('v4 intersection faker', () => {
           // This case should succeed and return the expected result
           const intersectionSchema = z.intersection(left, right)
           const result = fake(intersectionSchema)
-          expect(result).toBe(expectedResult)
+          if (Number.isNaN(expectedResult)) {
+            expect(Number.isNaN(result)).toBe(true)
+          } else {
+            expect(result).toBe(expectedResult)
+          }
         } else {
           expect(() => {
             const intersectionSchema = z.intersection(left, right)

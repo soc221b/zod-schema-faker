@@ -50,8 +50,8 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 4. Implement constant type handlers (TDD) - Highly Specific
-  - [ ] 4.1 Write failing test for nan intersection
+- [-] 4. Implement constant type handlers (TDD) - Highly Specific
+  - [x] 4.1 Write failing test for nan intersection
     - Test nan intersection scenarios and compatibility
     - _Requirements: 2.2_
 
