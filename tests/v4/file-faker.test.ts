@@ -858,5 +858,81 @@ describe('file faker', () => {
       expect(result.type).toBe('image/jpeg')
       expect(result.name).toMatch(/\.(jpg|jpeg)$/i)
     })
+
+    test('should handle unknown MIME type categories for coverage', () => {
+      // Test MIME types that fall back to category detection to cover missing lines
+      const unknownMimeTypes = [
+        'audio/mpeg', // Should fall back to 'audio' category
+        'video/mp4', // Should fall back to 'video' category
+        'font/woff', // Should fall back to 'font' category
+        'multipart/form-data', // Should fall back to 'multipart' category
+        'unknown/type', // Should fall back to 'application' category
+      ]
+
+      unknownMimeTypes.forEach(mimeType => {
+        const schema = z.file().check(z.mime([mimeType]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mimeType)
+        expect(result.size).toBeGreaterThan(0)
+      })
+    })
+
+    test('should handle content size adjustment edge cases for coverage', () => {
+      // Test cases that trigger buffer adjustment logic to cover missing lines
+      const testCases = [
+        { size: 1, description: 'very small size' },
+        { size: 5, description: 'small size requiring padding' },
+        { size: 50, description: 'medium size requiring truncation' },
+      ]
+
+      testCases.forEach(({ size, description }) => {
+        const schema = z.file().check(z.size(size))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.size).toBe(size)
+        expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+      })
+    })
+
+    test('should cover all MIME type category fallbacks', () => {
+      // Test MIME types that specifically trigger the fallback logic in getMimeTypeCategory
+      const fallbackMimeTypes = [
+        'audio/custom', // Should trigger 'audio' case
+        'video/custom', // Should trigger 'video' case
+        'font/custom', // Should trigger 'font' case
+        'multipart/custom', // Should trigger 'multipart' case
+        'unknown/unknown', // Should trigger default case -> 'application'
+        'custom/type', // Should trigger default case -> 'application'
+        'weird/format', // Should trigger default case -> 'application'
+      ]
+
+      fallbackMimeTypes.forEach(mimeType => {
+        const schema = z.file().check(z.mime([mimeType]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mimeType)
+        expect(result.size).toBeGreaterThan(0)
+        // Should get a fallback extension
+        expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+      })
+    })
+
+    test('should trigger buffer size adjustment logic', () => {
+      // Create a test that specifically triggers the buffer adjustment code
+      // by generating content that doesn't match the target size exactly
+      const sizes = [3, 7, 13, 23] // Prime numbers to increase chance of size mismatch
+
+      sizes.forEach(size => {
+        const schema = z.file().check(z.size(size))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.size).toBe(size) // This should trigger the buffer adjustment logic
+      })
+    })
   })
 })
