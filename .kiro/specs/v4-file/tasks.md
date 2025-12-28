@@ -29,13 +29,13 @@ seamlessly with the existing faker system.
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
     - Test should fail initially (no implementation yet)
 
-- [ ] 2. Create minimal file faker implementation (GREEN phase)
-  - [ ] 2.1 Create the fakeFile function in src/v4/internals/schemas/file.ts
+- [x] 2. Create minimal file faker implementation (GREEN phase)
+  - [x] 2.1 Create the fakeFile function in src/v4/internals/schemas/file.ts
     - Write minimal implementation to make basic file generation test pass
     - Handle basic File object generation with name, size, type, and lastModified
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 4.1, 4.2, 4.5_
 
-  - [ ] 2.2 Integrate with existing v4 faker system
+  - [x] 2.2 Integrate with existing v4 faker system
     - Update rootFake switch statement to call fakeFile
     - Import fakeFile function from schemas/file
     - _Requirements: 4.3_

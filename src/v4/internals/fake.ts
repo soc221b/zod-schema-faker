@@ -8,6 +8,7 @@ import { fakeCustom } from './schemas/custom'
 import { fakeDate } from './schemas/date'
 import { fakeDefault } from './schemas/default'
 import { fakeEnum } from './schemas/enum'
+import { fakeFile } from './schemas/file'
 import { fakeFunction } from './schemas/function'
 import { fakeLazy } from './schemas/lazy'
 import { fakeLiteral } from './schemas/literal'
@@ -59,8 +60,7 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'function':
       return fakeFunction(schema as any, context, rootFake)
     case 'file':
-      // TODO
-      break
+      return fakeFile(schema as any, context, rootFake)
     case 'int':
       // TODO
       break
