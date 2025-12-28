@@ -80,22 +80,22 @@ The implementation follows this specificity hierarchy (most specific first):
     - Added enum support to literal handler for proper precedence
     - _Requirements: 2.2_
 
-- [ ] 6. Implement template_literal intersection handler (TDD) - Constrained Type
-  - [ ] 6.1 Write failing test for template_literal intersection
+- [x] 6. Implement template_literal intersection handler (TDD) - Constrained Type
+  - [x] 6.1 Write failing test for template_literal intersection
     - Test template literal schema intersection behavior (more specific than string)
     - _Requirements: 2.2_
 
-  - [ ] 6.2 Implement template_literal intersection logic
+  - [x] 6.2 Implement template_literal intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 7. Implement string intersection handler (TDD) - Primitive
-  - [ ] 7.1 Write failing test for string intersection
+- [x] 7. Implement string intersection handler (TDD) - Primitive
+  - [x] 7.1 Write failing test for string intersection
     - Test length constraints (min/max), pattern matching, format validation
     - Test constraint merging and conflict detection
     - _Requirements: 2.1_
 
-  - [ ] 7.2 Implement string intersection logic
+  - [x] 7.2 Implement string intersection logic
     - Make the test pass with minimal implementation
     - Handle length constraints, patterns, and formats
     - _Requirements: 2.1_
