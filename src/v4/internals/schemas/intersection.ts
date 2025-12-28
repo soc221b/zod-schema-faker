@@ -18,6 +18,10 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
 
     // Highly specific: literals and constants
     case 'literal':
+      // Check if right side is more specific and should be handled first
+      if (shouldSwap(left._zod.def.type, right._zod.def.type)) {
+        return fakeIntersection(createIntersection(right, left), context, rootFake)
+      }
       return handleLiteralIntersection(left, right, context, rootFake)
     case 'nan':
     case 'null':
@@ -205,7 +209,61 @@ function handleNeverIntersection(left: any, right: any, context: Context, rootFa
 }
 
 function handleLiteralIntersection(left: any, right: any, context: Context, rootFake: any): any {
-  throw new Error('handleLiteralIntersection not yet implemented')
+  const leftValues = left._zod.def.values
+
+  // If right is also a literal, check if values match
+  if (right._zod.def.type === 'literal') {
+    const rightValues = right._zod.def.values
+
+    // Find intersection of the two literal value arrays
+    const intersection = leftValues.filter((value: any) => rightValues.includes(value))
+
+    if (intersection.length > 0) {
+      // Return one of the intersecting values
+      return intersection[0]
+    } else {
+      // No common values - impossible intersection
+      throw new TypeError(`Cannot intersect literal values [${leftValues.join(', ')}] with literal values [${rightValues.join(', ')}] - no common values`)
+    }
+  }
+
+  // If right is a compatible base type, check if literal values satisfy it
+  switch (right._zod.def.type) {
+    case 'string':
+      // Check if any literal value is a string
+      const stringValues = leftValues.filter((value: any) => typeof value === 'string')
+      if (stringValues.length > 0) {
+        // For now, just return the first string value
+        // TODO: Check string constraints when we implement string intersection
+        return stringValues[0]
+      }
+      break
+    case 'number':
+      // Check if any literal value is a number
+      const numberValues = leftValues.filter((value: any) => typeof value === 'number')
+      if (numberValues.length > 0) {
+        // For now, just return the first number value
+        // TODO: Check number constraints when we implement number intersection
+        return numberValues[0]
+      }
+      break
+    case 'boolean':
+      // Check if any literal value is a boolean
+      const booleanValues = leftValues.filter((value: any) => typeof value === 'boolean')
+      if (booleanValues.length > 0) {
+        return booleanValues[0]
+      }
+      break
+    case 'any':
+      // Any accepts any literal - return first value
+      return leftValues[0]
+    case 'unknown':
+      // Unknown accepts any literal - return first value
+      return leftValues[0]
+  }
+
+  // If we get here, the literal is incompatible with the right schema
+  throw new TypeError(`Cannot intersect literal values [${leftValues.join(', ')}] with ${right._zod.def.type} type - types are incompatible`)
 }
 
 function handleConstantIntersection(left: any, right: any, context: Context, rootFake: any): any {

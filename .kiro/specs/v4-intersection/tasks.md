@@ -40,13 +40,13 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 3. Implement literal intersection handler (TDD) - Highly Specific
-  - [ ] 3.1 Write failing test for literal intersection
+- [x] 3. Implement literal intersection handler (TDD) - Highly Specific
+  - [x] 3.1 Write failing test for literal intersection
     - Test literal value compatibility checking
     - Test literal + compatible type intersections
     - _Requirements: 2.2_
 
-  - [ ] 3.2 Implement literal intersection logic
+  - [x] 3.2 Implement literal intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 

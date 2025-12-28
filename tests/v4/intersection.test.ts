@@ -27,7 +27,7 @@ describe('v4 intersection faker', () => {
       expect(() => {
         const intersectionSchema = z.intersection(literalA, literalB)
         fake(intersectionSchema)
-      }).toThrow('handleLiteralIntersection not yet implemented')
+      }).toThrow('Cannot intersect literal values')
 
       // Test that the infrastructure correctly identifies schema types
       const objectSchema = z.object({ name: z.string() })
@@ -37,6 +37,66 @@ describe('v4 intersection faker', () => {
         const intersectionSchema = z.intersection(objectSchema, anotherObjectSchema)
         fake(intersectionSchema)
       }).toThrow('handleObjectIntersection not yet implemented')
+    })
+  })
+
+  describe('literal intersection handler', () => {
+    it('should handle identical literals by returning the literal value', () => {
+      // Same literal values should intersect to that value
+      const literalA1 = z.literal('hello')
+      const literalA2 = z.literal('hello')
+
+      const intersectionSchema = z.intersection(literalA1, literalA2)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe('hello')
+    })
+
+    it('should throw error for conflicting literals', () => {
+      // Different literal values cannot be intersected
+      const literalA = z.literal('hello')
+      const literalB = z.literal('world')
+
+      const intersectionSchema = z.intersection(literalA, literalB)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect literal')
+    })
+
+    it('should handle literal with compatible type', () => {
+      // Literal should work with compatible base type
+      const literalString = z.literal('hello')
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(literalString, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return the literal value since it satisfies both constraints
+      expect(result).toBe('hello')
+    })
+
+    it('should handle literal with incompatible type', () => {
+      // Literal string with number should be impossible
+      const literalString = z.literal('hello')
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(literalString, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect literal')
+    })
+
+    it('should handle different literal types', () => {
+      // Test with number literals
+      const literalNum1 = z.literal(42)
+      const literalNum2 = z.literal(42)
+      const literalNum3 = z.literal(24)
+
+      // Same number literals should work
+      const sameIntersection = z.intersection(literalNum1, literalNum2)
+      expect(fake(sameIntersection)).toBe(42)
+
+      // Different number literals should fail
+      const differentIntersection = z.intersection(literalNum1, literalNum3)
+      expect(() => fake(differentIntersection)).toThrow('Cannot intersect literal')
     })
   })
 
@@ -95,18 +155,25 @@ describe('v4 intersection faker', () => {
       // Test that different schema types reach their respective handlers
       const testCases = [
         { left: z.never(), right: z.string(), expectedError: 'Cannot generate fake data for intersection with never type - intersection is impossible' },
-        { left: z.literal('test'), right: z.string(), expectedError: 'handleLiteralIntersection not yet implemented' },
+        { left: z.literal('test'), right: z.string(), expectedResult: 'test' }, // Should return the literal value
         { left: z.nan(), right: z.number(), expectedError: 'handleConstantIntersection not yet implemented' },
         { left: z.null(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
         { left: z.undefined(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
         { left: z.void(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },
       ]
 
-      testCases.forEach(({ left, right, expectedError }) => {
-        expect(() => {
+      testCases.forEach(({ left, right, expectedError, expectedResult }) => {
+        if (expectedResult !== undefined) {
+          // This case should succeed and return the expected result
           const intersectionSchema = z.intersection(left, right)
-          fake(intersectionSchema)
-        }).toThrow(expectedError)
+          const result = fake(intersectionSchema)
+          expect(result).toBe(expectedResult)
+        } else {
+          expect(() => {
+            const intersectionSchema = z.intersection(left, right)
+            fake(intersectionSchema)
+          }).toThrow(expectedError)
+        }
       })
     })
 
