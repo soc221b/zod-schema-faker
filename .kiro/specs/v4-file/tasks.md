@@ -8,23 +8,23 @@ seamlessly with the existing faker system.
 
 ## Tasks
 
-- [ ] 1. Set up test infrastructure and write failing tests (RED phase)
-  - [ ] 1.1 Create basic file faker test structure
+- [x] 1. Set up test infrastructure and write failing tests (RED phase)
+  - [x] 1.1 Create basic file faker test structure
     - Create test file tests/v4/file-faker.test.ts
     - Set up test utilities and imports
     - _Requirements: All requirements - test setup_
 
-  - [ ] 1.2 Write failing property test for basic file generation
+  - [x] 1.2 Write failing property test for basic file generation
     - **Property 1: File Object Generation**
     - **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5**
     - Test should fail initially (no implementation yet)
 
-  - [ ] 1.3 Write failing property test for size constraints
+  - [x] 1.3 Write failing property test for size constraints
     - **Property 2: Size Constraint Compliance**
     - **Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5**
     - Test should fail initially (no implementation yet)
 
-  - [ ] 1.4 Write failing property test for MIME type constraints
+  - [x] 1.4 Write failing property test for MIME type constraints
     - **Property 3: MIME Type Constraint Compliance**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
     - Test should fail initially (no implementation yet)
