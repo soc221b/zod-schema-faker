@@ -163,6 +163,22 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     })(),
   },
 
+  // file
+  { schema: z.file() },
+  { description: 'min size', schema: z.file().check(z.minSize(100)) },
+  { description: 'max size', schema: z.file().check(z.maxSize(1000)) },
+  { description: 'exact size', schema: z.file().check(z.size(256)) },
+  { description: 'size range', schema: z.file().check(z.minSize(50), z.maxSize(500)) },
+  { description: 'mime type', schema: z.file().check(z.mime(['text/plain'])) },
+  { description: 'mime type image', schema: z.file().check(z.mime(['image/jpeg'])) },
+  { description: 'mime type application', schema: z.file().check(z.mime(['application/json'])) },
+  {
+    description: 'multiple mime types',
+    schema: z.file().check(z.mime(['text/plain', 'text/html', 'application/json'])),
+  },
+  { description: 'size and mime', schema: z.file().check(z.size(100), z.mime(['image/png'])) },
+  { description: 'zero size', schema: z.file().check(z.size(0)) },
+
   // function
   {
     schema: z.function({
@@ -745,6 +761,19 @@ const invalidSuits: { description?: string; schema: z.ZodType; only?: boolean; a
       .min(new Date('2222-01-01T00:00:00.000Z')),
     //
     //
+  },
+
+  // file
+  { description: 'negative min size', schema: z.file().check(z.minSize(-100)) },
+  { description: 'negative max size', schema: z.file().check(z.maxSize(-50)) },
+  { description: 'negative exact size', schema: z.file().check(z.size(-25)) },
+  { description: 'min > max size', schema: z.file().check(z.minSize(1000), z.maxSize(500)) },
+  {
+    description: 'conflicting mime types',
+    schema: z
+      .file()
+      .check(z.mime(['text/plain']))
+      .check(z.mime(['application/json'])),
   },
 
   // never
