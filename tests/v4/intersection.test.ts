@@ -508,6 +508,123 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('number intersection handler', () => {
+    it('should handle identical number schemas by returning a valid number', () => {
+      // Same number schema should intersect to a valid number
+      const numberSchema1 = z.number()
+      const numberSchema2 = z.number()
+
+      const intersectionSchema = z.intersection(numberSchema1, numberSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+    })
+
+    it('should handle number range constraints by merging them', () => {
+      // Number with min/max constraints should merge constraints
+      const minNumber = z.number().min(5)
+      const maxNumber = z.number().max(10)
+
+      const intersectionSchema = z.intersection(minNumber, maxNumber)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+      expect(result).toBeGreaterThanOrEqual(5)
+      expect(result).toBeLessThanOrEqual(10)
+    })
+
+    it('should throw error for conflicting range constraints', () => {
+      // Conflicting constraints should be impossible
+      const minNumber = z.number().min(10)
+      const maxNumber = z.number().max(5)
+
+      const intersectionSchema = z.intersection(minNumber, maxNumber)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect number constraints - min value (10) is greater than max value (5)',
+      )
+    })
+
+    it('should handle number with compatible literal', () => {
+      // Number should work with number literal
+      const numberSchema = z.number()
+      const numberLiteral = z.literal(42)
+
+      const intersectionSchema = z.intersection(numberSchema, numberLiteral)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe(42)
+    })
+
+    it('should handle integer constraints', () => {
+      // Number with integer constraint should generate integers
+      const integerNumber = z.number().int()
+      const rangeNumber = z.number().min(1).max(10)
+
+      const intersectionSchema = z.intersection(integerNumber, rangeNumber)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+      expect(Number.isInteger(result)).toBe(true)
+      expect(result).toBeGreaterThanOrEqual(1)
+      expect(result).toBeLessThanOrEqual(10)
+    })
+
+    it('should handle step constraints', () => {
+      // Number with step constraint should generate multiples
+      const stepNumber = z.number().step(0.5)
+      const rangeNumber = z.number().min(0).max(5)
+
+      const intersectionSchema = z.intersection(stepNumber, rangeNumber)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+      expect(result % 0.5).toBe(0)
+      expect(result).toBeGreaterThanOrEqual(0)
+      expect(result).toBeLessThanOrEqual(5)
+    })
+
+    it('should throw error for number with incompatible type', () => {
+      // Number with string should be impossible
+      const numberSchema = z.number()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(numberSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect number with string')
+    })
+
+    it('should handle number with any/unknown types', () => {
+      // Number should work with any/unknown
+      const numberSchema = z.number()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const numberAnyIntersection = z.intersection(numberSchema, anySchema)
+      const numberUnknownIntersection = z.intersection(numberSchema, unknownSchema)
+
+      const anyResult = fake(numberAnyIntersection)
+      const unknownResult = fake(numberUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+    })
+
+    it('should handle complex number constraints', () => {
+      // Test multiple constraints together
+      const constrainedNumber = z.number().min(1).max(100).int()
+      const anotherConstrainedNumber = z.number().min(50).max(200)
+
+      const intersectionSchema = z.intersection(constrainedNumber, anotherConstrainedNumber)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+      expect(Number.isInteger(result)).toBe(true)
+      expect(result).toBeGreaterThanOrEqual(50) // max of mins
+      expect(result).toBeLessThanOrEqual(100) // min of maxes
+    })
+  })
+
   describe('basic infrastructure tests', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers

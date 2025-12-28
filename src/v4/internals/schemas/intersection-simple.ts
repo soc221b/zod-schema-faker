@@ -43,6 +43,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     // Primitives
     case 'string':
       return handleStringIntersection(left, right, context, rootFake)
+    case 'number':
+      return handleNumberIntersection(left, right, context, rootFake)
 
     default:
       throw new TypeError(`Intersection with ${left._zod.def.type} not yet supported`)
@@ -258,6 +260,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
       const stringValues = leftValues.filter((value: any) => typeof value === 'string')
       if (stringValues.length > 0) {
         return stringValues[0]
+      }
+      break
+    case 'number':
+      const numberValues = leftValues.filter((value: any) => typeof value === 'number')
+      if (numberValues.length > 0) {
+        return numberValues[0]
       }
       break
     case 'enum':
@@ -499,4 +507,256 @@ function validateLiteralAgainstTemplate(literal: string, templateSchema: any): b
   }
 
   return true // Assume it matches if we can't determine otherwise
+}
+
+function handleNumberIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'number':
+      // Merge number constraints (min/max, int, step)
+      return mergeNumberConstraints(left, right, context, rootFake)
+
+    case 'literal':
+      // Check if the literal value is a number
+      const literalValues = right._zod.def.values
+      const numberLiterals = literalValues.filter((value: any) => typeof value === 'number')
+
+      if (numberLiterals.length > 0) {
+        // Check if the number literal satisfies left number constraints
+        const literalValue = numberLiterals[0]
+        if (satisfiesNumberConstraints(literalValue, left)) {
+          return literalValue
+        } else {
+          throw new TypeError(
+            `Cannot intersect number constraints with literal "${literalValue}" - literal does not satisfy number constraints`,
+          )
+        }
+      } else {
+        throw new TypeError(
+          `Cannot intersect number with literal values [${literalValues.join(', ')}] - literals are not numbers`,
+        )
+      }
+
+    case 'any':
+    case 'unknown':
+      // Number intersected with any/unknown should return a number
+      return generateNumberValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect number with ${rightType}`)
+  }
+}
+
+function mergeNumberConstraints(left: any, right: any, context: Context, rootFake: any): number {
+  // Extract constraints from both direct properties and checks array (v4 structure)
+  const leftMin = getMinValueFromSchema(left)
+  const leftMax = getMaxValueFromSchema(left)
+  const rightMin = getMinValueFromSchema(right)
+  const rightMax = getMaxValueFromSchema(right)
+
+  // Check for integer constraints
+  const leftIsInt = left.isInt ?? false
+  const rightIsInt = right.isInt ?? false
+  const isInteger = leftIsInt || rightIsInt
+
+  // Check for step constraints (multipleOf in v4)
+  const leftStep = getStepFromChecks(left._zod.def.checks)
+  const rightStep = getStepFromChecks(right._zod.def.checks)
+  const step = leftStep || rightStep
+
+  // Merge constraints (intersection means both must be satisfied)
+  const mergedMin = Math.max(leftMin, rightMin)
+  const mergedMax = Math.min(leftMax, rightMax)
+
+  // Check for impossible constraints
+  if (mergedMin > mergedMax) {
+    throw new TypeError(
+      `Cannot intersect number constraints - min value (${mergedMin}) is greater than max value (${mergedMax})`,
+    )
+  }
+
+  // Generate a number within the merged constraints
+  let value: number
+  if (mergedMin === mergedMax) {
+    value = mergedMin
+  } else if (mergedMin === -Infinity && mergedMax === Infinity) {
+    // No constraints, generate a reasonable number
+    value = Math.random() * 100
+  } else if (mergedMin === -Infinity) {
+    // Only max constraint
+    value = Math.random() * mergedMax
+  } else if (mergedMax === Infinity) {
+    // Only min constraint
+    value = mergedMin + Math.random() * 100
+  } else {
+    // Both min and max constraints
+    value = Math.random() * (mergedMax - mergedMin) + mergedMin
+  }
+
+  // Apply integer constraint if needed
+  if (isInteger) {
+    value = Math.round(value)
+    // Ensure the rounded value is still within bounds
+    if (mergedMax !== Infinity) {
+      value = Math.min(value, mergedMax)
+    }
+    if (mergedMin !== -Infinity) {
+      value = Math.max(value, mergedMin)
+    }
+
+    // If rounding pushed us outside bounds, try to find a valid integer
+    if (value < mergedMin || value > mergedMax) {
+      // Find the closest valid integer within bounds
+      const minInt = Math.ceil(mergedMin)
+      const maxInt = Math.floor(mergedMax)
+
+      if (minInt <= maxInt) {
+        // Generate a random integer within the valid range
+        value = Math.floor(Math.random() * (maxInt - minInt + 1)) + minInt
+      } else {
+        // No valid integer exists in the range
+        throw new TypeError(
+          `Cannot satisfy integer constraint within range [${mergedMin}, ${mergedMax}] - no valid integers exist`,
+        )
+      }
+    }
+  }
+
+  // Apply step constraint if needed
+  if (step && step > 0) {
+    value = Math.round(value / step) * step
+    // Ensure the stepped value is still within bounds
+    if (value < mergedMin || value > mergedMax) {
+      // Find a valid step value within bounds
+      const minSteps = Math.ceil(mergedMin / step)
+      const maxSteps = Math.floor(mergedMax / step)
+
+      if (minSteps <= maxSteps) {
+        const randomSteps = Math.floor(Math.random() * (maxSteps - minSteps + 1)) + minSteps
+        value = randomSteps * step
+      } else {
+        // No valid step value exists in the range
+        throw new TypeError(
+          `Cannot satisfy step constraint ${step} within range [${mergedMin}, ${mergedMax}] - no valid step values exist`,
+        )
+      }
+    }
+  }
+
+  return value
+}
+
+function satisfiesNumberConstraints(value: number, numberSchema: any): boolean {
+  const minValue = numberSchema.minValue ?? -Infinity
+  const maxValue = numberSchema.maxValue ?? Infinity
+  const isInteger = numberSchema.isInt ?? false
+  const step = getStepFromChecks(numberSchema._zod.def.checks)
+
+  // Check range constraints
+  if (value < minValue || value > maxValue) {
+    return false
+  }
+
+  // Check integer constraint
+  if (isInteger && !Number.isInteger(value)) {
+    return false
+  }
+
+  // Check step constraint
+  if (step && step > 0 && value % step !== 0) {
+    return false
+  }
+
+  return true
+}
+
+function generateNumberValue(numberSchema: any, context: Context, rootFake: any): number {
+  const minValue = numberSchema.minValue ?? 0
+  const maxValue = numberSchema.maxValue ?? 100 // Default reasonable max
+  const isInteger = numberSchema.isInt ?? false
+  const step = getStepFromChecks(numberSchema._zod.def.checks)
+
+  let value: number
+  if (minValue === maxValue) {
+    value = minValue
+  } else if (minValue === -Infinity && maxValue === Infinity) {
+    // No constraints, generate a reasonable number
+    value = Math.random() * 100
+  } else if (minValue === -Infinity) {
+    // Only max constraint
+    value = Math.random() * maxValue
+  } else if (maxValue === Infinity) {
+    // Only min constraint
+    value = minValue + Math.random() * 100
+  } else {
+    // Both min and max constraints
+    value = Math.random() * (maxValue - minValue) + minValue
+  }
+
+  // Apply integer constraint if needed
+  if (isInteger) {
+    value = Math.round(value)
+  }
+
+  // Apply step constraint if needed
+  if (step && step > 0) {
+    value = Math.round(value / step) * step
+  }
+
+  return value
+}
+
+function getStepFromChecks(checks: any[]): number | undefined {
+  if (!checks) return undefined
+
+  // Look for multipleOf check in v4 structure
+  for (const check of checks) {
+    if (check._zod?.def?.check === 'multiple_of') {
+      return check._zod.def.value
+    }
+  }
+
+  return undefined
+}
+function getMinValueFromSchema(schema: any): number {
+  // First check direct property (for schemas without integer constraint)
+  if (schema.minValue !== undefined && schema.minValue !== -Infinity && schema.minValue !== -9007199254740991) {
+    return schema.minValue
+  }
+
+  // Then check checks array (for schemas with integer constraint that overrides direct properties)
+  const checks = schema._zod?.def?.checks
+  if (checks) {
+    for (const check of checks) {
+      if (check._zod?.def?.check === 'greater_than') {
+        // For inclusive greater_than (>=), return the value as-is
+        // For exclusive greater_than (>), return value + epsilon
+        return check._zod.def.inclusive ? check._zod.def.value : check._zod.def.value + Number.EPSILON
+      }
+    }
+  }
+
+  return -Infinity
+}
+
+function getMaxValueFromSchema(schema: any): number {
+  // First check direct property (for schemas without integer constraint)
+  if (schema.maxValue !== undefined && schema.maxValue !== Infinity && schema.maxValue !== 9007199254740991) {
+    return schema.maxValue
+  }
+
+  // Then check checks array (for schemas with integer constraint that overrides direct properties)
+  const checks = schema._zod?.def?.checks
+  if (checks) {
+    for (const check of checks) {
+      if (check._zod?.def?.check === 'less_than') {
+        // For inclusive less_than (<=), return the value as-is
+        // For exclusive less_than (<), return value - epsilon
+        return check._zod.def.inclusive ? check._zod.def.value : check._zod.def.value - Number.EPSILON
+      }
+    }
+  }
+
+  return Infinity
 }
