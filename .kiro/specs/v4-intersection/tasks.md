@@ -63,13 +63,21 @@ The implementation follows this specificity hierarchy (most specific first):
     - Includes swapping logic for proper precedence
     - _Requirements: 2.2_
 
-- [ ] 5. Implement enum intersection handler (TDD) - Constrained Type
-  - [ ] 5.1 Write failing test for enum intersection
+- [x] 5. Implement enum intersection handler (TDD) - Constrained Type
+  - [x] 5.1 Write failing tests for enum intersection
     - Test enum schema intersection behavior (more specific than primitives)
+    - Test identical enums, overlapping enums, non-overlapping enums
+    - Test enum with compatible/incompatible literals and types
     - _Requirements: 2.2_
 
-  - [ ] 5.2 Implement enum intersection logic
-    - Make the test pass with minimal implementation
+  - [x] 5.2 Implement enum intersection logic
+    - Unified handler for all enum intersection scenarios
+    - Handles identical enums by returning random enum value
+    - Handles overlapping enums by finding common values
+    - Handles enum with compatible types (literal, string, any, unknown)
+    - Throws descriptive errors for incompatible intersections
+    - Uses v4 enum structure (entries object vs values array)
+    - Added enum support to literal handler for proper precedence
     - _Requirements: 2.2_
 
 - [ ] 6. Implement template_literal intersection handler (TDD) - Constrained Type

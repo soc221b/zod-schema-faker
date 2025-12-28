@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import { faker } from '@faker-js/faker'
+import { beforeAll, describe, expect, it } from 'vitest'
 import * as z from 'zod/v4'
-import { fake } from '../../src/v4/fake'
+import { fake, setFaker } from '../../src/v4'
 
 describe('v4 intersection faker', () => {
+  beforeAll(() => {
+    setFaker(faker)
+  })
   describe('Property 1: Intersection data validity', () => {
     it('**Feature: v4-intersection, Property 1: Intersection data validity**', () => {
       // **Validates: Requirements 1.1, 1.2**
@@ -304,6 +308,201 @@ describe('v4 intersection faker', () => {
       const result = fake(intersectionSchema)
 
       expect(['1', '2', '3']).toContain(result)
+    })
+  })
+
+  describe('template literal intersection handler', () => {
+    it('should handle identical template literals by returning a matching value', () => {
+      // Same template literal should intersect to a value matching that pattern
+      const template1 = z.templateLiteral(['hello-', z.string()] as any)
+      const template2 = z.templateLiteral(['hello-', z.string()] as any)
+
+      const intersectionSchema = z.intersection(template1, template2)
+      const result = fake(intersectionSchema)
+
+      // Should return a string matching the template pattern
+      expect(typeof result).toBe('string')
+      expect(result).toMatch(/^hello-.+/)
+    })
+
+    it('should handle overlapping template literals by finding common pattern', () => {
+      // Template literals with overlapping patterns should work
+      const template1 = z.templateLiteral([z.string(), '-world'] as any)
+      const template2 = z.templateLiteral(['hello-', z.string()] as any)
+
+      const intersectionSchema = z.intersection(template1, template2)
+
+      // This should be impossible since no string can match both patterns
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect template literal')
+    })
+
+    it('should handle template literal with compatible literal', () => {
+      // Template literal should work with literal if literal matches pattern
+      const template = z.templateLiteral(['hello-', z.string()] as any)
+      const literal = z.literal('hello-world')
+
+      const intersectionSchema = z.intersection(template, literal)
+      const result = fake(intersectionSchema)
+
+      // Should return the literal value since it matches the template
+      expect(result).toBe('hello-world')
+    })
+
+    it('should throw error for template literal with incompatible literal', () => {
+      // Template literal with non-matching literal should be impossible
+      const template = z.templateLiteral(['hello-', z.string()] as any)
+      const literal = z.literal('goodbye-world')
+
+      const intersectionSchema = z.intersection(template, literal)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect literal values [goodbye-world] with template_literal - literal does not match template pattern',
+      )
+    })
+
+    it('should handle template literal with compatible string type', () => {
+      // Template literal should work with string type (template generates strings)
+      const template = z.templateLiteral(['prefix-', z.string(), '-suffix'] as any)
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(template, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string matching the template pattern
+      expect(typeof result).toBe('string')
+      expect(result).toMatch(/^prefix-.+-suffix$/)
+    })
+
+    it('should throw error for template literal with incompatible type', () => {
+      // Template literal with number should be impossible (templates generate strings)
+      const template = z.templateLiteral(['hello-', z.string()] as any)
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(template, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect template literal')
+    })
+
+    it('should handle complex template literals', () => {
+      // Test with more complex template patterns
+      const template = z.templateLiteral(['user-', z.string(), '-', z.number()] as any)
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(template, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string matching the complex template pattern
+      expect(typeof result).toBe('string')
+      expect(result).toMatch(/^user-.+-\d+$/)
+    })
+  })
+
+  describe('string intersection handler', () => {
+    it('should handle identical string schemas by returning a valid string', () => {
+      // Same string schema should intersect to a valid string
+      const stringSchema1 = z.string()
+      const stringSchema2 = z.string()
+
+      const intersectionSchema = z.intersection(stringSchema1, stringSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle string length constraints by merging them', () => {
+      // String with min/max constraints should merge constraints
+      const minString = z.string().min(5)
+      const maxString = z.string().max(10)
+
+      const intersectionSchema = z.intersection(minString, maxString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5)
+      expect(result.length).toBeLessThanOrEqual(10)
+    })
+
+    it('should throw error for conflicting length constraints', () => {
+      // Conflicting constraints should be impossible
+      const minString = z.string().min(10)
+      const maxString = z.string().max(5)
+
+      const intersectionSchema = z.intersection(minString, maxString)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string constraints - min length (10) is greater than max length (5)')
+    })
+
+    it('should handle string with compatible literal', () => {
+      // String should work with string literal
+      const stringSchema = z.string()
+      const stringLiteral = z.literal('hello')
+
+      const intersectionSchema = z.intersection(stringSchema, stringLiteral)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe('hello')
+    })
+
+    it('should handle string with compatible enum', () => {
+      // String should work with string enum
+      const stringSchema = z.string()
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+
+      const intersectionSchema = z.intersection(stringSchema, colorEnum)
+      const result = fake(intersectionSchema)
+
+      expect(['red', 'green', 'blue']).toContain(result)
+    })
+
+    it('should handle string with compatible template literal', () => {
+      // String should work with template literal
+      const stringSchema = z.string()
+      const template = z.templateLiteral(['hello-', z.string()] as any)
+
+      const intersectionSchema = z.intersection(stringSchema, template)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result).toMatch(/^hello-.+/)
+    })
+
+    it('should throw error for string with incompatible type', () => {
+      // String with number should be impossible
+      const stringSchema = z.string()
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(stringSchema, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with number')
+    })
+
+    it('should handle string with any/unknown types', () => {
+      // String should work with any/unknown
+      const stringSchema = z.string()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const stringAnyIntersection = z.intersection(stringSchema, anySchema)
+      const stringUnknownIntersection = z.intersection(stringSchema, unknownSchema)
+
+      const anyResult = fake(stringAnyIntersection)
+      const unknownResult = fake(stringUnknownIntersection)
+
+      expect(typeof anyResult).toBe('string')
+      expect(typeof unknownResult).toBe('string')
+    })
+
+    it('should handle complex string constraints', () => {
+      // Test multiple constraints together
+      const constrainedString = z.string().min(3).max(8)
+      const anotherConstrainedString = z.string().min(5).max(10)
+
+      const intersectionSchema = z.intersection(constrainedString, anotherConstrainedString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5) // max of mins
+      expect(result.length).toBeLessThanOrEqual(8) // min of maxes
     })
   })
 
