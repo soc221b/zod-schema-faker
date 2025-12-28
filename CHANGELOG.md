@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/soc221b/zod-schema-faker/compare/2.0.2...2.1.0) (2025-12-28)
+
+
+### Features
+
+* **v4:** implement file faker ([#647](https://github.com/soc221b/zod-schema-faker/issues/647)) ([3def650](https://github.com/soc221b/zod-schema-faker/commit/3def65098ff742b0acd06816a1b37dfba1754224))
+
 ## [2.0.2](https://github.com/soc221b/zod-schema-faker/compare/2.0.1...2.0.2) (2025-12-02)
 
 
