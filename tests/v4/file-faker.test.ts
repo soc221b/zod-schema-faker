@@ -139,6 +139,207 @@ describe('file faker', () => {
     })
   })
 
+  describe('edge cases', () => {
+    test('should handle empty files (0 bytes)', () => {
+      const schema = z.file().check(z.size(0))
+      const result = fake(schema)
+
+      expect(result).toBeInstanceOf(File)
+      expect(result.size).toBe(0)
+      expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+      expect(result.type).toBe('text/plain')
+    })
+
+    test('should handle maximum reasonable size files', () => {
+      // Test with the maximum reasonable size (100MB)
+      const maxSize = 100 * 1024 * 1024 // 100MB
+      const schema = z.file().check(z.size(maxSize))
+      const result = fake(schema)
+
+      expect(result).toBeInstanceOf(File)
+      expect(result.size).toBe(maxSize)
+      expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+    })
+
+    test('should handle unknown MIME types with fallback behavior', () => {
+      const unknownMimeTypes = [
+        'application/unknown-format',
+        'text/nonexistent',
+        'image/made-up-format',
+        'custom/weird-type',
+        'x-application/test',
+      ]
+
+      unknownMimeTypes.forEach(mimeType => {
+        const schema = z.file().check(z.mime([mimeType]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mimeType)
+        expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+        expect(result.size).toBeGreaterThan(0)
+
+        // Should generate reasonable extension fallback
+        const extension = result.name.split('.').pop()
+        expect(extension).toBeTruthy()
+        expect(extension!.length).toBeGreaterThan(0)
+        expect(extension!.length).toBeLessThanOrEqual(10)
+      })
+    })
+
+    test('should handle constraint boundary conditions', () => {
+      // Test minimum non-zero size
+      const minSchema = z.file().check(z.size(1))
+      const minResult = fake(minSchema)
+      expect(minResult.size).toBe(1)
+
+      // Test size range at boundaries
+      const rangeSchema = z.file().check(z.minSize(1), z.maxSize(2))
+      const rangeResult = fake(rangeSchema)
+      expect(rangeResult.size).toBeGreaterThanOrEqual(1)
+      expect(rangeResult.size).toBeLessThanOrEqual(2)
+
+      // Test exact size at boundary
+      const exactSchema = z.file().check(z.size(1))
+      const exactResult = fake(exactSchema)
+      expect(exactResult.size).toBe(1)
+    })
+
+    test('should handle malformed MIME type patterns gracefully', () => {
+      const malformedMimeTypes = [
+        'invalid-mime-type', // No slash
+        'text/', // Missing subtype
+        '/plain', // Missing main type
+        'text//plain', // Double slash
+        '', // Empty string
+        'text/plain/extra', // Too many parts
+      ]
+
+      malformedMimeTypes.forEach(mimeType => {
+        const schema = z.file().check(z.mime([mimeType]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mimeType)
+        expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+
+        // Should still generate valid file with fallback extension
+        const extension = result.name.split('.').pop()
+        expect(extension).toBeTruthy()
+        expect(extension!.length).toBeGreaterThan(0)
+      })
+    })
+
+    test('should handle very specific MIME types with appropriate extensions', () => {
+      const specificMimeTypes = [
+        { mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', expectedExt: 'xlsx' },
+        { mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', expectedExt: 'docx' },
+        { mime: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', expectedExt: 'pptx' },
+        { mime: 'application/vnd.ms-excel', expectedExt: 'xls' },
+        { mime: 'application/vnd.ms-powerpoint', expectedExt: 'ppt' },
+        { mime: 'application/msword', expectedExt: 'doc' },
+      ]
+
+      specificMimeTypes.forEach(({ mime, expectedExt }) => {
+        const schema = z.file().check(z.mime([mime]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mime)
+        expect(result.name).toMatch(new RegExp(`\\.${expectedExt}$`, 'i'))
+      })
+    })
+
+    test('should handle size constraints with zero minimum', () => {
+      const schema = z.file().check(z.minSize(0), z.maxSize(10))
+      const result = fake(schema)
+
+      expect(result).toBeInstanceOf(File)
+      expect(result.size).toBeGreaterThanOrEqual(0)
+      expect(result.size).toBeLessThanOrEqual(10)
+    })
+
+    test('should handle identical min and max size constraints', () => {
+      const size = 42
+      const schema = z.file().check(z.minSize(size), z.maxSize(size))
+      const result = fake(schema)
+
+      expect(result).toBeInstanceOf(File)
+      expect(result.size).toBe(size)
+    })
+
+    test('should handle content generation for different MIME type categories', () => {
+      const mimeTypeTests = [
+        { mime: 'text/html', category: 'text', shouldContain: ['<html>', '<body>'] },
+        { mime: 'text/css', category: 'text', shouldContain: ['body', 'font-family'] },
+        { mime: 'text/javascript', category: 'text', shouldContain: ['function'] },
+        { mime: 'text/csv', category: 'text', shouldContain: ['name,email'] },
+        { mime: 'text/markdown', category: 'text', shouldContain: ['#'] },
+        { mime: 'text/xml', category: 'text', shouldContain: ['<?xml', '<root>'] },
+        { mime: 'text/yaml', category: 'text', shouldContain: ['name:', 'version:'] },
+        { mime: 'application/json', category: 'application', shouldContain: ['{', '"id"'] },
+        { mime: 'application/xml', category: 'application', shouldContain: ['<?xml', '<data>'] },
+        { mime: 'application/javascript', category: 'application', shouldContain: ['const', 'export'] },
+      ]
+
+      mimeTypeTests.forEach(({ mime, shouldContain }) => {
+        const schema = z.file().check(z.mime([mime]), z.minSize(100))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mime)
+        expect(result.size).toBeGreaterThanOrEqual(100)
+
+        // Read file content to verify it matches expected patterns
+        result.text().then(content => {
+          shouldContain.forEach(pattern => {
+            expect(content).toContain(pattern)
+          })
+        })
+      })
+    })
+
+    test('should handle large file content generation efficiently', () => {
+      // Test file larger than 10MB threshold for efficient generation
+      const largeSize = 15 * 1024 * 1024 // 15MB
+      const schema = z.file().check(z.size(largeSize))
+      const result = fake(schema)
+
+      expect(result).toBeInstanceOf(File)
+      expect(result.size).toBe(largeSize)
+      expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+
+      // Should use efficient large file generation
+      result.text().then(content => {
+        expect(content).toContain('LARGE_FILE_CONTENT_PLACEHOLDER')
+      })
+    })
+
+    test('should handle file extension fallback for complex MIME types', () => {
+      const complexMimeTypes = [
+        'application/vnd.api+json',
+        'text/vnd.graphviz',
+        'application/x-protobuf',
+        'application/vnd.docker.image.rootfs.diff.tar.gzip',
+      ]
+
+      complexMimeTypes.forEach(mimeType => {
+        const schema = z.file().check(z.mime([mimeType]))
+        const result = fake(schema)
+
+        expect(result).toBeInstanceOf(File)
+        expect(result.type).toBe(mimeType)
+        expect(result.name).toMatch(/\.[a-zA-Z0-9]+$/)
+
+        // Should generate reasonable extension from MIME type
+        const extension = result.name.split('.').pop()
+        expect(extension).toBeTruthy()
+        expect(extension!.length).toBeGreaterThan(0)
+        expect(extension!.length).toBeLessThanOrEqual(10)
+      })
+    })
+  })
+
   describe('error handling', () => {
     test('should handle unsupported MIME types gracefully', () => {
       // Test with completely unknown MIME type
