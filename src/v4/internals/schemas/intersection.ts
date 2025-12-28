@@ -609,7 +609,8 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
       const templateConstraints = extractStringConstraints(left)
       const templateMinLength = templateConstraints.min || 1
       const templateMaxLength = templateConstraints.max || 10
-      const templateTargetLength = Math.floor(Math.random() * (templateMaxLength - templateMinLength + 1)) + templateMinLength
+      const templateTargetLength =
+        Math.floor(Math.random() * (templateMaxLength - templateMinLength + 1)) + templateMinLength
 
       let templateResult = 'template'
       if (templateResult.length < templateTargetLength) {

@@ -22,7 +22,7 @@ describe('v4 intersection faker', () => {
       expect(() => {
         const intersectionSchema = z.intersection(stringSchema, numberSchema)
         fake(intersectionSchema)
-      }).toThrow('handleStringIntersection not yet implemented')
+      }).toThrow('Cannot intersect string with number')
 
       // Test that the intersection case is being reached
       const literalA = z.literal('a')
@@ -40,7 +40,7 @@ describe('v4 intersection faker', () => {
       expect(() => {
         const intersectionSchema = z.intersection(objectSchema, anotherObjectSchema)
         fake(intersectionSchema)
-      }).toThrow('handleObjectIntersection not yet implemented')
+      }).toThrow('Intersection with object not yet supported')
     })
   })
 
@@ -429,7 +429,9 @@ describe('v4 intersection faker', () => {
 
       const intersectionSchema = z.intersection(minString, maxString)
 
-      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string constraints - min length (10) is greater than max length (5)')
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect string constraints - min length (10) is greater than max length (5)',
+      )
     })
 
     it('should handle string with compatible literal', () => {
@@ -552,7 +554,7 @@ describe('v4 intersection faker', () => {
         const numberSchema = z.number()
         const intersectionSchema = z.intersection(stringSchema, numberSchema)
         fake(intersectionSchema)
-      }).toThrow('handleStringIntersection not yet implemented')
+      }).toThrow('Cannot intersect string with number')
     })
   })
 })
