@@ -227,6 +227,15 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
 
   // If right is a compatible base type, check if literal values satisfy it
   switch (right._zod.def.type) {
+    case 'enum':
+      // Check if any literal value is in the enum
+      const enumEntries = right._zod.def.entries
+      const enumValues = Object.values(enumEntries)
+      const compatibleLiterals = leftValues.filter((value: any) => enumValues.includes(value))
+      if (compatibleLiterals.length > 0) {
+        return compatibleLiterals[0]
+      }
+      break
     case 'string':
       // Check if any literal value is a string
       const stringValues = leftValues.filter((value: any) => typeof value === 'string')
@@ -362,7 +371,81 @@ function handleConstantIntersection(left: any, right: any, context: Context, roo
 }
 
 function handleEnumIntersection(left: any, right: any, context: Context, rootFake: any): any {
-  throw new Error('handleEnumIntersection not yet implemented')
+  // Handle swapping - if right side is more specific, swap and recurse
+  if (shouldSwap('enum', right._zod.def.type)) {
+    return fakeIntersection(createIntersection(right, left), context, rootFake)
+  }
+
+  // Get the enum values from the left schema (v4 uses entries object)
+  const leftEntries = left._zod.def.entries
+  const leftValues = Object.values(leftEntries)
+
+  // Handle intersection with right schema
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'enum':
+      // Intersect two enums - find common values
+      const rightEntries = right._zod.def.entries
+      const rightValues = Object.values(rightEntries)
+      const commonValues = leftValues.filter((value: any) => rightValues.includes(value))
+
+      if (commonValues.length > 0) {
+        // Return a random value from the common values
+        const randomIndex = Math.floor(Math.random() * commonValues.length)
+        return commonValues[randomIndex]
+      } else {
+        // No common values - impossible intersection
+        throw new TypeError(
+          `Cannot intersect enum values [${leftValues.join(', ')}] with enum values [${rightValues.join(', ')}] - no common values`,
+        )
+      }
+
+    case 'literal':
+      // Check if the literal value is in the enum
+      const literalValues = right._zod.def.values
+      const compatibleValues = literalValues.filter((value: any) => leftValues.includes(value))
+
+      if (compatibleValues.length > 0) {
+        // Return the literal value since it's in the enum
+        return compatibleValues[0]
+      } else {
+        throw new TypeError(
+          `Cannot intersect enum values [${leftValues.join(', ')}] with literal values [${literalValues.join(', ')}] - literal not in enum`,
+        )
+      }
+
+    case 'string':
+      // Enum values are strings, so this should work
+      // Return a random enum value (all enum values are strings)
+      const randomIndex = Math.floor(Math.random() * leftValues.length)
+      return leftValues[randomIndex]
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept any enum value
+      const anyRandomIndex = Math.floor(Math.random() * leftValues.length)
+      return leftValues[anyRandomIndex]
+
+    case 'number':
+    case 'boolean':
+    case 'object':
+    case 'array':
+      // Enum values are strings, so these types are incompatible
+      throw new TypeError(`Cannot intersect enum with ${rightType} - enum values are strings`)
+
+    // For constant types, check if any enum value matches
+    case 'null':
+    case 'undefined':
+    case 'void':
+    case 'nan':
+      // These constants cannot match string enum values
+      throw new TypeError(`Cannot intersect enum with ${rightType} - enum values are strings`)
+
+    default:
+      // For unhandled types, assume incompatible
+      throw new TypeError(`Cannot intersect enum with ${rightType}`)
+  }
 }
 
 function handleTemplateLiteralIntersection(left: any, right: any, context: Context, rootFake: any): any {

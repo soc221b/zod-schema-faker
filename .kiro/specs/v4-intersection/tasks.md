@@ -50,37 +50,17 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [-] 4. Implement constant type handlers (TDD) - Highly Specific
-  - [x] 4.1 Write failing test for nan intersection
-    - Test nan intersection scenarios and compatibility
+- [x] 4. Implement constant type handlers (TDD) - Highly Specific
+  - [x] 4.1 Write failing tests for all constant intersections
+    - Test nan, null, undefined, void intersection scenarios and compatibility
     - _Requirements: 2.2_
 
-  - [ ] 4.2 Implement nan intersection logic
-    - Make the test pass with minimal implementation
-    - _Requirements: 2.2_
-
-  - [ ] 4.3 Write failing test for null intersection
-    - Test null intersection scenarios and compatibility
-    - _Requirements: 2.2_
-
-  - [ ] 4.4 Implement null intersection logic
-    - Make the test pass with minimal implementation
-    - _Requirements: 2.2_
-
-  - [ ] 4.5 Write failing test for undefined intersection
-    - Test undefined intersection scenarios and compatibility
-    - _Requirements: 2.2_
-
-  - [ ] 4.6 Implement undefined intersection logic
-    - Make the test pass with minimal implementation
-    - _Requirements: 2.2_
-
-  - [ ] 4.7 Write failing test for void intersection
-    - Test void intersection scenarios and compatibility
-    - _Requirements: 2.2_
-
-  - [ ] 4.8 Implement void intersection logic
-    - Make the test pass with minimal implementation
+  - [x] 4.2 Implement handleConstantIntersection function
+    - Unified handler for all constant types (nan, null, undefined, void)
+    - Handles same-type intersections (nan & nan → NaN)
+    - Handles compatible intersections (nan & number → NaN)
+    - Throws descriptive errors for incompatible intersections
+    - Includes swapping logic for proper precedence
     - _Requirements: 2.2_
 
 - [ ] 5. Implement enum intersection handler (TDD) - Constrained Type

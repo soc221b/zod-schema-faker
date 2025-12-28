@@ -213,6 +213,100 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('enum intersection handler', () => {
+    it('should handle identical enums by returning a valid enum value', () => {
+      // Same enum should intersect to a value from that enum
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const sameColorEnum = z.enum(['red', 'green', 'blue'])
+
+      const intersectionSchema = z.intersection(colorEnum, sameColorEnum)
+      const result = fake(intersectionSchema)
+
+      // Should return one of the enum values
+      expect(['red', 'green', 'blue']).toContain(result)
+    })
+
+    it('should handle overlapping enums by returning a common value', () => {
+      // Enums with some common values should intersect to a common value
+      const primaryColors = z.enum(['red', 'green', 'blue'])
+      const warmColors = z.enum(['red', 'orange', 'yellow'])
+
+      const intersectionSchema = z.intersection(primaryColors, warmColors)
+      const result = fake(intersectionSchema)
+
+      // Should return 'red' since it's the only common value
+      expect(result).toBe('red')
+    })
+
+    it('should throw error for non-overlapping enums', () => {
+      // Enums with no common values cannot be intersected
+      const primaryColors = z.enum(['red', 'green', 'blue'])
+      const metals = z.enum(['gold', 'silver', 'bronze'])
+
+      const intersectionSchema = z.intersection(primaryColors, metals)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect enum')
+    })
+
+    it('should handle enum with compatible literal', () => {
+      // Enum should work with literal if literal value is in enum
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const redLiteral = z.literal('red')
+
+      const intersectionSchema = z.intersection(colorEnum, redLiteral)
+      const result = fake(intersectionSchema)
+
+      // Should return the literal value since it's in the enum
+      expect(result).toBe('red')
+    })
+
+    it('should throw error for enum with incompatible literal', () => {
+      // Enum with literal not in enum should be impossible
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const yellowLiteral = z.literal('yellow')
+
+      const intersectionSchema = z.intersection(colorEnum, yellowLiteral)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect literal values [yellow] with enum type - types are incompatible',
+      )
+    })
+
+    it('should handle enum with compatible string type', () => {
+      // Enum should work with string type (enum values are strings)
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(colorEnum, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return one of the enum values (which are all strings)
+      expect(['red', 'green', 'blue']).toContain(result)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should throw error for enum with incompatible type', () => {
+      // Enum with number should be impossible (enum values are strings)
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(colorEnum, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect enum')
+    })
+
+    it('should handle numeric enums', () => {
+      // Test with numeric enum values
+      const statusEnum = z.enum(['1', '2', '3']) // Note: Zod enums are always string-based
+      const sameStatusEnum = z.enum(['1', '2', '3'])
+
+      const intersectionSchema = z.intersection(statusEnum, sameStatusEnum)
+      const result = fake(intersectionSchema)
+
+      expect(['1', '2', '3']).toContain(result)
+    })
+  })
+
   describe('basic infrastructure tests', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers
