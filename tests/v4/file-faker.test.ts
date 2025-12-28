@@ -103,6 +103,40 @@ describe('file faker', () => {
 
       expect(result.size).toBe(exactSize)
     })
+
+    test('should throw errors for negative size constraints', () => {
+      // Test negative minimum size should throw
+      expect(() => {
+        const negativeMinSchema = z.file().check(z.minSize(-100))
+        fake(negativeMinSchema)
+      }).toThrow('Invalid file size constraint: minimum size cannot be negative (-100)')
+
+      // Test negative maximum size should throw
+      expect(() => {
+        const negativeMaxSchema = z.file().check(z.maxSize(-50))
+        fake(negativeMaxSchema)
+      }).toThrow('Invalid file size constraint: maximum size cannot be negative (-50)')
+
+      // Test negative exact size should throw
+      expect(() => {
+        const negativeExactSchema = z.file().check(z.size(-25))
+        fake(negativeExactSchema)
+      }).toThrow('Invalid file size constraint: exact size cannot be negative (-25)')
+    })
+
+    test('should throw error for conflicting constraints (min > max)', () => {
+      // When min > max, should throw error
+      expect(() => {
+        const conflictingSchema = z.file().check(z.minSize(1000), z.maxSize(500))
+        fake(conflictingSchema)
+      }).toThrow('Conflicting file size constraints: minimum size (1000) cannot be greater than maximum size (500)')
+    })
+
+    test('should generate zero-size files correctly', () => {
+      const zeroSizeSchema = z.file().check(z.size(0))
+      const result = fake(zeroSizeSchema)
+      expect(result.size).toBe(0)
+    })
   })
 
   describe('MIME type constraints', () => {

@@ -21,15 +21,27 @@ export function fakeFile<T extends core.$ZodFile>(
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
     switch (check._zod.def.check) {
       case 'min_size': {
-        minSize = Math.max(minSize, check._zod.def.minimum)
+        const minimum = check._zod.def.minimum
+        if (minimum < 0) {
+          throw new Error(`Invalid file size constraint: minimum size cannot be negative (${minimum})`)
+        }
+        minSize = Math.max(minSize, minimum)
         break
       }
       case 'max_size': {
-        maxSize = Math.min(maxSize, check._zod.def.maximum)
+        const maximum = check._zod.def.maximum
+        if (maximum < 0) {
+          throw new Error(`Invalid file size constraint: maximum size cannot be negative (${maximum})`)
+        }
+        maxSize = Math.min(maxSize, maximum)
         break
       }
       case 'size_equals': {
-        exactSize = check._zod.def.size
+        const size = check._zod.def.size
+        if (size < 0) {
+          throw new Error(`Invalid file size constraint: exact size cannot be negative (${size})`)
+        }
+        exactSize = size
         break
       }
       case 'mime_type': {
@@ -43,6 +55,13 @@ export function fakeFile<T extends core.$ZodFile>(
         break
       }
     }
+  }
+
+  // Check for conflicting constraints (min > max)
+  if (exactSize === undefined && minSize > maxSize) {
+    throw new Error(
+      `Conflicting file size constraints: minimum size (${minSize}) cannot be greater than maximum size (${maxSize})`,
+    )
   }
 
   // Determine final file size
@@ -161,14 +180,31 @@ function generateFileContent(mimeType: string, targetSize: number): ArrayBuffer 
     content = faker.lorem.paragraphs()
   }
 
-  // Adjust content to match target size
+  // Adjust content to match target size exactly
   if (content.length < targetSize) {
-    // Pad with repeated content to reach target size
-    const padding = faker.lorem.paragraphs().repeat(Math.ceil((targetSize - content.length) / 100))
-    content = content + padding.slice(0, targetSize - content.length)
+    // Pad with repeated content to reach target size exactly
+    const baseContent = content
+    while (content.length < targetSize) {
+      const remaining = targetSize - content.length
+      if (remaining >= baseContent.length) {
+        content += baseContent
+      } else {
+        content += baseContent.slice(0, remaining)
+      }
+    }
   } else if (content.length > targetSize) {
-    // Truncate to target size
+    // Truncate to target size exactly
     content = content.slice(0, targetSize)
+  }
+
+  // Ensure we have exactly the target size
+  if (content.length !== targetSize) {
+    // Fallback: pad with spaces or truncate as needed
+    if (content.length < targetSize) {
+      content = content.padEnd(targetSize, ' ')
+    } else {
+      content = content.slice(0, targetSize)
+    }
   }
 
   // Convert to ArrayBuffer
