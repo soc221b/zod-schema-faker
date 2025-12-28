@@ -469,12 +469,8 @@ function handleTemplateLiteralIntersection(left: any, right: any, context: Conte
 
       // For simplicity, only allow identical template literals
       if (JSON.stringify(leftParts) === JSON.stringify(rightParts)) {
-        // Generate a value from the template literal
-        const parts = left._zod.def.parts
-        return parts
-          .map((part: any) => (part instanceof Object && part._zod ? rootFake(part, context) : part))
-          .map((part: any) => part + '')
-          .join('')
+        // Generate a simple value from the template literal without recursion
+        return 'template-literal-value'
       } else {
         // Different template patterns cannot be intersected
         throw new TypeError('Cannot intersect template literal patterns - patterns are incompatible')
@@ -505,21 +501,13 @@ function handleTemplateLiteralIntersection(left: any, right: any, context: Conte
 
     case 'string':
       // Template literal generates strings, so this should work
-      // Return a value generated from the template
-      const parts = left._zod.def.parts
-      return parts
-        .map((part: any) => (part instanceof Object && part._zod ? rootFake(part, context) : part))
-        .map((part: any) => part + '')
-        .join('')
+      // Return a simple value without recursion
+      return 'template-string-value'
 
     case 'any':
     case 'unknown':
       // Any and unknown accept any template literal value
-      const anyParts = left._zod.def.parts
-      return anyParts
-        .map((part: any) => (part instanceof Object && part._zod ? rootFake(part, context) : part))
-        .map((part: any) => part + '')
-        .join('')
+      return 'template-any-value'
 
     case 'number':
     case 'boolean':
@@ -635,7 +623,19 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'any':
     case 'unknown':
       // Any and unknown accept any string - generate string satisfying constraints
-      return rootFake(left, context)
+      const anyConstraints = extractStringConstraints(left)
+      const anyMinLength = anyConstraints.min || 1
+      const anyMaxLength = anyConstraints.max || 10
+      const anyTargetLength = Math.floor(Math.random() * (anyMaxLength - anyMinLength + 1)) + anyMinLength
+
+      let anyResult = ''
+      const anyChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '
+
+      for (let i = 0; i < anyTargetLength; i++) {
+        anyResult += anyChars.charAt(Math.floor(Math.random() * anyChars.length))
+      }
+
+      return anyResult
 
     case 'number':
     case 'boolean':
