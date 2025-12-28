@@ -35,6 +35,7 @@ import { fakeUndefined } from './schemas/undefined'
 import { fakeUnion } from './schemas/union'
 import { fakeUnknown } from './schemas/unknown'
 import { fakeVoid } from './schemas/void'
+import { fakeIntersection } from './schemas/intersection'
 import { RootFake } from './type'
 
 export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
@@ -65,8 +66,7 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
       // TODO
       break
     case 'intersection':
-      // TODO
-      break
+      return fakeIntersection(schema as any, context, rootFake)
     case 'lazy':
       return fakeLazy(schema as any, context, rootFake)
     case 'literal':

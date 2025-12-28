@@ -21,13 +21,13 @@ The implementation follows this specificity hierarchy (most specific first):
 
 ## Tasks
 
-- [ ] 1. Set up intersection infrastructure
+- [x] 1. Set up intersection infrastructure
   - Create `src/v4/internals/schemas/intersection.ts` file
   - Add intersection case to main `rootFake` switch statement in `src/v4/internals/fake.ts`
   - Define core intersection types and utilities
   - _Requirements: 1.4, 3.3, 3.4_
 
-- [ ] 1.1 Write property test for basic intersection infrastructure
+- [x] 1.1 Write property test for basic intersection infrastructure
   - **Property 1: Intersection data validity**
   - **Validates: Requirements 1.1, 1.2**
 
