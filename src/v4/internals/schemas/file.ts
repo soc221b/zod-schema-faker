@@ -15,7 +15,7 @@ export function fakeFile<T extends core.$ZodFile>(
   let minSize = 0
   let maxSize = 1024 // Default 1KB
   let exactSize: number | undefined = undefined
-  let mimeType = 'text/plain'
+  let allowedMimeTypes: string[] = []
 
   // Process schema checks for constraints
   for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
@@ -45,9 +45,11 @@ export function fakeFile<T extends core.$ZodFile>(
         break
       }
       case 'mime_type': {
-        // Handle MIME type constraint when available
-        // Note: The exact property name for MIME type may vary in Zod v4
-        // For now, we'll skip this until we know the correct API
+        // Extract MIME type constraints from Zod v4 check
+        const mimeCheck = check as any
+        if (mimeCheck._zod?.def?.mime && Array.isArray(mimeCheck._zod.def.mime)) {
+          allowedMimeTypes = [...mimeCheck._zod.def.mime]
+        }
         break
       }
       default: {
@@ -66,6 +68,16 @@ export function fakeFile<T extends core.$ZodFile>(
 
   // Determine final file size
   const fileSize = exactSize !== undefined ? exactSize : faker.number.int({ min: minSize, max: maxSize })
+
+  // Determine MIME type to use
+  let mimeType: string
+  if (allowedMimeTypes.length > 0) {
+    // Randomly select from allowed MIME types
+    mimeType = faker.helpers.arrayElement(allowedMimeTypes)
+  } else {
+    // Use default MIME type
+    mimeType = 'text/plain'
+  }
 
   // Generate appropriate filename with extension based on MIME type
   const extension = getExtensionForMimeType(mimeType)

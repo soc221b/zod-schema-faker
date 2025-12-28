@@ -47,8 +47,8 @@ seamlessly with the existing faker system.
     - Make size constraint tests pass
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 5.1, 5.2_
 
-- [ ] 4. Implement MIME type constraint handling (GREEN phase)
-  - [ ] 4.1 Add MIME type constraint processing
+- [x] 4. Implement MIME type constraint handling (GREEN phase)
+  - [x] 4.1 Add MIME type constraint processing
     - Process mime_type checks from Zod v4
     - Generate appropriate file extensions for MIME types
     - Create realistic content based on MIME type

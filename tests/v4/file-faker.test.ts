@@ -187,11 +187,11 @@ describe('file faker', () => {
         // Test different MIME types
         const randomMimeType = faker.helpers.arrayElement(mimeTypes)
 
-        // For now, we'll test basic file generation since MIME type checks aren't implemented yet
-        const schema = z.file() // .check(z.mimeType(randomMimeType))
+        // Test file generation with MIME type constraints
+        const schema = z.file().check(z.mime([randomMimeType]))
         const result = fake(schema)
 
-        // These assertions will fail initially since there's no implementation
+        // Validate that the generated file has the correct MIME type
         expect(result.type).toBe(randomMimeType)
 
         // Validate appropriate file extension for MIME type
@@ -313,20 +313,20 @@ describe('file faker', () => {
 
     test('should respect MIME type constraint', () => {
       const mimeType = 'text/plain'
-      // For now, let's use a generic check - we'll need to figure out the correct API
-      const schema = z.file() // .check(z.mimeType(mimeType))
+      // Use the z.mime() API to specify allowed MIME types
+      const schema = z.file().check(z.mime([mimeType]))
       const result = fake(schema)
 
-      // This test will fail initially since there's no implementation
+      // Validate that the generated file has the specified MIME type
       expect(result.type).toBe(mimeType)
     })
 
     test('should generate appropriate file extension for MIME type', () => {
-      // For now, let's use a generic check - we'll need to figure out the correct API
-      const schema = z.file() // .check(z.mimeType('image/jpeg'))
+      // Use the z.mime() API to specify MIME type constraint
+      const schema = z.file().check(z.mime(['image/jpeg']))
       const result = fake(schema)
 
-      // This test will fail initially since there's no implementation
+      // Validate that the file has the correct MIME type and extension
       expect(result.type).toBe('image/jpeg')
       expect(result.name).toMatch(/\.(jpg|jpeg)$/i)
     })
