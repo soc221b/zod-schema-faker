@@ -111,12 +111,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Handle numeric constraints and range validation
     - _Requirements: 2.1_
 
-- [ ] 9. Implement bigint intersection handler (TDD) - Primitive
-  - [ ] 9.1 Write failing test for bigint intersection
+- [x] 9. Implement bigint intersection handler (TDD) - Primitive
+  - [x] 9.1 Write failing test for bigint intersection
     - Test bigint constraint merging and validation
     - _Requirements: 2.1_
 
-  - [ ] 9.2 Implement bigint intersection logic
+  - [x] 9.2 Implement bigint intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 

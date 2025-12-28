@@ -674,4 +674,94 @@ describe('v4 intersection faker', () => {
       }).toThrow('Cannot intersect string with number')
     })
   })
+
+  describe('bigint intersection handler', () => {
+    it('should handle identical bigint schemas by returning a valid bigint', () => {
+      // Same bigint schema should intersect to a valid bigint
+      const bigintSchema1 = z.bigint()
+      const bigintSchema2 = z.bigint()
+
+      const intersectionSchema = z.intersection(bigintSchema1, bigintSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('bigint')
+    })
+
+    it('should handle bigint range constraints by merging them', () => {
+      // Bigint with min/max constraints should merge constraints
+      const minBigint = z.bigint().min(5n)
+      const maxBigint = z.bigint().max(10n)
+
+      const intersectionSchema = z.intersection(minBigint, maxBigint)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('bigint')
+      expect(result).toBeGreaterThanOrEqual(5n)
+      expect(result).toBeLessThanOrEqual(10n)
+    })
+
+    it('should throw error for conflicting range constraints', () => {
+      // Conflicting constraints should be impossible
+      const minBigint = z.bigint().min(10n)
+      const maxBigint = z.bigint().max(5n)
+
+      const intersectionSchema = z.intersection(minBigint, maxBigint)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect bigint constraints - min value (10) is greater than max value (5)',
+      )
+    })
+
+    it('should handle bigint with compatible literal', () => {
+      // Bigint should work with bigint literal
+      const bigintSchema = z.bigint()
+      const bigintLiteral = z.literal(42n)
+
+      const intersectionSchema = z.intersection(bigintSchema, bigintLiteral)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe(42n)
+    })
+
+    it('should throw error for bigint with incompatible type', () => {
+      // Bigint with string should be impossible
+      const bigintSchema = z.bigint()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(bigintSchema, stringSchema)
+
+      // Since string and bigint have same specificity, no swapping occurs
+      // The error comes from the bigint handler
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect bigint with string')
+    })
+
+    it('should handle bigint with any/unknown types', () => {
+      // Bigint should work with any/unknown
+      const bigintSchema = z.bigint()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const bigintAnyIntersection = z.intersection(bigintSchema, anySchema)
+      const bigintUnknownIntersection = z.intersection(bigintSchema, unknownSchema)
+
+      const anyResult = fake(bigintAnyIntersection)
+      const unknownResult = fake(bigintUnknownIntersection)
+
+      expect(typeof anyResult).toBe('bigint')
+      expect(typeof unknownResult).toBe('bigint')
+    })
+
+    it('should handle complex bigint constraints', () => {
+      // Test multiple constraints together
+      const constrainedBigint = z.bigint().min(1n).max(100n)
+      const anotherConstrainedBigint = z.bigint().min(50n).max(200n)
+
+      const intersectionSchema = z.intersection(constrainedBigint, anotherConstrainedBigint)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('bigint')
+      expect(result).toBeGreaterThanOrEqual(50n) // max of mins
+      expect(result).toBeLessThanOrEqual(100n) // min of maxes
+    })
+  })
 })

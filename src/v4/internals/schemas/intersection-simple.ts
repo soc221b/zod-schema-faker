@@ -45,6 +45,14 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleStringIntersection(left, right, context, rootFake)
     case 'number':
       return handleNumberIntersection(left, right, context, rootFake)
+    case 'bigint':
+      return handleBigintIntersection(left, right, context, rootFake)
+
+    // Most general types
+    case 'any':
+    case 'unknown':
+      // For any/unknown, just generate fake data for the right schema
+      return rootFake(right, context)
 
     default:
       throw new TypeError(`Intersection with ${left._zod.def.type} not yet supported`)
@@ -62,6 +70,7 @@ function shouldSwap(left: any, right: any): boolean {
     unknown: 1,
     string: 2,
     number: 2,
+    bigint: 2,
     boolean: 2,
     template_literal: 3,
     enum: 4,
@@ -266,6 +275,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
       const numberValues = leftValues.filter((value: any) => typeof value === 'number')
       if (numberValues.length > 0) {
         return numberValues[0]
+      }
+      break
+    case 'bigint':
+      const bigintValues = leftValues.filter((value: any) => typeof value === 'bigint')
+      if (bigintValues.length > 0) {
+        return bigintValues[0]
       }
       break
     case 'enum':
@@ -507,6 +522,45 @@ function validateLiteralAgainstTemplate(literal: string, templateSchema: any): b
   }
 
   return true // Assume it matches if we can't determine otherwise
+}
+
+function handleBigintIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'bigint':
+      // Merge bigint constraints (min/max)
+      return mergeBigintConstraints(left, right, context, rootFake)
+
+    case 'literal':
+      // Check if the literal value is a bigint
+      const literalValues = right._zod.def.values
+      const bigintLiterals = literalValues.filter((value: any) => typeof value === 'bigint')
+
+      if (bigintLiterals.length > 0) {
+        // Check if the bigint literal satisfies left bigint constraints
+        const literalValue = bigintLiterals[0]
+        if (satisfiesBigintConstraints(literalValue, left)) {
+          return literalValue
+        } else {
+          throw new TypeError(
+            `Cannot intersect bigint constraints with literal "${literalValue}" - literal does not satisfy bigint constraints`,
+          )
+        }
+      } else {
+        throw new TypeError(
+          `Cannot intersect bigint with literal values [${literalValues.join(', ')}] - literals are not bigints`,
+        )
+      }
+
+    case 'any':
+    case 'unknown':
+      // Bigint intersected with any/unknown should return a bigint
+      return generateBigintValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect bigint with ${rightType}`)
+  }
 }
 
 function handleNumberIntersection(left: any, right: any, context: Context, rootFake: any): any {
@@ -759,4 +813,82 @@ function getMaxValueFromSchema(schema: any): number {
   }
 
   return Infinity
+}
+function mergeBigintConstraints(left: any, right: any, context: Context, rootFake: any): bigint {
+  // Extract constraints directly from schema properties (v4 structure)
+  const leftMin = left.minValue ?? null
+  const leftMax = left.maxValue ?? null
+  const rightMin = right.minValue ?? null
+  const rightMax = right.maxValue ?? null
+
+  // Convert null to appropriate infinity values for comparison
+  const mergedMin =
+    leftMin !== null && rightMin !== null ? (leftMin > rightMin ? leftMin : rightMin) : (leftMin ?? rightMin ?? 0n) // Default to 0n if both are null
+
+  const mergedMax =
+    leftMax !== null && rightMax !== null ? (leftMax < rightMax ? leftMax : rightMax) : (leftMax ?? rightMax ?? null) // Keep null if either is null (no upper bound)
+
+  // Check for impossible constraints
+  if (mergedMax !== null && mergedMin > mergedMax) {
+    throw new TypeError(
+      `Cannot intersect bigint constraints - min value (${mergedMin}) is greater than max value (${mergedMax})`,
+    )
+  }
+
+  // Generate a bigint within the merged constraints
+  let value: bigint
+  if (mergedMax !== null && mergedMin === mergedMax) {
+    value = mergedMin
+  } else if (mergedMax === null) {
+    // No upper bound, generate a reasonable bigint above min
+    const range = 100n
+    value = mergedMin + BigInt(Math.floor(Math.random() * Number(range)))
+  } else {
+    // Both min and max constraints - ensure both are bigint
+    const minBigint = mergedMin as bigint
+    const maxBigint = mergedMax as bigint
+    const range = maxBigint - minBigint + 1n
+    const randomOffset = BigInt(Math.floor(Math.random() * Number(range)))
+    value = minBigint + randomOffset
+  }
+
+  return value
+}
+
+function satisfiesBigintConstraints(value: bigint, bigintSchema: any): boolean {
+  const minValue = bigintSchema.minValue
+  const maxValue = bigintSchema.maxValue
+
+  // Check range constraints
+  if (minValue !== null && value < minValue) {
+    return false
+  }
+  if (maxValue !== null && value > maxValue) {
+    return false
+  }
+
+  return true
+}
+
+function generateBigintValue(bigintSchema: any, context: Context, rootFake: any): bigint {
+  const minValue = bigintSchema.minValue ?? 0n
+  const maxValue = bigintSchema.maxValue ?? null
+
+  let value: bigint
+  if (maxValue !== null && minValue === maxValue) {
+    value = minValue
+  } else if (maxValue === null) {
+    // No upper bound, generate a reasonable bigint above min
+    const range = 100n
+    value = minValue + BigInt(Math.floor(Math.random() * Number(range)))
+  } else {
+    // Both min and max constraints - ensure both are bigint
+    const minBigint = minValue as bigint
+    const maxBigint = maxValue as bigint
+    const range = maxBigint - minBigint + 1n
+    const randomOffset = BigInt(Math.floor(Math.random() * Number(range)))
+    value = minBigint + randomOffset
+  }
+
+  return value
 }
