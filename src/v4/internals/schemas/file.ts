@@ -96,103 +96,236 @@ export function fakeFile<T extends core.$ZodFile>(
 }
 
 /**
+ * Comprehensive MIME type to file extension mapping system
+ */
+interface MimeTypeMapping {
+  extension: string
+  category: 'text' | 'image' | 'application' | 'audio' | 'video' | 'font' | 'multipart'
+}
+
+/**
+ * Comprehensive MIME type mapping with categories
+ */
+const MIME_TYPE_MAPPINGS: Record<string, MimeTypeMapping> = {
+  // Text types
+  'text/plain': { extension: 'txt', category: 'text' },
+  'text/html': { extension: 'html', category: 'text' },
+  'text/css': { extension: 'css', category: 'text' },
+  'text/javascript': { extension: 'js', category: 'text' },
+  'text/csv': { extension: 'csv', category: 'text' },
+  'text/markdown': { extension: 'md', category: 'text' },
+  'text/xml': { extension: 'xml', category: 'text' },
+  'text/yaml': { extension: 'yaml', category: 'text' },
+
+  // Application types
+  'application/json': { extension: 'json', category: 'application' },
+  'application/xml': { extension: 'xml', category: 'application' },
+  'application/javascript': { extension: 'js', category: 'application' },
+  'application/pdf': { extension: 'pdf', category: 'application' },
+  'application/zip': { extension: 'zip', category: 'application' },
+  'application/octet-stream': { extension: 'bin', category: 'application' },
+  'application/graphql': { extension: 'graphql', category: 'application' },
+  'application/x-www-form-urlencoded': { extension: 'form', category: 'application' },
+  'application/vnd.ms-excel': { extension: 'xls', category: 'application' },
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { extension: 'xlsx', category: 'application' },
+  'application/msword': { extension: 'doc', category: 'application' },
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': {
+    extension: 'docx',
+    category: 'application',
+  },
+  'application/vnd.ms-powerpoint': { extension: 'ppt', category: 'application' },
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': {
+    extension: 'pptx',
+    category: 'application',
+  },
+
+  // Image types
+  'image/jpeg': { extension: 'jpg', category: 'image' },
+  'image/png': { extension: 'png', category: 'image' },
+  'image/gif': { extension: 'gif', category: 'image' },
+  'image/svg+xml': { extension: 'svg', category: 'image' },
+  'image/webp': { extension: 'webp', category: 'image' },
+
+  // Audio types
+  'audio/mpeg': { extension: 'mp3', category: 'audio' },
+  'audio/wav': { extension: 'wav', category: 'audio' },
+  'audio/ogg': { extension: 'ogg', category: 'audio' },
+
+  // Video types
+  'video/mp4': { extension: 'mp4', category: 'video' },
+  'video/webm': { extension: 'webm', category: 'video' },
+  'video/ogg': { extension: 'ogv', category: 'video' },
+
+  // Font types
+  'font/woff': { extension: 'woff', category: 'font' },
+  'font/woff2': { extension: 'woff2', category: 'font' },
+  'font/ttf': { extension: 'ttf', category: 'font' },
+  'font/otf': { extension: 'otf', category: 'font' },
+
+  // Multipart types
+  'multipart/form-data': { extension: 'form', category: 'multipart' },
+}
+
+/**
  * Get appropriate file extension for a given MIME type
  */
 function getExtensionForMimeType(mimeType: string): string {
-  const mimeExtensionMap: Record<string, string> = {
-    'text/plain': 'txt',
-    'text/html': 'html',
-    'text/css': 'css',
-    'text/javascript': 'js',
-    'text/csv': 'csv',
-    'application/json': 'json',
-    'application/xml': 'xml',
-    'application/javascript': 'js',
-    'application/pdf': 'pdf',
-    'application/zip': 'zip',
-    'application/vnd.ms-excel': 'xls',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
-    'application/msword': 'doc',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
-    'application/vnd.ms-powerpoint': 'ppt',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
-    'application/octet-stream': 'bin',
-    'application/graphql': 'graphql',
-    'application/x-www-form-urlencoded': 'form',
-    'image/jpeg': 'jpg',
-    'image/png': 'png',
-    'image/gif': 'gif',
-    'image/svg+xml': 'svg',
-    'image/webp': 'webp',
-    'audio/mpeg': 'mp3',
-    'audio/ogg': 'ogg',
-    'audio/wav': 'wav',
-    'audio/webm': 'webm',
-    'video/mp4': 'mp4',
-    'video/webm': 'webm',
-    'video/ogg': 'ogv',
-    'font/woff': 'woff',
-    'font/woff2': 'woff2',
-    'font/ttf': 'ttf',
-    'font/otf': 'otf',
-    'multipart/form-data': 'form',
+  const mapping = MIME_TYPE_MAPPINGS[mimeType]
+  if (mapping) {
+    return mapping.extension
   }
 
-  return mimeExtensionMap[mimeType] || 'txt'
+  // Fallback: try to extract extension from MIME type pattern
+  const parts = mimeType.split('/')
+  if (parts.length === 2) {
+    const subtype = parts[1]
+    if (subtype.length <= 5 && /^[a-z0-9]+$/.test(subtype)) {
+      return subtype
+    }
+  }
+
+  return 'txt'
+}
+
+/**
+ * Get MIME type category for content generation strategy
+ */
+function getMimeTypeCategory(mimeType: string): MimeTypeMapping['category'] {
+  const mapping = MIME_TYPE_MAPPINGS[mimeType]
+  if (mapping) {
+    return mapping.category
+  }
+
+  // Fallback based on main type
+  const mainType = mimeType.split('/')[0]
+  switch (mainType) {
+    case 'text':
+      return 'text'
+    case 'image':
+      return 'image'
+    case 'audio':
+      return 'audio'
+    case 'video':
+      return 'video'
+    case 'font':
+      return 'font'
+    case 'multipart':
+      return 'multipart'
+    default:
+      return 'application'
+  }
 }
 
 /**
  * Generate file content based on MIME type and target size
  */
 function generateFileContent(mimeType: string, targetSize: number): ArrayBuffer {
-  const faker = getFaker()
-
   if (targetSize === 0) {
     return new ArrayBuffer(0)
   }
 
+  const faker = getFaker()
   let content: string
 
-  // Generate content based on MIME type
-  if (mimeType.startsWith('text/')) {
-    switch (mimeType) {
-      case 'text/html':
-        content = `<!DOCTYPE html><html><head><title>${faker.lorem.words()}</title></head><body><h1>${faker.lorem.sentence()}</h1><p>${faker.lorem.paragraphs()}</p></body></html>`
-        break
-      case 'text/css':
-        content = `body { font-family: Arial, sans-serif; } h1 { color: #333; } p { margin: 10px; }`
-        break
-      case 'text/javascript':
-        content = `function ${faker.hacker.noun()}() { console.log("${faker.lorem.sentence()}"); return "${faker.lorem.word()}"; }`
-        break
-      case 'text/csv':
-        content = `name,email,age\n${faker.person.fullName()},${faker.internet.email()},${faker.number.int({ min: 18, max: 80 })}\n${faker.person.fullName()},${faker.internet.email()},${faker.number.int({ min: 18, max: 80 })}`
-        break
-      default:
-        content = faker.lorem.paragraphs()
-    }
-  } else if (mimeType.startsWith('application/')) {
-    switch (mimeType) {
-      case 'application/json':
-        content = JSON.stringify({
-          id: faker.string.uuid(),
-          name: faker.person.fullName(),
-          email: faker.internet.email(),
-          data: faker.lorem.paragraphs(),
-        })
-        break
-      case 'application/xml':
-        content = `<?xml version="1.0" encoding="UTF-8"?><root><item id="${faker.string.uuid()}"><name>${faker.person.fullName()}</name><content>${faker.lorem.sentence()}</content></item></root>`
-        break
-      default:
-        content = faker.lorem.paragraphs()
-    }
-  } else {
-    // For binary types (image, audio, video, etc.), generate random text content
-    content = faker.lorem.paragraphs()
+  // Generate content based on MIME type category
+  const category = getMimeTypeCategory(mimeType)
+
+  switch (category) {
+    case 'text':
+      content = generateTextContent(mimeType, faker)
+      break
+    case 'application':
+      content = generateApplicationContent(mimeType, faker)
+      break
+    default:
+      content = generateBinaryPlaceholder(mimeType, faker)
+      break
   }
 
   // Adjust content to match target size exactly
+  content = adjustContentSize(content, targetSize)
+
+  // Convert to ArrayBuffer
+  const encoder = new TextEncoder()
+  const encoded = encoder.encode(content)
+
+  // Ensure exact size by padding or truncating at byte level
+  if (encoded.length !== targetSize) {
+    const buffer = new ArrayBuffer(targetSize)
+    const view = new Uint8Array(buffer)
+
+    if (encoded.length < targetSize) {
+      view.set(encoded)
+      // Remaining bytes are already zero-initialized
+    } else {
+      view.set(encoded.slice(0, targetSize))
+    }
+
+    return buffer
+  }
+
+  return encoded.buffer
+}
+
+/**
+ * Generate text content for text/* MIME types
+ */
+function generateTextContent(mimeType: string, faker: any): string {
+  switch (mimeType) {
+    case 'text/html':
+      return `<html><head><title>${faker.lorem.words(2)}</title></head><body><h1>${faker.lorem.words(3)}</h1><p>${faker.lorem.sentence()}</p></body></html>`
+    case 'text/css':
+      return `body { font-family: Arial; color: #333; } h1 { margin: 10px; }`
+    case 'text/javascript':
+      return `function ${faker.hacker.noun().replace(/\s+/g, '')}() { return "${faker.lorem.word()}"; }`
+    case 'text/csv':
+      return `name,email\n${faker.person.fullName()},${faker.internet.email()}`
+    case 'text/markdown':
+      return `# ${faker.lorem.words(2)}\n\n${faker.lorem.sentence()}`
+    case 'text/xml':
+      return `<?xml version="1.0"?><root><item>${faker.lorem.word()}</item></root>`
+    case 'text/yaml':
+      return `name: ${faker.lorem.word()}\nversion: 1.0.0`
+    default:
+      return faker.lorem.paragraphs(2)
+  }
+}
+
+/**
+ * Generate application content for application/* MIME types
+ */
+function generateApplicationContent(mimeType: string, faker: any): string {
+  switch (mimeType) {
+    case 'application/json':
+      return JSON.stringify({
+        id: faker.string.uuid(),
+        name: faker.person.fullName(),
+        email: faker.internet.email(),
+      })
+    case 'application/xml':
+      return `<?xml version="1.0"?><data><user id="${faker.string.uuid()}">${faker.person.fullName()}</user></data>`
+    case 'application/javascript':
+      return `const data = { message: "${faker.lorem.sentence()}" }; export default data;`
+    default:
+      return `Binary file content for ${mimeType}\nGenerated: ${new Date().toISOString()}\nData: ${faker.string.alphanumeric(50)}`
+  }
+}
+
+/**
+ * Generate binary placeholder content
+ */
+function generateBinaryPlaceholder(mimeType: string, faker: any): string {
+  return `${mimeType.toUpperCase()} file placeholder\nGenerated: ${new Date().toISOString()}\nID: ${faker.string.uuid()}\nData: ${faker.string.alphanumeric(100)}`
+}
+
+/**
+ * Adjust content size to match target exactly
+ */
+function adjustContentSize(content: string, targetSize: number): string {
+  if (content.length === targetSize) {
+    return content
+  }
+
   if (content.length < targetSize) {
     // Pad with repeated content to reach target size exactly
     const baseContent = content
@@ -204,22 +337,10 @@ function generateFileContent(mimeType: string, targetSize: number): ArrayBuffer 
         content += baseContent.slice(0, remaining)
       }
     }
-  } else if (content.length > targetSize) {
+  } else {
     // Truncate to target size exactly
     content = content.slice(0, targetSize)
   }
 
-  // Ensure we have exactly the target size
-  if (content.length !== targetSize) {
-    // Fallback: pad with spaces or truncate as needed
-    if (content.length < targetSize) {
-      content = content.padEnd(targetSize, ' ')
-    } else {
-      content = content.slice(0, targetSize)
-    }
-  }
-
-  // Convert to ArrayBuffer
-  const encoder = new TextEncoder()
-  return encoder.encode(content).buffer
+  return content
 }
