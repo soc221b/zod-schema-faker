@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 import { beforeAll, describe, expect, test } from 'vitest'
 import * as z from 'zod/v4'
-import { fake, setFaker } from '../../src/v4'
+import { fake, getFaker, setFaker } from '../../src/v4'
 
 beforeAll(() => {
   setFaker(faker)
@@ -228,6 +228,241 @@ describe('file faker', () => {
         expect(result).toBeInstanceOf(File)
         expect(result.size).toBeGreaterThanOrEqual(0)
       })
+    })
+  })
+
+  describe('architecture integration', () => {
+    // Feature: v4-file, Property 4: Architecture Integration
+    // **Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5**
+    test('Property 4: Architecture Integration - for any file schema processed through v4 faker system, should integrate seamlessly', () => {
+      // Run property test with 100+ iterations
+      for (let i = 0; i < 100; i++) {
+        // Test 1: Function signature pattern consistency with other v4 schema fakers
+        const basicSchema = z.file()
+        const result = fake(basicSchema)
+
+        // Should follow same pattern as other v4 fakers (return type matches schema)
+        expect(result).toBeInstanceOf(File)
+        expect(basicSchema.parse(result)).toBe(result) // Should validate against original schema
+
+        // Test 2: Context and RootFake integration (test nested structures)
+        const nestedSchema = z.object({
+          document: z.file(),
+          metadata: z.object({
+            attachments: z.array(z.file().check(z.mime(['image/jpeg']))),
+            backup: z.file().check(z.size(100)),
+          }),
+        })
+
+        const nestedResult = fake(nestedSchema)
+        expect(nestedResult).toHaveProperty('document')
+        expect(nestedResult.document).toBeInstanceOf(File)
+        expect(nestedResult).toHaveProperty('metadata')
+        expect(nestedResult.metadata).toHaveProperty('attachments')
+        expect(Array.isArray(nestedResult.metadata.attachments)).toBe(true)
+        expect(nestedResult.metadata.attachments.every(file => file instanceof File)).toBe(true)
+        expect(nestedResult.metadata.backup).toBeInstanceOf(File)
+        expect(nestedResult.metadata.backup.size).toBe(100)
+
+        // Test 3: Integration with rootFake switch statement (test through main fake() function)
+        const randomConstraints = []
+
+        // Randomly add size constraints
+        if (faker.datatype.boolean()) {
+          const minSize = faker.number.int({ min: 0, max: 100 })
+          const maxSize = faker.number.int({ min: minSize + 1, max: minSize + 500 })
+          randomConstraints.push(z.minSize(minSize), z.maxSize(maxSize))
+        }
+
+        // Randomly add MIME type constraints
+        if (faker.datatype.boolean()) {
+          const mimeTypes = ['text/plain', 'application/json', 'image/png', 'application/pdf']
+          const selectedMime = faker.helpers.arrayElement(mimeTypes)
+          randomConstraints.push(z.mime([selectedMime]))
+        }
+
+        const constrainedSchema = randomConstraints.length > 0 ? z.file().check(...randomConstraints) : z.file()
+
+        const constrainedResult = fake(constrainedSchema)
+        expect(constrainedResult).toBeInstanceOf(File)
+
+        // Should validate against the constrained schema
+        expect(() => constrainedSchema.parse(constrainedResult)).not.toThrow()
+
+        // Test 4: getFaker() utilities integration
+        // The file faker should use the same faker instance as other parts of the system
+        const currentFaker = getFaker()
+        expect(currentFaker).toBeDefined()
+
+        // Generate multiple files and ensure they use consistent randomization
+        const file1 = fake(z.file())
+        const file2 = fake(z.file())
+
+        // Files should be different (randomized) but both valid
+        expect(file1).toBeInstanceOf(File)
+        expect(file2).toBeInstanceOf(File)
+        expect(file1.name).not.toBe(file2.name) // Should generate different names
+
+        // Test 5: TypeScript type inference integration
+        const typedSchema = z.file().check(z.mime(['application/json']))
+        const typedResult = fake(typedSchema)
+
+        // TypeScript should infer this as File type
+        expect(typedResult).toBeInstanceOf(File)
+        expect(typedResult.type).toBe('application/json')
+
+        // Test with union types containing files
+        const unionSchema = z.union([z.string(), z.file().check(z.mime(['text/plain'])), z.number()])
+
+        const unionResult = fake(unionSchema)
+        // Should be one of the union types
+        expect(typeof unionResult === 'string' || typeof unionResult === 'number' || unionResult instanceof File).toBe(
+          true,
+        )
+
+        // Test 6: Schema parameter handling with appropriate TypeScript types
+        const complexSchema = z.object({
+          files: z.array(z.file().check(z.minSize(10), z.maxSize(1000))),
+          optionalFile: z
+            .file()
+            .check(z.mime(['image/png']))
+            .optional(),
+          defaultFile: z.file().default(() => new File(['default'], 'default.txt', { type: 'text/plain' })),
+        })
+
+        const complexResult = fake(complexSchema)
+        expect(complexResult).toHaveProperty('files')
+        expect(Array.isArray(complexResult.files)).toBe(true)
+        expect(
+          complexResult.files.every(file => {
+            return file instanceof File && file.size >= 10 && file.size <= 1000
+          }),
+        ).toBe(true)
+
+        // optionalFile might be undefined or a File
+        if (complexResult.optionalFile !== undefined) {
+          expect(complexResult.optionalFile).toBeInstanceOf(File)
+          expect(complexResult.optionalFile.type).toBe('image/png')
+        }
+
+        expect(complexResult.defaultFile).toBeInstanceOf(File)
+      }
+    })
+  })
+
+  describe('error resilience', () => {
+    // Feature: v4-file, Property 5: Error Resilience
+    // **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
+    test('Property 5: Error Resilience - for any file schema with invalid or conflicting constraints, should handle gracefully', () => {
+      // Run property test with 100+ iterations
+      for (let i = 0; i < 100; i++) {
+        // Test various error scenarios and edge cases
+
+        // Test 1: Negative size constraints should throw meaningful errors
+        const negativeMin = faker.number.int({ min: -1000, max: -1 })
+        const negativeMax = faker.number.int({ min: -1000, max: -1 })
+        const negativeExact = faker.number.int({ min: -1000, max: -1 })
+
+        expect(() => {
+          const schema = z.file().check(z.minSize(negativeMin))
+          fake(schema)
+        }).toThrow(`Invalid file size constraint: minimum size cannot be negative (${negativeMin})`)
+
+        expect(() => {
+          const schema = z.file().check(z.maxSize(negativeMax))
+          fake(schema)
+        }).toThrow(`Invalid file size constraint: maximum size cannot be negative (${negativeMax})`)
+
+        expect(() => {
+          const schema = z.file().check(z.size(negativeExact))
+          fake(schema)
+        }).toThrow(`Invalid file size constraint: exact size cannot be negative (${negativeExact})`)
+
+        // Test 2: Conflicting size constraints (min > max) should throw errors
+        const minSize = faker.number.int({ min: 100, max: 1000 })
+        const maxSize = faker.number.int({ min: 1, max: minSize - 1 })
+
+        expect(() => {
+          const schema = z.file().check(z.minSize(minSize), z.maxSize(maxSize))
+          fake(schema)
+        }).toThrow(
+          `Conflicting file size constraints: minimum size (${minSize}) cannot be greater than maximum size (${maxSize})`,
+        )
+
+        // Test 3: Unsupported/unknown MIME types should generate reasonable fallbacks
+        const unknownMimeTypes = [
+          'application/unknown-type',
+          'invalid-mime-type',
+          'completely/made-up-type',
+          'x-custom/weird-format',
+          'text/nonexistent-format',
+        ]
+
+        const randomUnknownMime = faker.helpers.arrayElement(unknownMimeTypes)
+        const unknownMimeSchema = z.file().check(z.mime([randomUnknownMime]))
+        const unknownResult = fake(unknownMimeSchema)
+
+        // Should generate a valid File object with fallback behavior
+        expect(unknownResult).toBeInstanceOf(File)
+        expect(unknownResult.type).toBe(randomUnknownMime)
+        expect(unknownResult.name).toMatch(/\.[a-zA-Z0-9]+$/)
+        expect(unknownResult.size).toBeGreaterThanOrEqual(0)
+
+        // Test 4: Empty MIME type arrays should use default fallback
+        const emptyMimeSchema = z.file().check(z.mime([]))
+        const emptyResult = fake(emptyMimeSchema)
+
+        expect(emptyResult).toBeInstanceOf(File)
+        expect(emptyResult.type).toBe('text/plain') // Default fallback
+        expect(emptyResult.name).toMatch(/\.txt$/i)
+
+        // Test 5: Never return null/undefined File objects under any circumstances
+        const edgeCaseSchemas = [
+          z.file(),
+          z.file().check(z.size(0)),
+          z.file().check(z.mime(['unknown/type'])),
+          z.file().check(z.minSize(0), z.maxSize(0)),
+          z.file().check(z.mime(['application/completely-unknown'])),
+        ]
+
+        edgeCaseSchemas.forEach(schema => {
+          const result = fake(schema)
+          expect(result).not.toBeNull()
+          expect(result).not.toBeUndefined()
+          expect(result).toBeInstanceOf(File)
+          expect(result.name).toBeTypeOf('string')
+          expect(result.size).toBeTypeOf('number')
+          expect(result.type).toBeTypeOf('string')
+          expect(result.lastModified).toBeTypeOf('number')
+        })
+
+        // Test 6: Conflicting MIME type constraints should throw errors
+        const allMimeTypes = [
+          'text/plain',
+          'application/json',
+          'image/png',
+          'text/html',
+          'application/xml',
+          'image/jpeg',
+        ]
+        const mimeType1 = faker.helpers.arrayElement(allMimeTypes)
+        let mimeType2 = faker.helpers.arrayElement(allMimeTypes)
+
+        // Ensure we have different MIME types for the conflict test
+        while (mimeType2 === mimeType1) {
+          mimeType2 = faker.helpers.arrayElement(allMimeTypes)
+        }
+
+        expect(() => {
+          const schema = z
+            .file()
+            .check(z.mime([mimeType1]))
+            .check(z.mime([mimeType2]))
+          fake(schema)
+        }).toThrow(
+          `Conflicting MIME type constraints: cannot have both [${mimeType1}] and [${mimeType2}] constraints on the same file`,
+        )
+      }
     })
   })
 
