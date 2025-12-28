@@ -40,11 +40,61 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('never intersection handler', () => {
+    it('should always result in never when left schema is never', () => {
+      // Never intersected with anything should always result in never
+      const neverSchema = z.never()
+      const stringSchema = z.string()
+      const numberSchema = z.number()
+      const objectSchema = z.object({ name: z.string() })
+
+      const testCases = [
+        { right: stringSchema, description: 'never & string' },
+        { right: numberSchema, description: 'never & number' },
+        { right: objectSchema, description: 'never & object' },
+        { right: neverSchema, description: 'never & never' },
+      ]
+
+      testCases.forEach(({ right, description }) => {
+        const intersectionSchema = z.intersection(neverSchema, right)
+
+        // Since never represents an impossible type, any intersection with never
+        // should throw an error indicating the intersection is impossible
+        expect(() => fake(intersectionSchema)).toThrow()
+
+        // The error should be from our never handler, not "not yet implemented"
+        expect(() => fake(intersectionSchema)).not.toThrow('handleNeverIntersection not yet implemented')
+      })
+    })
+
+    it('should handle never on the right side through swapping', () => {
+      // When never is on the right side, it should be swapped to the left
+      // and handled by the never handler
+      const stringSchema = z.string()
+      const neverSchema = z.never()
+
+      const intersectionSchema = z.intersection(stringSchema, neverSchema)
+
+      // This should also result in an impossible intersection
+      expect(() => fake(intersectionSchema)).toThrow()
+
+      // Let's check what error we actually get
+      try {
+        fake(intersectionSchema)
+      } catch (error) {
+        console.log('Actual error:', error.message)
+      }
+
+      // The error should be from the never handler, not the string handler
+      expect(() => fake(intersectionSchema)).toThrow('Cannot generate fake data for intersection with never type - intersection is impossible')
+    })
+  })
+
   describe('basic infrastructure tests', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers
       const testCases = [
-        { left: z.never(), right: z.string(), expectedError: 'handleNeverIntersection not yet implemented' },
+        { left: z.never(), right: z.string(), expectedError: 'Cannot generate fake data for intersection with never type - intersection is impossible' },
         { left: z.literal('test'), right: z.string(), expectedError: 'handleLiteralIntersection not yet implemented' },
         { left: z.nan(), right: z.number(), expectedError: 'handleConstantIntersection not yet implemented' },
         { left: z.null(), right: z.string(), expectedError: 'handleConstantIntersection not yet implemented' },

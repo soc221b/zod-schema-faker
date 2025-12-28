@@ -33,6 +33,10 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
 
     // Primitives
     case 'string':
+      // Check if right side is more specific and should be handled first
+      if (shouldSwap(left._zod.def.type, right._zod.def.type)) {
+        return fakeIntersection(createIntersection(right, left), context, rootFake)
+      }
       return handleStringIntersection(left, right, context, rootFake)
     case 'number':
       return handleNumberIntersection(left, right, context, rootFake)
@@ -105,7 +109,7 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
 
     default:
       // If right schema has more specific handling, swap and recurse
-      if (hasSpecificHandler(right._zod.def.type)) {
+      if (shouldSwap(left._zod.def.type, right._zod.def.type)) {
         return fakeIntersection(
           createIntersection(right, left),
           context,
@@ -119,24 +123,85 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
 
 // Utility functions for intersection handling
 function hasSpecificHandler(type: string): boolean {
-  const specificTypes = [
-    'never', 'literal', 'nan', 'null', 'undefined', 'void',
-    'enum', 'template_literal', 'string', 'number', 'bigint',
-    'boolean', 'date', 'symbol', 'tuple', 'object', 'array',
-    'record', 'map', 'set', 'union', 'lazy', 'pipe'
-  ]
-  return specificTypes.includes(type)
+  return getSpecificity(type) > 0
+}
+
+function getSpecificity(type: string): number {
+  // Higher numbers = more specific (should be handled first)
+  const specificityMap: Record<string, number> = {
+    // Most specific
+    'never': 100,
+
+    // Highly specific
+    'literal': 90,
+    'nan': 85,
+    'null': 85,
+    'undefined': 85,
+    'void': 85,
+
+    // Constrained types
+    'enum': 80,
+    'template_literal': 75,
+
+    // Primitives
+    'string': 70,
+    'number': 70,
+    'bigint': 70,
+    'boolean': 70,
+    'date': 70,
+    'symbol': 70,
+
+    // Collections (tuple most specific)
+    'tuple': 65,
+    'object': 60,
+    'array': 55,
+    'record': 50,
+    'map': 50,
+    'set': 50,
+
+    // Combinators
+    'union': 45,
+    'lazy': 40,
+    'pipe': 40,
+
+    // Wrappers
+    'optional': 35,
+    'nullable': 35,
+    'default': 35,
+    'readonly': 35,
+    'nonoptional': 35,
+    'catch': 35,
+    'prefault': 35,
+
+    // Advanced
+    'function': 30,
+    'promise': 30,
+    'file': 30,
+    'custom': 30,
+
+    // Most general
+    'unknown': 20,
+    'any': 10,
+  }
+
+  return specificityMap[type] || 0
+}
+
+function shouldSwap(leftType: string, rightType: string): boolean {
+  return getSpecificity(rightType) > getSpecificity(leftType)
 }
 
 function createIntersection(left: core.$ZodType, right: core.$ZodType): core.$ZodIntersection {
-  // This would need to use Zod's internal intersection creation
-  // For now, we'll throw an error as this is a placeholder
-  throw new Error('createIntersection not yet implemented')
+  // Create a new intersection schema with swapped left/right
+  // We need to use Zod's intersection method
+  return (left as any).and(right) as core.$ZodIntersection
 }
 
 // Handler function stubs - these will be implemented in subsequent tasks
 function handleNeverIntersection(left: any, right: any, context: Context, rootFake: any): any {
-  throw new Error('handleNeverIntersection not yet implemented')
+  // Never intersected with anything is always impossible
+  // Never represents a type that can never be instantiated
+  throw new TypeError('Cannot generate fake data for intersection with never type - intersection is impossible')
 }
 
 function handleLiteralIntersection(left: any, right: any, context: Context, rootFake: any): any {
