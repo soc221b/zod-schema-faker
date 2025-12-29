@@ -69,6 +69,9 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'map':
       return handleMapIntersection(left, right, context, rootFake)
 
+    case 'set':
+      return handleSetIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
       return handleAnyIntersection(left, right, context, rootFake)
@@ -1639,4 +1642,134 @@ function generateMapValue(mapSchema: any, context: Context, rootFake: any): any 
   }
 
   return result
+}
+function handleSetIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'set':
+      // Merge set constraints (size and element type intersection)
+      return mergeSetConstraints(left, right, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Set intersected with any/unknown should return a set
+      return generateSetValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect set with ${rightType}`)
+  }
+}
+
+function mergeSetConstraints(left: any, right: any, context: Context, rootFake: any): any {
+  const leftDef = left._zod.def
+  const rightDef = right._zod.def
+
+  // Extract size constraints from both sets
+  const leftMin = getSetMinSize(leftDef.checks) ?? 0
+  const leftMax = getSetMaxSize(leftDef.checks) ?? 5 // Default reasonable max
+  const rightMin = getSetMinSize(rightDef.checks) ?? 0
+  const rightMax = getSetMaxSize(rightDef.checks) ?? 5 // Default reasonable max
+
+  // Merge constraints (intersection means both must be satisfied)
+  const mergedMin = Math.max(leftMin, rightMin)
+  const mergedMax = Math.min(leftMax, rightMax)
+
+  // Check for impossible constraints
+  if (mergedMin > mergedMax) {
+    throw new TypeError(
+      `Cannot intersect set constraints - min size (${mergedMin}) is greater than max size (${mergedMax})`,
+    )
+  }
+
+  // Get element types - in v4, it's stored in def.valueType
+  const leftElement = leftDef.valueType
+  const rightElement = rightDef.valueType
+
+  // Create intersection of element types
+  const elementIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: leftElement,
+        right: rightElement,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate set with merged constraints
+  const size = mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
+  const result = new Set()
+
+  // Generate unique values for the set
+  let attempts = 0
+  const maxAttempts = size * 10 // Prevent infinite loops
+
+  while (result.size < size && attempts < maxAttempts) {
+    try {
+      const elementValue = fakeIntersection(elementIntersection, context, rootFake)
+      result.add(elementValue)
+    } catch (error) {
+      // If element intersection fails, throw a more specific error
+      throw new TypeError(`Cannot intersect set element types: ${error.message}`)
+    }
+    attempts++
+  }
+
+  return result
+}
+
+function generateSetValue(setSchema: any, context: Context, rootFake: any): any {
+  const def = setSchema._zod.def
+  const elementType = def.valueType
+
+  // Extract size constraints
+  const minSize = getSetMinSize(def.checks) ?? 0
+  const maxSize = getSetMaxSize(def.checks) ?? 5 // Default reasonable max
+
+  // Generate set size
+  const size = minSize === maxSize ? minSize : Math.floor(Math.random() * (maxSize - minSize + 1)) + minSize
+  const result = new Set()
+
+  // Generate unique values for the set
+  let attempts = 0
+  const maxAttempts = size * 10 // Prevent infinite loops
+
+  while (result.size < size && attempts < maxAttempts) {
+    const elementValue = rootFake(elementType, context)
+    result.add(elementValue)
+    attempts++
+  }
+
+  return result
+}
+
+// Helper functions to extract set size constraints
+function getSetMinSize(checks: any[]): number | undefined {
+  if (!checks || !Array.isArray(checks)) return undefined
+
+  for (const check of checks) {
+    if (check._zod?.def?.check === 'min_size') {
+      return check._zod.def.minimum
+    }
+    if (check._zod?.def?.check === 'size_equals') {
+      return check._zod.def.size
+    }
+  }
+  return undefined
+}
+
+function getSetMaxSize(checks: any[]): number | undefined {
+  if (!checks || !Array.isArray(checks)) return undefined
+
+  for (const check of checks) {
+    if (check._zod?.def?.check === 'max_size') {
+      return check._zod.def.maximum
+    }
+    if (check._zod?.def?.check === 'size_equals') {
+      return check._zod.def.size
+    }
+  }
+  return undefined
 }

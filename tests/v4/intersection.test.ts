@@ -1732,3 +1732,119 @@ describe('v4 intersection faker', () => {
       })
     })
   })
+
+  describe('set intersection handler', () => {
+    it('should handle identical set schemas by returning a valid set', () => {
+      const set1 = z.set(z.string())
+      const set2 = z.set(z.string())
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      result.forEach((value) => {
+        expect(typeof value).toBe('string')
+      })
+    })
+
+    it('should handle set element type intersections', () => {
+      const set1 = z.set(z.string().min(3))
+      const set2 = z.set(z.string().max(10))
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      result.forEach((value) => {
+        expect(typeof value).toBe('string')
+        expect(value.length).toBeGreaterThanOrEqual(3)
+        expect(value.length).toBeLessThanOrEqual(10)
+      })
+    })
+
+    it('should handle set size constraints by merging them', () => {
+      const set1 = z.set(z.string()).min(2).max(5)
+      const set2 = z.set(z.string()).min(3).max(4)
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      expect(result.size).toBeGreaterThanOrEqual(3)
+      expect(result.size).toBeLessThanOrEqual(4)
+      result.forEach((value) => {
+        expect(typeof value).toBe('string')
+      })
+    })
+
+    it('should throw error for conflicting size constraints', () => {
+      const set1 = z.set(z.string()).min(5).max(10)
+      const set2 = z.set(z.string()).min(15).max(20)
+
+      expect(() => {
+        const intersectionSchema = z.intersection(set1, set2)
+        fake(intersectionSchema)
+      }).toThrow('Cannot intersect set constraints')
+    })
+
+    it('should throw error for incompatible element types', () => {
+      const set1 = z.set(z.string())
+      const set2 = z.set(z.number())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(set1, set2)
+        fake(intersectionSchema)
+      }).toThrow()
+    })
+
+    it('should handle set with any/unknown element types', () => {
+      const set1 = z.set(z.string())
+      const set2 = z.set(z.any())
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      result.forEach((value) => {
+        expect(typeof value).toBe('string')
+      })
+    })
+
+    it('should throw error for set with incompatible type', () => {
+      const set1 = z.set(z.string())
+      const array1 = z.array(z.string())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(set1, array1)
+        fake(intersectionSchema)
+      }).toThrow('Cannot intersect set with array')
+    })
+
+    it('should handle nested set intersections', () => {
+      const set1 = z.set(z.set(z.string()))
+      const set2 = z.set(z.set(z.string().min(2)))
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      result.forEach((value) => {
+        expect(value instanceof Set).toBe(true)
+        value.forEach((nestedValue) => {
+          expect(typeof nestedValue).toBe('string')
+          expect(nestedValue.length).toBeGreaterThanOrEqual(2)
+        })
+      })
+    })
+
+    it('should handle empty set constraints', () => {
+      const set1 = z.set(z.string()).size(0)
+      const set2 = z.set(z.string()).max(0)
+
+      const intersectionSchema = z.intersection(set1, set2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Set).toBe(true)
+      expect(result.size).toBe(0)
+    })
+  })
