@@ -994,4 +994,90 @@ describe('v4 intersection faker', () => {
       expect(typeof unknownResult).toBe('symbol')
     })
   })
+
+  describe('Property 2: Constraint merging correctness', () => {
+    it('**Feature: v4-intersection, Property 2: Constraint merging correctness**', () => {
+      // **Validates: Requirements 2.1**
+
+      // Test constraint merging across same-type schema pairs
+      // For any pair of compatible schemas of the same type, intersecting them
+      // should produce data that satisfies the merged constraints from both schemas
+
+      // String constraint merging
+      const stringMin3 = z.string().min(3)
+      const stringMax8 = z.string().max(8)
+      const stringIntersection = z.intersection(stringMin3, stringMax8)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(stringIntersection)
+        expect(typeof result).toBe('string')
+        expect(result.length).toBeGreaterThanOrEqual(3)
+        expect(result.length).toBeLessThanOrEqual(8)
+      }
+
+      // Number constraint merging
+      const numberMin10 = z.number().min(10)
+      const numberMax50 = z.number().max(50)
+      const numberIntersection = z.intersection(numberMin10, numberMax50)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(numberIntersection)
+        expect(typeof result).toBe('number')
+        expect(result).toBeGreaterThanOrEqual(10)
+        expect(result).toBeLessThanOrEqual(50)
+      }
+
+      // Bigint constraint merging
+      const bigintMin5 = z.bigint().min(5n)
+      const bigintMax20 = z.bigint().max(20n)
+      const bigintIntersection = z.intersection(bigintMin5, bigintMax20)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(bigintIntersection)
+        expect(typeof result).toBe('bigint')
+        expect(result).toBeGreaterThanOrEqual(5n)
+        expect(result).toBeLessThanOrEqual(20n)
+      }
+
+      // Date constraint merging
+      const minDate = new Date('2020-01-01')
+      const maxDate = new Date('2025-12-31')
+      const dateMin = z.date().min(minDate)
+      const dateMax = z.date().max(maxDate)
+      const dateIntersection = z.intersection(dateMin, dateMax)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(dateIntersection)
+        expect(result).toBeInstanceOf(Date)
+        expect(result.getTime()).toBeGreaterThanOrEqual(minDate.getTime())
+        expect(result.getTime()).toBeLessThanOrEqual(maxDate.getTime())
+      }
+
+      // Integer constraint merging
+      const integerSchema = z.number().int()
+      const rangeSchema = z.number().min(1).max(10)
+      const integerRangeIntersection = z.intersection(integerSchema, rangeSchema)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(integerRangeIntersection)
+        expect(typeof result).toBe('number')
+        expect(Number.isInteger(result)).toBe(true)
+        expect(result).toBeGreaterThanOrEqual(1)
+        expect(result).toBeLessThanOrEqual(10)
+      }
+
+      // Step constraint merging
+      const stepSchema = z.number().step(0.5)
+      const stepRangeSchema = z.number().min(0).max(5)
+      const stepIntersection = z.intersection(stepSchema, stepRangeSchema)
+
+      for (let i = 0; i < 10; i++) {
+        const result = fake(stepIntersection)
+        expect(typeof result).toBe('number')
+        expect(result % 0.5).toBe(0)
+        expect(result).toBeGreaterThanOrEqual(0)
+        expect(result).toBeLessThanOrEqual(5)
+      }
+    })
+  })
 })

@@ -147,7 +147,7 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 
-- [ ] 13. Write property test for primitive constraint merging
+- [x] 13. Write property test for primitive constraint merging
   - **Property 2: Constraint merging correctness**
   - **Validates: Requirements 2.1**
 
