@@ -57,12 +57,14 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     // Collections (most specific first)
     case 'tuple':
       return handleTupleIntersection(left, right, context, rootFake)
+    case 'object':
+      return handleObjectIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
+      return handleAnyIntersection(left, right, context, rootFake)
     case 'unknown':
-      // For any/unknown, just generate fake data for the right schema
-      return rootFake(right, context)
+      return handleUnknownIntersection(left, right, context, rootFake)
 
     default:
       throw new TypeError(`Intersection with ${left._zod.def.type} not yet supported`)
@@ -86,6 +88,7 @@ function shouldSwap(left: any, right: any): boolean {
     symbol: 2,
     template_literal: 3,
     enum: 4,
+    object: 5, // Collections are more specific than primitives
     tuple: 5, // Collections are more specific than primitives
     nan: 6,
     null: 6,
@@ -1215,4 +1218,118 @@ function generateTupleValue(tupleSchema: any, context: Context, rootFake: any): 
   }
 
   return result
+}
+function handleObjectIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'object':
+      // Merge object constraints (property-wise intersection)
+      return mergeObjectConstraints(left, right, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Object intersected with any/unknown should return an object
+      return generateObjectValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect object with ${rightType}`)
+  }
+}
+
+function mergeObjectConstraints(left: any, right: any, context: Context, rootFake: any): any {
+  const leftShape = left._zod.def.shape || {}
+  const rightShape = right._zod.def.shape || {}
+
+  // Get all property names from both objects
+  const allPropertyNames = new Set([...Object.keys(leftShape), ...Object.keys(rightShape)])
+
+  const result: any = {}
+
+  // Process each property
+  for (const propertyName of allPropertyNames) {
+    const leftProperty = leftShape[propertyName]
+    const rightProperty = rightShape[propertyName]
+
+    if (leftProperty && rightProperty) {
+      // Both objects have this property - intersect the property types
+      const propertyIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: leftProperty,
+            right: rightProperty,
+          },
+        },
+        '"~standard"': {} as any, // Required by Zod v4 type system
+      } as any
+
+      // Generate fake data for the intersected property
+      const propertyValue = fakeIntersection(propertyIntersection, context, rootFake)
+      result[propertyName] = propertyValue
+    } else if (leftProperty) {
+      // Only left object has this property
+      const propertyValue = rootFake(leftProperty, context)
+      result[propertyName] = propertyValue
+    } else if (rightProperty) {
+      // Only right object has this property
+      const propertyValue = rootFake(rightProperty, context)
+      result[propertyName] = propertyValue
+    }
+  }
+
+  return result
+}
+
+function generateObjectValue(objectSchema: any, context: Context, rootFake: any): any {
+  const shape = objectSchema._zod.def.shape || {}
+  const result: any = {}
+
+  // Generate fake data for each property
+  for (const [propertyName, propertySchema] of Object.entries(shape)) {
+    const propertyValue = rootFake(propertySchema, context)
+    result[propertyName] = propertyValue
+  }
+
+  return result
+}
+
+function handleAnyIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'any':
+      // any & any = any, but we need to generate some value
+      // Generate a simple string as a reasonable default
+      return 'any-value'
+
+    case 'unknown':
+      // any & unknown = unknown, but we need to generate some value
+      // Generate a simple string as a reasonable default
+      return 'unknown-value'
+
+    default:
+      // any intersected with specific type should return that type
+      return rootFake(right, context)
+  }
+}
+
+function handleUnknownIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'any':
+      // unknown & any = unknown, but we need to generate some value
+      // Generate a simple string as a reasonable default
+      return 'unknown-value'
+
+    case 'unknown':
+      // unknown & unknown = unknown, but we need to generate some value
+      // Generate a simple string as a reasonable default
+      return 'unknown-value'
+
+    default:
+      // unknown intersected with specific type should return that type
+      return rootFake(right, context)
+  }
 }

@@ -37,10 +37,11 @@ describe('v4 intersection faker', () => {
       const objectSchema = z.object({ name: z.string() })
       const anotherObjectSchema = z.object({ age: z.number() })
 
-      expect(() => {
-        const intersectionSchema = z.intersection(objectSchema, anotherObjectSchema)
-        fake(intersectionSchema)
-      }).toThrow('Intersection with object not yet supported')
+      // Object intersections are now supported, so this should not throw
+      const intersectionSchema = z.intersection(objectSchema, anotherObjectSchema)
+      const result = fake(intersectionSchema)
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
     })
   })
 
@@ -1207,3 +1208,155 @@ describe('v4 intersection faker', () => {
     })
   })
 })
+  describe('object intersection handler', () => {
+    it('should handle identical object schemas by returning a valid object', () => {
+      // Same object schema should intersect to a valid object
+      const objectSchema1 = z.object({ name: z.string(), age: z.number() })
+      const objectSchema2 = z.object({ name: z.string(), age: z.number() })
+
+      const intersectionSchema = z.intersection(objectSchema1, objectSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+    })
+
+    it('should handle object shape merging by combining properties', () => {
+      // Objects with different properties should merge their shapes
+      const object1 = z.object({ name: z.string(), age: z.number() })
+      const object2 = z.object({ email: z.string(), active: z.boolean() })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+      expect(typeof result.email).toBe('string')
+      expect(typeof result.active).toBe('boolean')
+    })
+
+    it('should handle overlapping object properties by intersecting property types', () => {
+      // Objects with same property names should intersect the property types
+      const object1 = z.object({ name: z.string().min(3), count: z.number().min(0) })
+      const object2 = z.object({ name: z.string().max(10), count: z.number().max(100) })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(result.name.length).toBeGreaterThanOrEqual(3)
+      expect(result.name.length).toBeLessThanOrEqual(10)
+      expect(typeof result.count).toBe('number')
+      expect(result.count).toBeGreaterThanOrEqual(0)
+      expect(result.count).toBeLessThanOrEqual(100)
+    })
+
+    it('should throw error for conflicting property types', () => {
+      // Objects with same property names but incompatible types should fail
+      const object1 = z.object({ value: z.string() })
+      const object2 = z.object({ value: z.number() })
+
+      const intersectionSchema = z.intersection(object1, object2)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with number')
+    })
+
+    it('should handle object with compatible literal properties', () => {
+      // Object should work with literal properties that match types
+      const object1 = z.object({ name: z.string(), status: z.string() })
+      const object2 = z.object({ name: z.literal('John'), status: z.literal('active') })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(result.name).toBe('John')
+      expect(result.status).toBe('active')
+    })
+
+    it('should handle object with any/unknown properties', () => {
+      // Object should work with any/unknown property types
+      const object1 = z.object({ name: z.string(), data: z.any() })
+      const object2 = z.object({ name: z.string(), data: z.unknown() })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(result.data).toBeDefined()
+    })
+
+    it('should throw error for object with incompatible type', () => {
+      // Object with non-object should be impossible
+      const objectSchema = z.object({ name: z.string() })
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(objectSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect object with string')
+    })
+
+    it('should handle strict mode objects', () => {
+      // Test strict mode object intersection behavior
+      const object1 = z.object({ name: z.string() }).strict()
+      const object2 = z.object({ age: z.number() }).strict()
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+      // Should only have the defined properties
+      expect(Object.keys(result)).toEqual(expect.arrayContaining(['name', 'age']))
+    })
+
+    it('should handle objects with catchall properties', () => {
+      // Test object intersection with catchall (passthrough) behavior
+      const object1 = z.object({ name: z.string() }).passthrough()
+      const object2 = z.object({ age: z.number() })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+    })
+
+    it('should handle complex nested object intersections', () => {
+      // Test nested object property intersections
+      const object1 = z.object({
+        user: z.object({ name: z.string().min(1) }),
+        settings: z.object({ theme: z.string() })
+      })
+      const object2 = z.object({
+        user: z.object({ name: z.string().max(20) }),
+        settings: z.object({ notifications: z.boolean() })
+      })
+
+      const intersectionSchema = z.intersection(object1, object2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof result.user).toBe('object')
+      expect(typeof result.user.name).toBe('string')
+      expect(result.user.name.length).toBeGreaterThanOrEqual(1)
+      expect(result.user.name.length).toBeLessThanOrEqual(20)
+      expect(typeof result.settings).toBe('object')
+      expect(typeof result.settings.theme).toBe('string')
+      expect(typeof result.settings.notifications).toBe('boolean')
+    })
+  })
