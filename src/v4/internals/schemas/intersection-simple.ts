@@ -54,6 +54,10 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'symbol':
       return handleSymbolIntersection(left, right, context, rootFake)
 
+    // Collections (most specific first)
+    case 'tuple':
+      return handleTupleIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
     case 'unknown':
@@ -82,12 +86,13 @@ function shouldSwap(left: any, right: any): boolean {
     symbol: 2,
     template_literal: 3,
     enum: 4,
-    nan: 5,
-    null: 5,
-    undefined: 5,
-    void: 5,
-    literal: 6,
-    never: 7,
+    tuple: 5, // Collections are more specific than primitives
+    nan: 6,
+    null: 6,
+    undefined: 6,
+    void: 6,
+    literal: 7,
+    never: 8,
   }
 
   const leftSpec = specificity[leftType] ?? 0
@@ -1005,9 +1010,7 @@ function handleSymbolIntersection(left: any, right: any, context: Context, rootF
       if (symbolLiterals.length > 0) {
         return symbolLiterals[0]
       } else {
-        throw new TypeError(
-          `Cannot intersect symbol with literal values - literals are not symbols`,
-        )
+        throw new TypeError(`Cannot intersect symbol with literal values - literals are not symbols`)
       }
 
     case 'any':
@@ -1027,8 +1030,8 @@ function mergeDateConstraints(left: any, right: any, context: Context, rootFake:
   const rightMax = getMaxDateFromChecks(right._zod.def.checks)
 
   // Merge constraints (intersection means both must be satisfied)
-  const mergedMin = leftMin && rightMin ? (leftMin > rightMin ? leftMin : rightMin) : (leftMin || rightMin)
-  const mergedMax = leftMax && rightMax ? (leftMax < rightMax ? leftMax : rightMax) : (leftMax || rightMax)
+  const mergedMin = leftMin && rightMin ? (leftMin > rightMin ? leftMin : rightMin) : leftMin || rightMin
+  const mergedMax = leftMax && rightMax ? (leftMax < rightMax ? leftMax : rightMax) : leftMax || rightMax
 
   // Check for impossible constraints
   if (mergedMin && mergedMax && mergedMin > mergedMax) {
@@ -1050,9 +1053,14 @@ function mergeDateConstraints(left: any, right: any, context: Context, rootFake:
     value = new Date(randomTime)
   } else if (!mergedMin) {
     // Only max constraint
-    const minTime = new Date(mergedMax.getFullYear() - 1, mergedMax.getMonth(), mergedMax.getDate()).getTime()
-    const randomTime = minTime + Math.random() * (mergedMax.getTime() - minTime)
-    value = new Date(randomTime)
+    if (mergedMax) {
+      const minTime = new Date(mergedMax.getFullYear() - 1, mergedMax.getMonth(), mergedMax.getDate()).getTime()
+      const randomTime = minTime + Math.random() * (mergedMax.getTime() - minTime)
+      value = new Date(randomTime)
+    } else {
+      // This shouldn't happen, but fallback to current date
+      value = new Date()
+    }
   } else if (!mergedMax) {
     // Only min constraint
     const maxTime = new Date(mergedMin.getFullYear() + 1, mergedMin.getMonth(), mergedMin.getDate()).getTime()
@@ -1098,9 +1106,14 @@ function generateDateValue(dateSchema: any, context: Context, rootFake: any): Da
     value = new Date(randomTime)
   } else if (!minValue) {
     // Only max constraint
-    const minTime = new Date(maxValue.getFullYear() - 1, maxValue.getMonth(), maxValue.getDate()).getTime()
-    const randomTime = minTime + Math.random() * (maxValue.getTime() - minTime)
-    value = new Date(randomTime)
+    if (maxValue) {
+      const minTime = new Date(maxValue.getFullYear() - 1, maxValue.getMonth(), maxValue.getDate()).getTime()
+      const randomTime = minTime + Math.random() * (maxValue.getTime() - minTime)
+      value = new Date(randomTime)
+    } else {
+      // This shouldn't happen, but fallback to current date
+      value = new Date()
+    }
   } else if (!maxValue) {
     // Only min constraint
     const maxTime = new Date(minValue.getFullYear() + 1, minValue.getMonth(), minValue.getDate()).getTime()
@@ -1127,10 +1140,79 @@ function getMaxDateFromChecks(checks: any[]): Date | undefined {
   return maxCheck?._zod?.def?.value
 }
 function formatLiteralValues(values: any[]): string {
-  return values.map(value => {
-    if (typeof value === 'symbol') {
-      return value.toString()
-    }
-    return String(value)
-  }).join(', ')
+  return values
+    .map(value => {
+      if (typeof value === 'symbol') {
+        return value.toString()
+      }
+      return String(value)
+    })
+    .join(', ')
+}
+
+function handleTupleIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'tuple':
+      // Merge tuple constraints (element-wise intersection)
+      return mergeTupleConstraints(left, right, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Tuple intersected with any/unknown should return a tuple
+      return generateTupleValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect tuple with ${rightType}`)
+  }
+}
+
+function mergeTupleConstraints(left: any, right: any, context: Context, rootFake: any): any[] {
+  const leftElements = left._zod.def.items || []
+  const rightElements = right._zod.def.items || []
+
+  // Check if tuples have the same length
+  if (leftElements.length !== rightElements.length) {
+    throw new TypeError(
+      `Cannot intersect tuples with different lengths - left has ${leftElements.length} elements, right has ${rightElements.length} elements`,
+    )
+  }
+
+  // Generate tuple by intersecting each element pair
+  const result: any[] = []
+  for (let i = 0; i < leftElements.length; i++) {
+    const leftElement = leftElements[i]
+    const rightElement = rightElements[i]
+
+    // Create intersection schema for this element pair
+    const elementIntersection = {
+      _zod: {
+        def: {
+          type: 'intersection' as const,
+          left: leftElement,
+          right: rightElement,
+        },
+      },
+      '"~standard"': {} as any, // Required by Zod v4 type system
+    } as any
+
+    // Generate fake data for the intersected element
+    const elementValue = fakeIntersection(elementIntersection, context, rootFake)
+    result.push(elementValue)
+  }
+
+  return result
+}
+
+function generateTupleValue(tupleSchema: any, context: Context, rootFake: any): any[] {
+  const elements = tupleSchema._zod.def.items || []
+  const result: any[] = []
+
+  for (const element of elements) {
+    const elementValue = rootFake(element, context)
+    result.push(elementValue)
+  }
+
+  return result
 }

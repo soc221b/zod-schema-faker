@@ -151,12 +151,12 @@ The implementation follows this specificity hierarchy (most specific first):
   - **Property 2: Constraint merging correctness**
   - **Validates: Requirements 2.1**
 
-- [ ] 14. Implement tuple intersection handler (TDD) - Collection (Most Specific)
-  - [ ] 14.1 Write failing test for tuple intersection
+- [x] 14. Implement tuple intersection handler (TDD) - Collection (Most Specific)
+  - [x] 14.1 Write failing test for tuple intersection
     - Test tuple element intersections and length compatibility
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 14.2 Implement tuple intersection logic
+  - [x] 14.2 Implement tuple intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 

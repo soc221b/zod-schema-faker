@@ -872,7 +872,8 @@ describe('v4 intersection faker', () => {
     it('should handle date with compatible literal', () => {
       // Date should work with date literal
       const dateSchema = z.date()
-      const dateLiteral = z.literal(new Date('2023-06-15'))
+      const testDate = new Date('2023-06-15')
+      const dateLiteral = z.literal(testDate as any) // Cast needed for v4 literal type constraints
 
       const intersectionSchema = z.intersection(dateSchema, dateLiteral)
       const result = fake(intersectionSchema)
@@ -948,7 +949,7 @@ describe('v4 intersection faker', () => {
       // Symbol should work with symbol literal
       const symbolSchema = z.symbol()
       const testSymbol = Symbol('test')
-      const symbolLiteral = z.literal(testSymbol)
+      const symbolLiteral = z.literal(testSymbol as any) // Cast needed for v4 literal type constraints
 
       const intersectionSchema = z.intersection(symbolSchema, symbolLiteral)
       const result = fake(intersectionSchema)
@@ -1078,6 +1079,131 @@ describe('v4 intersection faker', () => {
         expect(result).toBeGreaterThanOrEqual(0)
         expect(result).toBeLessThanOrEqual(5)
       }
+    })
+  })
+
+  describe('tuple intersection handler', () => {
+    it('should handle identical tuple schemas by returning a valid tuple', () => {
+      // Same tuple schema should intersect to a valid tuple
+      const tupleSchema1 = z.tuple([z.string(), z.number()])
+      const tupleSchema2 = z.tuple([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(tupleSchema1, tupleSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(2)
+      expect(typeof result[0]).toBe('string')
+      expect(typeof result[1]).toBe('number')
+    })
+
+    it('should handle compatible tuple element intersections', () => {
+      // Tuples with compatible element types should intersect element-wise
+      const tuple1 = z.tuple([z.string().min(3), z.number().min(10)])
+      const tuple2 = z.tuple([z.string().max(8), z.number().max(50)])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(2)
+      expect(typeof result[0]).toBe('string')
+      expect(result[0].length).toBeGreaterThanOrEqual(3)
+      expect(result[0].length).toBeLessThanOrEqual(8)
+      expect(typeof result[1]).toBe('number')
+      expect(result[1]).toBeGreaterThanOrEqual(10)
+      expect(result[1]).toBeLessThanOrEqual(50)
+    })
+
+    it('should throw error for tuples with different lengths', () => {
+      // Tuples with different lengths cannot be intersected
+      const tuple1 = z.tuple([z.string(), z.number()])
+      const tuple2 = z.tuple([z.string(), z.number(), z.boolean()])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect tuples with different lengths - left has 2 elements, right has 3 elements',
+      )
+    })
+
+    it('should throw error for tuples with incompatible element types', () => {
+      // Tuples with incompatible element types cannot be intersected
+      const tuple1 = z.tuple([z.string(), z.number()])
+      const tuple2 = z.tuple([z.number(), z.string()])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with number')
+    })
+
+    it('should handle tuple with compatible literal elements', () => {
+      // Tuple should work with literal elements that match types
+      const tuple1 = z.tuple([z.string(), z.number()])
+      const tuple2 = z.tuple([z.literal('hello'), z.literal(42)])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(2)
+      expect(result[0]).toBe('hello')
+      expect(result[1]).toBe(42)
+    })
+
+    it('should handle tuple with any/unknown element types', () => {
+      // Tuple should work with any/unknown element types
+      const tuple1 = z.tuple([z.string(), z.number()])
+      const tuple2 = z.tuple([z.any(), z.unknown()])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(2)
+      expect(typeof result[0]).toBe('string')
+      expect(typeof result[1]).toBe('number')
+    })
+
+    it('should throw error for tuple with incompatible type', () => {
+      // Tuple with non-tuple should be impossible
+      const tupleSchema = z.tuple([z.string(), z.number()])
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(tupleSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect tuple with string')
+    })
+
+    it('should handle empty tuples', () => {
+      // Empty tuples should intersect to empty tuple
+      const emptyTuple1 = z.tuple([])
+      const emptyTuple2 = z.tuple([])
+
+      const intersectionSchema = z.intersection(emptyTuple1, emptyTuple2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(0)
+    })
+
+    it('should handle complex nested tuple intersections', () => {
+      // Test nested tuple element intersections with simpler types for now
+      // Complex object/array intersections will be handled in later tasks
+      const tuple1 = z.tuple([z.string().min(1), z.number().min(0)])
+      const tuple2 = z.tuple([z.string().max(10), z.number().max(100)])
+
+      const intersectionSchema = z.intersection(tuple1, tuple2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toHaveLength(2)
+      expect(typeof result[0]).toBe('string')
+      expect(result[0].length).toBeGreaterThanOrEqual(1)
+      expect(result[0].length).toBeLessThanOrEqual(10)
+      expect(typeof result[1]).toBe('number')
+      expect(result[1]).toBeGreaterThanOrEqual(0)
+      expect(result[1]).toBeLessThanOrEqual(100)
     })
   })
 })
