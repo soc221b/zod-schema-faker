@@ -180,12 +180,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
-- [ ] 17. Implement record intersection handler (TDD) - Collection
-  - [ ] 17.1 Write failing test for record intersection
+- [x] 17. Implement record intersection handler (TDD) - Collection
+  - [x] 17.1 Write failing test for record intersection
     - Test key/value type intersections
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 17.2 Implement record intersection logic
+  - [x] 17.2 Implement record intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
