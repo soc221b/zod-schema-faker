@@ -1587,7 +1587,7 @@ describe('array intersection handler', () => {
     expect(() => {
       const intersectionSchema = z.intersection(array1, array2)
       fake(intersectionSchema)
-    }).toThrow()
+    }).toThrow('Cannot intersect array element types')
   })
 
   it('should handle array with any/unknown element types', () => {
@@ -1610,7 +1610,7 @@ describe('array intersection handler', () => {
     expect(() => {
       const intersectionSchema = z.intersection(array1, object1)
       fake(intersectionSchema)
-    }).toThrow('Cannot intersect object with array')
+    }).toThrow('Cannot intersect array with object')
   })
 
   it('should handle nested array intersections', () => {
@@ -1895,6 +1895,171 @@ describe('map intersection handler', () => {
         expect(nestedValue).toBeGreaterThanOrEqual(0)
       })
     })
+  })
+})
+
+describe('union intersection handler', () => {
+  it('should handle union with compatible type by filtering union options', () => {
+    // Union intersected with compatible type should filter to matching options
+    const unionSchema = z.union([z.string(), z.number(), z.boolean()])
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(unionSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+  })
+
+  it('should handle union with literal by filtering to compatible options', () => {
+    // Union intersected with literal should filter to options that can contain the literal
+    const unionSchema = z.union([z.string(), z.number()])
+    const stringLiteral = z.literal('hello')
+
+    const intersectionSchema = z.intersection(unionSchema, stringLiteral)
+    const result = fake(intersectionSchema)
+
+    expect(result).toBe('hello')
+  })
+
+  it('should handle union with enum by filtering to compatible options', () => {
+    // Union intersected with enum should filter to options that can contain enum values
+    const unionSchema = z.union([z.string(), z.number()])
+    const colorEnum = z.enum(['red', 'green', 'blue'])
+
+    const intersectionSchema = z.intersection(unionSchema, colorEnum)
+    const result = fake(intersectionSchema)
+
+    expect(['red', 'green', 'blue']).toContain(result)
+    expect(typeof result).toBe('string')
+  })
+
+  it('should handle union with another union by finding compatible combinations', () => {
+    // Union intersected with another union should find compatible type combinations
+    const union1 = z.union([z.string(), z.number()])
+    const union2 = z.union([z.string(), z.boolean()])
+
+    const intersectionSchema = z.intersection(union1, union2)
+    const result = fake(intersectionSchema)
+
+    // Should return string since it's the only common type
+    expect(typeof result).toBe('string')
+  })
+
+  it('should throw error for union with no compatible options', () => {
+    // Union with no compatible options should be impossible
+    const unionSchema = z.union([z.string(), z.boolean()])
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(unionSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect number with union - no compatible union options')
+  })
+
+  it('should handle union with any/unknown types', () => {
+    // Union should work with any/unknown by returning one of the union options
+    const unionSchema = z.union([z.string(), z.number()])
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const unionAnyIntersection = z.intersection(unionSchema, anySchema)
+    const unionUnknownIntersection = z.intersection(unionSchema, unknownSchema)
+
+    const anyResult = fake(unionAnyIntersection)
+    const unknownResult = fake(unionUnknownIntersection)
+
+    expect(['string', 'number']).toContain(typeof anyResult)
+    expect(['string', 'number']).toContain(typeof unknownResult)
+  })
+
+  it('should handle union with constrained types by filtering and applying constraints', () => {
+    // Union with constrained types should filter to compatible options and apply constraints
+    const unionSchema = z.union([z.string(), z.number()])
+    const constrainedString = z.string().min(5)
+
+    const intersectionSchema = z.intersection(unionSchema, constrainedString)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('should handle complex union intersections with multiple constraints', () => {
+    // Test complex union filtering with multiple constraint types
+    const complexUnion = z.union([z.string().min(1), z.number().min(0), z.boolean()])
+    const stringConstraint = z.string().max(10)
+
+    const intersectionSchema = z.intersection(complexUnion, stringConstraint)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(1)
+    expect(result.length).toBeLessThanOrEqual(10)
+  })
+
+  it('should handle union with object types by filtering to compatible shapes', () => {
+    // Union with object types should filter to compatible object shapes
+    const unionSchema = z.union([z.object({ name: z.string() }), z.string(), z.number()])
+    const objectSchema = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(unionSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    // The result should be an object with both name and age properties
+    // since only the object option from the union is compatible
+    expect(result).toHaveProperty('name')
+    expect(result).toHaveProperty('age')
+    expect(typeof (result as any).name).toBe('string')
+    expect(typeof (result as any).age).toBe('number')
+  })
+
+  it('should handle union with array types by filtering to compatible element types', () => {
+    // Union with array types should filter to compatible array element types
+    const unionSchema = z.union([z.array(z.string()), z.string(), z.number()])
+    const arraySchema = z.array(z.string().min(3))
+
+    const intersectionSchema = z.intersection(unionSchema, arraySchema)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+      expect(item.length).toBeGreaterThanOrEqual(3)
+    })
+  })
+
+  it('should handle nested union intersections', () => {
+    // Test nested union structures with intersections
+    const nestedUnion1 = z.union([z.union([z.string(), z.number()]), z.boolean()])
+    const nestedUnion2 = z.union([z.string(), z.union([z.number(), z.date()])])
+
+    const intersectionSchema = z.intersection(nestedUnion1, nestedUnion2)
+    const result = fake(intersectionSchema)
+
+    // Should return string or number (the common types)
+    expect(['string', 'number']).toContain(typeof result)
+  })
+
+  it('should handle union with never type by filtering out never', () => {
+    // Union containing never should filter out the never option
+    const unionSchema = z.union([z.string(), z.never()])
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(unionSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+  })
+
+  it('should throw error when all union options are filtered out', () => {
+    // When all union options are incompatible, should throw error
+    const unionSchema = z.union([z.string(), z.boolean()])
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(unionSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect number with union - no compatible union options')
   })
 })
 

@@ -211,16 +211,16 @@ The implementation follows this specificity hierarchy (most specific first):
   - **Property 4: Recursive intersection resolution**
   - **Validates: Requirements 2.4**
 
-- [ ] 21. Checkpoint - Ensure core functionality works
+- [x] 21. Checkpoint - Ensure core functionality works
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 22. Implement union intersection handler (TDD) - Combinator
-  - [ ] 22.1 Write failing test for union intersection
+- [x] 22. Implement union intersection handler (TDD) - Combinator
+  - [x] 22.1 Write failing test for union intersection
     - Test union option filtering for compatibility
     - Test union + any type intersections
     - _Requirements: 2.2, 2.4_
 
-  - [ ] 22.2 Implement union intersection logic
+  - [x] 22.2 Implement union intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2, 2.4_
 

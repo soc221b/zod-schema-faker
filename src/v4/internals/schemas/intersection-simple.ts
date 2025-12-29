@@ -72,6 +72,10 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'set':
       return handleSetIntersection(left, right, context, rootFake)
 
+    // Combinators
+    case 'union':
+      return handleUnionIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
       return handleAnyIntersection(left, right, context, rootFake)
@@ -92,22 +96,27 @@ function shouldSwap(left: any, right: any): boolean {
   const specificity: Record<string, number> = {
     any: 0,
     unknown: 1,
-    string: 2,
-    number: 2,
-    bigint: 2,
-    boolean: 2,
-    date: 2,
-    symbol: 2,
-    template_literal: 3,
-    enum: 4,
-    object: 5, // Collections are more specific than primitives
-    tuple: 5, // Collections are more specific than primitives
-    nan: 6,
-    null: 6,
-    undefined: 6,
-    void: 6,
-    literal: 7,
-    never: 8,
+    union: 2, // Combinators are less specific than primitives but more than any/unknown
+    string: 3,
+    number: 3,
+    bigint: 3,
+    boolean: 3,
+    date: 3,
+    symbol: 3,
+    template_literal: 4,
+    enum: 5,
+    object: 6, // Collections are more specific than primitives
+    tuple: 6, // Collections are more specific than primitives
+    array: 6,
+    record: 6,
+    map: 6,
+    set: 6,
+    nan: 7,
+    null: 7,
+    undefined: 7,
+    void: 7,
+    literal: 8,
+    never: 9,
   }
 
   const leftSpec = specificity[leftType] ?? 0
@@ -161,6 +170,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'unknown':
       // String intersected with any/unknown should return a string
       return generateStringValue(left, context, rootFake)
+
+    case 'union':
+      // String intersected with union should filter union to string-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -365,6 +378,10 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     case 'any':
     case 'unknown':
       return leftValues[0]
+
+    case 'union':
+      // Literal intersected with union should filter union to literal-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
   }
 
   throw new TypeError(
@@ -459,6 +476,10 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
     case 'unknown':
       const anyRandomIndex = Math.floor(Math.random() * leftValues.length)
       return leftValues[anyRandomIndex]
+
+    case 'union':
+      // Enum intersected with union should filter union to enum-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect enum with ${rightType}`)
@@ -642,6 +663,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'unknown':
       // Number intersected with any/unknown should return a number
       return generateNumberValue(left, context, rootFake)
+
+    case 'union':
+      // Number intersected with union should filter union to number-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1244,6 +1269,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with any/unknown should return an object
       return generateObjectValue(left, context, rootFake)
 
+    case 'union':
+      // Object intersected with union should filter union to object-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1358,6 +1387,10 @@ function handleArrayIntersection(left: any, right: any, context: Context, rootFa
       // Array intersected with any/unknown should return an array
       return generateArrayValue(left, context, rootFake)
 
+    case 'union':
+      // Array intersected with union should filter union to array-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect array with ${rightType}`)
   }
@@ -1411,7 +1444,9 @@ function mergeArrayConstraints(left: any, right: any, context: Context, rootFake
       result.push(elementValue)
     } catch (error) {
       // If element intersection fails, throw a more specific error
-      throw new TypeError(`Cannot intersect array element types: ${error instanceof Error ? error.message : String(error)}`)
+      throw new TypeError(
+        `Cannot intersect array element types: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
   }
 
@@ -1722,7 +1757,9 @@ function mergeSetConstraints(left: any, right: any, context: Context, rootFake: 
       result.add(elementValue)
     } catch (error) {
       // If we get here, something went wrong after the initial test
-      throw new TypeError(`Cannot intersect set element types: ${error instanceof Error ? error.message : String(error)}`)
+      throw new TypeError(
+        `Cannot intersect set element types: ${error instanceof Error ? error.message : String(error)}`,
+      )
     }
     attempts++
   }
@@ -1768,6 +1805,117 @@ function getSetMinSize(checks: any[]): number | undefined {
     }
   }
   return undefined
+}
+
+function handleUnionIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const leftOptions = left._zod.def.options || []
+  const rightType = right._zod.def.type
+
+  // Filter union options to find those compatible with the right schema
+  const compatibleOptions: any[] = []
+
+  for (const option of leftOptions) {
+    try {
+      // Test if this union option can be intersected with the right schema
+      const testIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: option,
+            right: right,
+          },
+        },
+        '"~standard"': {} as any, // Required by Zod v4 type system
+      } as any
+
+      // Try to generate fake data to see if intersection is possible
+      const testResult = fakeIntersection(testIntersection, context, rootFake)
+
+      // If we get here without throwing, this option is compatible
+      compatibleOptions.push(option)
+    } catch (error) {
+      // This option is not compatible, skip it
+      continue
+    }
+  }
+
+  // Check if we found any compatible options
+  if (compatibleOptions.length === 0) {
+    throw new TypeError(`Cannot intersect union with ${rightType} - no compatible union options`)
+  }
+
+  // Pick a random compatible option and intersect it with the right schema
+  const randomIndex = Math.floor(Math.random() * compatibleOptions.length)
+  const selectedOption = compatibleOptions[randomIndex]
+
+  // Create the final intersection with the selected option
+  const finalIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: selectedOption,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(finalIntersection, context, rootFake)
+}
+
+function handleUnionWithSpecificType(unionSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a union
+  // We need to filter the union options to find those compatible with the specific type
+  const unionOptions = unionSchema._zod.def.options || []
+  const compatibleOptions: any[] = []
+
+  for (const option of unionOptions) {
+    try {
+      // Test if the specific schema can be intersected with this union option
+      const testIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: specificSchema,
+            right: option,
+          },
+        },
+        '"~standard"': {} as any, // Required by Zod v4 type system
+      } as any
+
+      // Try to generate fake data to see if intersection is possible
+      const testResult = fakeIntersection(testIntersection, context, rootFake)
+
+      // If we get here without throwing, this option is compatible
+      compatibleOptions.push(option)
+    } catch (error) {
+      // This option is not compatible, skip it
+      continue
+    }
+  }
+
+  // Check if we found any compatible options
+  if (compatibleOptions.length === 0) {
+    throw new TypeError(`Cannot intersect ${specificSchema._zod.def.type} with union - no compatible union options`)
+  }
+
+  // Pick a random compatible option and intersect the specific schema with it
+  const randomIndex = Math.floor(Math.random() * compatibleOptions.length)
+  const selectedOption = compatibleOptions[randomIndex]
+
+  // Create the final intersection with the selected option
+  const finalIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: selectedOption,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(finalIntersection, context, rootFake)
 }
 
 function getSetMaxSize(checks: any[]): number | undefined {
