@@ -2063,6 +2063,163 @@ describe('union intersection handler', () => {
   })
 })
 
+describe('lazy intersection handler', () => {
+  it('should handle lazy with compatible type by resolving deferred schema', () => {
+    // Lazy intersected with compatible type should resolve the lazy schema first
+    const lazyStringSchema = z.lazy(() => z.string())
+    const stringSchema = z.string().min(5)
+
+    const intersectionSchema = z.intersection(lazyStringSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('should handle lazy with literal by resolving and checking compatibility', () => {
+    // Lazy intersected with literal should resolve lazy schema and check compatibility
+    const lazyStringSchema = z.lazy(() => z.string())
+    const stringLiteral = z.literal('hello')
+
+    const intersectionSchema = z.intersection(lazyStringSchema, stringLiteral)
+    const result = fake(intersectionSchema)
+
+    expect(result).toBe('hello')
+  })
+
+  it('should handle lazy with another lazy by resolving both schemas', () => {
+    // Lazy intersected with another lazy should resolve both schemas
+    const lazyString1 = z.lazy(() => z.string().min(3))
+    const lazyString2 = z.lazy(() => z.string().max(10))
+
+    const intersectionSchema = z.intersection(lazyString1, lazyString2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(3)
+    expect(result.length).toBeLessThanOrEqual(10)
+  })
+
+  it('should throw error for lazy with incompatible type', () => {
+    // Lazy with incompatible type should throw error after resolution
+    const lazyStringSchema = z.lazy(() => z.string())
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(lazyStringSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow(/Cannot intersect (string with number|number with string)/)
+  })
+
+  it('should handle lazy with any/unknown types', () => {
+    // Lazy should work with any/unknown by resolving the lazy schema
+    const lazyNumberSchema = z.lazy(() => z.number())
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const lazyAnyIntersection = z.intersection(lazyNumberSchema, anySchema)
+    const lazyUnknownIntersection = z.intersection(lazyNumberSchema, unknownSchema)
+
+    const anyResult = fake(lazyAnyIntersection)
+    const unknownResult = fake(lazyUnknownIntersection)
+
+    expect(typeof anyResult).toBe('number')
+    expect(typeof unknownResult).toBe('number')
+  })
+
+  it('should handle recursive lazy schemas', () => {
+    // Test recursive lazy schema intersection
+    type Node = {
+      value: string
+      children?: Node[]
+    }
+
+    const nodeSchema: z.ZodType<Node> = z.lazy(() =>
+      z.object({
+        value: z.string(),
+        children: z.array(nodeSchema).optional(),
+      }),
+    )
+
+    const constraintSchema = z.object({
+      value: z.string().min(3),
+    })
+
+    const intersectionSchema = z.intersection(nodeSchema, constraintSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.value).toBe('string')
+    expect(result.value.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('should handle lazy with object types by resolving and merging shapes', () => {
+    // Lazy object intersected with another object should merge shapes
+    const lazyObjectSchema = z.lazy(() => z.object({ name: z.string() }))
+    const objectSchema = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(lazyObjectSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof (result as any).name).toBe('string')
+    expect(typeof (result as any).age).toBe('number')
+  })
+
+  it('should handle lazy with array types by resolving and merging constraints', () => {
+    // Lazy array intersected with another array should merge constraints
+    const lazyArraySchema = z.lazy(() => z.array(z.string()))
+    const arraySchema = z.array(z.string().min(2))
+
+    const intersectionSchema = z.intersection(lazyArraySchema, arraySchema)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+      expect(item.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  it('should handle complex nested lazy intersections', () => {
+    // Test complex nested lazy structures
+    const lazyComplexSchema = z.lazy(() =>
+      z.object({
+        data: z.array(z.object({ id: z.string() })),
+      }),
+    )
+
+    const constraintSchema = z.object({
+      data: z.array(z.object({ id: z.string().min(5) })),
+    })
+
+    const intersectionSchema = z.intersection(lazyComplexSchema, constraintSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(Array.isArray((result as any).data)).toBe(true)
+    ;(result as any).data.forEach((item: any) => {
+      expect(typeof item).toBe('object')
+      expect(typeof item.id).toBe('string')
+      expect(item.id.length).toBeGreaterThanOrEqual(5)
+    })
+  })
+
+  it('should handle lazy schema resolution errors gracefully', () => {
+    // Test error handling when lazy schema resolution fails
+    const problematicLazySchema = z.lazy(() => {
+      throw new Error('Lazy schema resolution failed')
+    })
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(problematicLazySchema, stringSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Lazy schema resolution failed')
+  })
+})
+
 describe('set intersection handler', () => {
   it('should handle identical set schemas by returning a valid set', () => {
     const set1 = z.set(z.string())

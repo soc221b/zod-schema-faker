@@ -75,6 +75,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     // Combinators
     case 'union':
       return handleUnionIntersection(left, right, context, rootFake)
+    case 'lazy':
+      return handleLazyIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -96,6 +98,7 @@ function shouldSwap(left: any, right: any): boolean {
   const specificity: Record<string, number> = {
     any: 0,
     unknown: 1,
+    lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
     union: 2, // Combinators are less specific than primitives but more than any/unknown
     string: 3,
     number: 3,
@@ -174,6 +177,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'union':
       // String intersected with union should filter union to string-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // String intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -382,6 +389,10 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     case 'union':
       // Literal intersected with union should filter union to literal-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // Literal intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
   }
 
   throw new TypeError(
@@ -480,6 +491,10 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
     case 'union':
       // Enum intersected with union should filter union to enum-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // Enum intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect enum with ${rightType}`)
@@ -667,6 +682,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'union':
       // Number intersected with union should filter union to number-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // Number intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1273,6 +1292,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with union should filter union to object-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
 
+    case 'lazy':
+      // Object intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1390,6 +1413,10 @@ function handleArrayIntersection(left: any, right: any, context: Context, rootFa
     case 'union':
       // Array intersected with union should filter union to array-compatible options
       return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // Array intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect array with ${rightType}`)
@@ -1863,6 +1890,31 @@ function handleUnionIntersection(left: any, right: any, context: Context, rootFa
   return fakeIntersection(finalIntersection, context, rootFake)
 }
 
+function handleLazyIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // Resolve the lazy schema first
+  let resolvedLazySchema: any
+  try {
+    resolvedLazySchema = left._zod.def.getter()
+  } catch (error) {
+    // Re-throw lazy schema resolution errors
+    throw error
+  }
+
+  // Create intersection with the resolved lazy schema
+  const resolvedIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: resolvedLazySchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(resolvedIntersection, context, rootFake)
+}
+
 function handleUnionWithSpecificType(unionSchema: any, specificSchema: any, context: Context, rootFake: any): any {
   // This is the reverse case where a specific type is intersected with a union
   // We need to filter the union options to find those compatible with the specific type
@@ -1930,4 +1982,32 @@ function getSetMaxSize(checks: any[]): number | undefined {
     }
   }
   return undefined
+}
+
+function handleLazyWithSpecificType(lazySchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a lazy
+  // We need to resolve the lazy schema first, then intersect with the specific type
+
+  // Resolve the lazy schema first
+  let resolvedLazySchema: any
+  try {
+    resolvedLazySchema = lazySchema._zod.def.getter()
+  } catch (error) {
+    // Re-throw lazy schema resolution errors
+    throw error
+  }
+
+  // Create intersection with the specific schema and resolved lazy schema
+  const resolvedIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: resolvedLazySchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(resolvedIntersection, context, rootFake)
 }

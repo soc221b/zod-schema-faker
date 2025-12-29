@@ -224,12 +224,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2, 2.4_
 
-- [ ] 23. Implement lazy intersection handler (TDD) - Combinator
-  - [ ] 23.1 Write failing test for lazy intersection
+- [x] 23. Implement lazy intersection handler (TDD) - Combinator
+  - [x] 23.1 Write failing test for lazy intersection
     - Test deferred schema resolution for lazy types
     - _Requirements: 2.4, 3.2_
 
-  - [ ] 23.2 Implement lazy intersection logic
+  - [x] 23.2 Implement lazy intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.4, 3.2_
 
