@@ -51,6 +51,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleBooleanIntersection(left, right, context, rootFake)
     case 'date':
       return handleDateIntersection(left, right, context, rootFake)
+    case 'symbol':
+      return handleSymbolIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -77,6 +79,7 @@ function shouldSwap(left: any, right: any): boolean {
     bigint: 2,
     boolean: 2,
     date: 2,
+    symbol: 2,
     template_literal: 3,
     enum: 4,
     nan: 5,
@@ -119,7 +122,7 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
         }
       } else {
         throw new TypeError(
-          `Cannot intersect string with literal values [${literalValues.join(', ')}] - literals are not strings`,
+          `Cannot intersect string with literal values [${formatLiteralValues(literalValues)}] - literals are not strings`,
         )
       }
 
@@ -263,7 +266,7 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     } else {
       // No common values - impossible intersection
       throw new TypeError(
-        `Cannot intersect literal values [${leftValues.join(', ')}] with literal values [${rightValues.join(', ')}] - no common values`,
+        `Cannot intersect literal values [${formatLiteralValues(leftValues)}] with literal values [${formatLiteralValues(rightValues)}] - no common values`,
       )
     }
   }
@@ -300,6 +303,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
         return dateValues[0]
       }
       break
+    case 'symbol':
+      const symbolValues = leftValues.filter((value: any) => typeof value === 'symbol')
+      if (symbolValues.length > 0) {
+        return symbolValues[0]
+      }
+      break
     case 'enum':
       // Check if any literal values are in the enum
       const enumEntries = right._zod.def.entries
@@ -310,7 +319,7 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
         return compatibleValues[0]
       } else {
         throw new TypeError(
-          `Cannot intersect literal values [${leftValues.join(', ')}] with enum type - types are incompatible`,
+          `Cannot intersect literal values [${formatLiteralValues(leftValues)}] with enum type - types are incompatible`,
         )
       }
     case 'template_literal':
@@ -325,12 +334,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
           return literalValue
         } else {
           throw new TypeError(
-            `Cannot intersect literal values [${leftValues.join(', ')}] with template_literal - literal does not match template pattern`,
+            `Cannot intersect literal values [${formatLiteralValues(leftValues)}] with template_literal - literal does not match template pattern`,
           )
         }
       } else {
         throw new TypeError(
-          `Cannot intersect literal values [${leftValues.join(', ')}] with template_literal type - types are incompatible`,
+          `Cannot intersect literal values [${formatLiteralValues(leftValues)}] with template_literal type - types are incompatible`,
         )
       }
     case 'any':
@@ -339,7 +348,7 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
   }
 
   throw new TypeError(
-    `Cannot intersect literal values [${leftValues.join(', ')}] with ${right._zod.def.type} type - types are incompatible`,
+    `Cannot intersect literal values [${formatLiteralValues(leftValues)}] with ${right._zod.def.type} type - types are incompatible`,
   )
 }
 
@@ -405,7 +414,7 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
         return commonValues[randomIndex]
       } else {
         throw new TypeError(
-          `Cannot intersect enum values [${leftValues.join(', ')}] with enum values [${rightValues.join(', ')}] - no common values`,
+          `Cannot intersect enum values [${formatLiteralValues(leftValues)}] with enum values [${formatLiteralValues(rightValues)}] - no common values`,
         )
       }
 
@@ -418,7 +427,7 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
         return compatibleLiterals[0]
       } else {
         throw new TypeError(
-          `Cannot intersect enum values [${leftValues.join(', ')}] with literal values [${literalValues.join(', ')}] - no common values`,
+          `Cannot intersect enum values [${formatLiteralValues(leftValues)}] with literal values [${formatLiteralValues(literalValues)}] - no common values`,
         )
       }
 
@@ -466,12 +475,12 @@ function handleTemplateLiteralIntersection(left: any, right: any, context: Conte
           return literalValue
         } else {
           throw new TypeError(
-            `Cannot intersect literal values [${literalValues.join(', ')}] with template_literal - literal does not match template pattern`,
+            `Cannot intersect literal values [${formatLiteralValues(literalValues)}] with template_literal - literal does not match template pattern`,
           )
         }
       } else {
         throw new TypeError(
-          `Cannot intersect template literal with literal values [${literalValues.join(', ')}] - literals are not strings`,
+          `Cannot intersect template literal with literal values [${formatLiteralValues(literalValues)}] - literals are not strings`,
         )
       }
 
@@ -566,7 +575,7 @@ function handleBigintIntersection(left: any, right: any, context: Context, rootF
         }
       } else {
         throw new TypeError(
-          `Cannot intersect bigint with literal values [${literalValues.join(', ')}] - literals are not bigints`,
+          `Cannot intersect bigint with literal values [${formatLiteralValues(literalValues)}] - literals are not bigints`,
         )
       }
 
@@ -605,7 +614,7 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
         }
       } else {
         throw new TypeError(
-          `Cannot intersect number with literal values [${literalValues.join(', ')}] - literals are not numbers`,
+          `Cannot intersect number with literal values [${formatLiteralValues(literalValues)}] - literals are not numbers`,
         )
       }
 
@@ -927,7 +936,7 @@ function handleBooleanIntersection(left: any, right: any, context: Context, root
         return booleanLiterals[0]
       } else {
         throw new TypeError(
-          `Cannot intersect boolean with literal values [${literalValues.join(', ')}] - literals are not booleans`,
+          `Cannot intersect boolean with literal values [${formatLiteralValues(literalValues)}] - literals are not booleans`,
         )
       }
 
@@ -966,7 +975,7 @@ function handleDateIntersection(left: any, right: any, context: Context, rootFak
         }
       } else {
         throw new TypeError(
-          `Cannot intersect date with literal values [${literalValues.join(', ')}] - literals are not dates`,
+          `Cannot intersect date with literal values [${formatLiteralValues(literalValues)}] - literals are not dates`,
         )
       }
 
@@ -977,6 +986,37 @@ function handleDateIntersection(left: any, right: any, context: Context, rootFak
 
     default:
       throw new TypeError(`Cannot intersect date with ${rightType}`)
+  }
+}
+
+function handleSymbolIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'symbol':
+      // Symbol intersected with symbol should return a symbol
+      return Symbol('generated')
+
+    case 'literal':
+      // Check if the literal value is a symbol
+      const literalValues = right._zod.def.values
+      const symbolLiterals = literalValues.filter((value: any) => typeof value === 'symbol')
+
+      if (symbolLiterals.length > 0) {
+        return symbolLiterals[0]
+      } else {
+        throw new TypeError(
+          `Cannot intersect symbol with literal values - literals are not symbols`,
+        )
+      }
+
+    case 'any':
+    case 'unknown':
+      // Symbol intersected with any/unknown should return a symbol
+      return Symbol('generated')
+
+    default:
+      throw new TypeError(`Cannot intersect symbol with ${rightType}`)
   }
 }
 function mergeDateConstraints(left: any, right: any, context: Context, rootFake: any): Date {
@@ -1085,4 +1125,12 @@ function getMaxDateFromChecks(checks: any[]): Date | undefined {
   if (!checks) return undefined
   const maxCheck = checks.find(check => check._zod?.def?.check === 'less_than')
   return maxCheck?._zod?.def?.value
+}
+function formatLiteralValues(values: any[]): string {
+  return values.map(value => {
+    if (typeof value === 'symbol') {
+      return value.toString()
+    }
+    return String(value)
+  }).join(', ')
 }

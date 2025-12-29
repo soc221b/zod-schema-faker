@@ -931,4 +931,67 @@ describe('v4 intersection faker', () => {
       expect(result.getTime()).toBeLessThanOrEqual(new Date('2024-06-30').getTime()) // min of maxes
     })
   })
+
+  describe('symbol intersection handler', () => {
+    it('should handle identical symbol schemas by returning a valid symbol', () => {
+      // Same symbol schema should intersect to a valid symbol
+      const symbolSchema1 = z.symbol()
+      const symbolSchema2 = z.symbol()
+
+      const intersectionSchema = z.intersection(symbolSchema1, symbolSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('symbol')
+    })
+
+    it('should handle symbol with compatible literal', () => {
+      // Symbol should work with symbol literal
+      const symbolSchema = z.symbol()
+      const testSymbol = Symbol('test')
+      const symbolLiteral = z.literal(testSymbol)
+
+      const intersectionSchema = z.intersection(symbolSchema, symbolLiteral)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe(testSymbol)
+    })
+
+    it('should throw error for symbol with incompatible literal', () => {
+      // Symbol with non-symbol literal should be impossible
+      const symbolSchema = z.symbol()
+      const stringLiteral = z.literal('hello')
+
+      const intersectionSchema = z.intersection(symbolSchema, stringLiteral)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect literal values [hello] with symbol type - types are incompatible',
+      )
+    })
+
+    it('should throw error for symbol with incompatible type', () => {
+      // Symbol with string should be impossible
+      const symbolSchema = z.symbol()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(symbolSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect symbol with string')
+    })
+
+    it('should handle symbol with any/unknown types', () => {
+      // Symbol should work with any/unknown
+      const symbolSchema = z.symbol()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const symbolAnyIntersection = z.intersection(symbolSchema, anySchema)
+      const symbolUnknownIntersection = z.intersection(symbolSchema, unknownSchema)
+
+      const anyResult = fake(symbolAnyIntersection)
+      const unknownResult = fake(symbolUnknownIntersection)
+
+      expect(typeof anyResult).toBe('symbol')
+      expect(typeof unknownResult).toBe('symbol')
+    })
+  })
 })
