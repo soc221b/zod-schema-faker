@@ -2348,6 +2348,158 @@ describe('pipe intersection handler', () => {
   })
 })
 
+describe('optional intersection handler', () => {
+  it('should handle optional with compatible type by preserving optionality', () => {
+    // Optional intersected with compatible type should preserve optional semantics
+    const optionalSchema = z.string().optional()
+    const stringSchema = z.string().min(5)
+
+    const intersectionSchema = z.intersection(optionalSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or a string with min length 5
+    if (result !== undefined) {
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5)
+    }
+  })
+
+  it('should handle optional with literal by checking compatibility', () => {
+    // Optional intersected with literal should work if literal is compatible
+    const optionalSchema = z.string().optional()
+    const stringLiteral = z.literal('hello')
+
+    const intersectionSchema = z.intersection(optionalSchema, stringLiteral)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or 'hello'
+    if (result !== undefined) {
+      expect(result).toBe('hello')
+    }
+  })
+
+  it('should handle optional with another optional by merging constraints', () => {
+    // Optional intersected with another optional should merge underlying types
+    const optional1 = z.string().min(3).optional()
+    const optional2 = z.string().max(10).optional()
+
+    const intersectionSchema = z.intersection(optional1, optional2)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or a string with merged constraints
+    if (result !== undefined) {
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(3)
+      expect(result.length).toBeLessThanOrEqual(10)
+    }
+  })
+
+  it('should throw error for optional with incompatible type', () => {
+    // Optional with incompatible underlying type should throw error
+    const optionalSchema = z.string().optional()
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(optionalSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow(/Cannot intersect (string with number|number with string)/)
+  })
+
+  it('should handle optional with any/unknown types', () => {
+    // Optional should work with any/unknown by preserving optionality
+    const optionalSchema = z.number().optional()
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const optionalAnyIntersection = z.intersection(optionalSchema, anySchema)
+    const optionalUnknownIntersection = z.intersection(optionalSchema, unknownSchema)
+
+    const anyResult = fake(optionalAnyIntersection)
+    const unknownResult = fake(optionalUnknownIntersection)
+
+    // Results should be either undefined or numbers
+    if (anyResult !== undefined) {
+      expect(typeof anyResult).toBe('number')
+    }
+    if (unknownResult !== undefined) {
+      expect(typeof unknownResult).toBe('number')
+    }
+  })
+
+  it('should handle optional with object types by merging shapes', () => {
+    // Optional object intersected with another object should merge shapes
+    const optionalSchema = z.object({ name: z.string() }).optional()
+    const objectSchema = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(optionalSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or an object with both properties
+    if (result !== undefined) {
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof (result as any).name).toBe('string')
+      expect(typeof (result as any).age).toBe('number')
+    }
+  })
+
+  it('should handle optional with array types by merging constraints', () => {
+    // Optional array intersected with another array should merge constraints
+    const optionalSchema = z.array(z.string()).optional()
+    const arraySchema = z.array(z.string().min(2))
+
+    const intersectionSchema = z.intersection(optionalSchema, arraySchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or an array with merged constraints
+    if (result !== undefined) {
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+        expect(item.length).toBeGreaterThanOrEqual(2)
+      })
+    }
+  })
+
+  it('should handle optional with union types by filtering compatible options', () => {
+    // Optional intersected with union should filter union to compatible options
+    const optionalSchema = z.string().optional()
+    const unionSchema = z.union([z.string(), z.number()])
+
+    const intersectionSchema = z.intersection(optionalSchema, unionSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or a string
+    if (result !== undefined) {
+      expect(typeof result).toBe('string')
+    }
+  })
+
+  it('should handle complex nested optional intersections', () => {
+    // Test complex nested optional structures
+    const optionalSchema = z.object({
+      data: z.array(z.object({ id: z.string() }))
+    }).optional()
+
+    const constraintSchema = z.object({
+      data: z.array(z.object({ id: z.string().min(5) }))
+    })
+
+    const intersectionSchema = z.intersection(optionalSchema, constraintSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either undefined or an object with merged constraints
+    if (result !== undefined) {
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(Array.isArray((result as any).data)).toBe(true)
+      ;(result as any).data.forEach((item: any) => {
+        expect(typeof item.id).toBe('string')
+        expect(item.id.length).toBeGreaterThanOrEqual(5)
+      })
+    }
+  })
+})
+
 describe('set intersection handler', () => {
   it('should handle identical set schemas by returning a valid set', () => {
     const set1 = z.set(z.string())

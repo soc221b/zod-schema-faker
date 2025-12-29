@@ -80,6 +80,10 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'pipe':
       return handlePipeIntersection(left, right, context, rootFake)
 
+    // Wrappers
+    case 'optional':
+      return handleOptionalIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
       return handleAnyIntersection(left, right, context, rootFake)
@@ -100,6 +104,7 @@ function shouldSwap(left: any, right: any): boolean {
   const specificity: Record<string, number> = {
     any: 0,
     unknown: 1,
+    optional: 1, // Wrappers are less specific than concrete types
     lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
     pipe: 2, // Pipe needs to use input schema, same level as lazy
     union: 2, // Combinators are less specific than primitives but more than any/unknown
@@ -188,6 +193,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'pipe':
       // String intersected with pipe should use pipe's input schema
       return handlePipeWithSpecificType(right, left, context, rootFake)
+
+    case 'optional':
+      // String intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -404,6 +413,10 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     case 'pipe':
       // Literal intersected with pipe should use pipe's input schema
       return handlePipeWithSpecificType(right, left, context, rootFake)
+
+    case 'optional':
+      // Literal intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
   }
 
   throw new TypeError(
@@ -701,6 +714,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'pipe':
       // Number intersected with pipe should use pipe's input schema
       return handlePipeWithSpecificType(right, left, context, rootFake)
+
+    case 'optional':
+      // Number intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1315,6 +1332,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with pipe should use pipe's input schema
       return handlePipeWithSpecificType(right, left, context, rootFake)
 
+    case 'optional':
+      // Object intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1440,6 +1461,10 @@ function handleArrayIntersection(left: any, right: any, context: Context, rootFa
     case 'pipe':
       // Array intersected with pipe should use pipe's input schema
       return handlePipeWithSpecificType(right, left, context, rootFake)
+
+    case 'optional':
+      // Array intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect array with ${rightType}`)
@@ -2072,4 +2097,61 @@ function handlePipeWithSpecificType(pipeSchema: any, specificSchema: any, contex
   } as any
 
   return fakeIntersection(inputIntersection, context, rootFake)
+}
+function handleOptionalIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For optional schemas, we intersect the underlying schema with the right schema
+  // The result preserves optionality - it can be undefined or the intersected value
+  const underlyingSchema = left._zod.def.innerType
+  const rightType = right._zod.def.type
+
+  // Create intersection with the underlying schema and the right schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For optional schemas, we can return undefined sometimes to preserve optionality
+  // Use a 20% chance of returning undefined to simulate optional behavior
+  if (Math.random() < 0.2) {
+    return undefined
+  }
+
+  return intersectedValue
+}
+function handleOptionalWithSpecificType(optionalSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with an optional
+  // We need to use the optional's underlying schema for intersection
+  const underlyingSchema = optionalSchema._zod.def.innerType
+
+  // Create intersection with the specific schema and optional's underlying schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: underlyingSchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For optional schemas, we can return undefined sometimes to preserve optionality
+  // Use a 20% chance of returning undefined to simulate optional behavior
+  if (Math.random() < 0.2) {
+    return undefined
+  }
+
+  return intersectedValue
 }
