@@ -745,6 +745,133 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('nonoptional intersection handler', () => {
+    it('should handle nonoptional with compatible type by preserving nonoptional semantics', () => {
+      // Nonoptional should work with compatible underlying type
+      const nonoptionalString = z.string().optional().nonoptional()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(nonoptionalString, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the intersected value, never undefined)
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with same nonoptional type', () => {
+      // Same nonoptional type should intersect to that type
+      const nonoptionalString1 = z.string().optional().nonoptional()
+      const nonoptionalString2 = z.string().optional().nonoptional()
+
+      const intersectionSchema = z.intersection(nonoptionalString1, nonoptionalString2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with incompatible type', () => {
+      // Nonoptional string with number should be impossible
+      const nonoptionalString = z.string().optional().nonoptional()
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(nonoptionalString, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect')
+    })
+
+    it('should handle nonoptional with any/unknown types', () => {
+      // Nonoptional should work with any/unknown
+      const nonoptionalNumber = z.number().optional().nonoptional()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const nonoptionalAnyIntersection = z.intersection(nonoptionalNumber, anySchema)
+      const nonoptionalUnknownIntersection = z.intersection(nonoptionalNumber, unknownSchema)
+
+      const anyResult = fake(nonoptionalAnyIntersection)
+      const unknownResult = fake(nonoptionalUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+      expect(anyResult).not.toBe(undefined)
+      expect(unknownResult).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with union types', () => {
+      // Nonoptional should work with compatible union options
+      const nonoptionalString = z.string().optional().nonoptional()
+      const stringNumberUnion = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(nonoptionalString, stringNumberUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the compatible union option)
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with lazy types', () => {
+      // Nonoptional should work with lazy schemas
+      const nonoptionalString = z.string().optional().nonoptional()
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(nonoptionalString, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with pipe types', () => {
+      // Nonoptional should work with pipe schemas
+      const nonoptionalString = z.string().optional().nonoptional()
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(nonoptionalString, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+    })
+
+    it('should handle nonoptional with other wrapper types', () => {
+      // Nonoptional should work with optional, nullable, default
+      const nonoptionalString = z.string().optional().nonoptional()
+      const optionalString = z.string().optional()
+      const nullableString = z.string().nullable()
+      const defaultString = z.string().default('default')
+
+      const nonoptionalOptionalIntersection = z.intersection(nonoptionalString, optionalString)
+      const nonoptionalNullableIntersection = z.intersection(nonoptionalString, nullableString)
+      const nonoptionalDefaultIntersection = z.intersection(nonoptionalString, defaultString)
+
+      const optionalResult = fake(nonoptionalOptionalIntersection)
+      const nullableResult = fake(nonoptionalNullableIntersection)
+      const defaultResult = fake(nonoptionalDefaultIntersection)
+
+      // Results should never be undefined (nonoptional enforces this)
+      expect(optionalResult).not.toBe(undefined)
+      expect(nullableResult === null || typeof nullableResult === 'string').toBe(true)
+      expect(defaultResult === 'default' || typeof defaultResult === 'string').toBe(true)
+    })
+
+    it('should handle complex nonoptional intersections', () => {
+      // Test nonoptional with constrained types
+      const nonoptionalConstrainedString = z.string().min(5).max(10).optional().nonoptional()
+      const anotherConstrainedString = z.string().min(3).max(8)
+
+      const intersectionSchema = z.intersection(nonoptionalConstrainedString, anotherConstrainedString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result).not.toBe(undefined)
+      expect(result.length).toBeGreaterThanOrEqual(5) // max of mins
+      expect(result.length).toBeLessThanOrEqual(8) // min of maxes
+    })
+  })
+
   describe('basic infrastructure tests', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers

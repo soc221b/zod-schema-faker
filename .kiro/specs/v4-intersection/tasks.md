@@ -278,12 +278,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 29. Implement nonoptional intersection handler (TDD) - Wrapper
-  - [ ] 29.1 Write failing test for nonoptional intersection
+- [x] 29. Implement nonoptional intersection handler (TDD) - Wrapper
+  - [x] 29.1 Write failing test for nonoptional intersection
     - Test nonoptional wrapper semantics preservation
     - _Requirements: 2.3_
 
-  - [ ] 29.2 Implement nonoptional intersection logic
+  - [x] 29.2 Implement nonoptional intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
