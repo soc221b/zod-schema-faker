@@ -66,6 +66,9 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'record':
       return handleRecordIntersection(left, right, context, rootFake)
 
+    case 'map':
+      return handleMapIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
       return handleAnyIntersection(left, right, context, rootFake)
@@ -1547,6 +1550,92 @@ function generateRecordValue(recordSchema: any, context: Context, rootFake: any)
     // Convert key to string if it's not already (records need string keys)
     const stringKey = typeof key === 'string' ? key : String(key)
     result[stringKey] = value
+  }
+
+  return result
+}
+function handleMapIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'map':
+      // Merge map constraints (key and value type intersection)
+      return mergeMapConstraints(left, right, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Map intersected with any/unknown should return a map
+      return generateMapValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect map with ${rightType}`)
+  }
+}
+
+function mergeMapConstraints(left: any, right: any, context: Context, rootFake: any): any {
+  const leftDef = left._zod.def
+  const rightDef = right._zod.def
+
+  // Get key and value types
+  const leftKeyType = leftDef.keyType
+  const leftValueType = leftDef.valueType
+  const rightKeyType = rightDef.keyType
+  const rightValueType = rightDef.valueType
+
+  // Create intersection of key types
+  const keyIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: leftKeyType,
+        right: rightKeyType,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Create intersection of value types
+  const valueIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: leftValueType,
+        right: rightValueType,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate map with intersected key/value types
+  const result = new Map()
+  const numEntries = Math.floor(Math.random() * 3) + 1 // Generate 1-3 entries
+
+  for (let i = 0; i < numEntries; i++) {
+    try {
+      const key = fakeIntersection(keyIntersection, context, rootFake)
+      const value = fakeIntersection(valueIntersection, context, rootFake)
+      result.set(key, value)
+    } catch (error) {
+      // If key or value intersection fails, throw a more specific error
+      throw new TypeError(`Cannot intersect map types: ${error.message}`)
+    }
+  }
+
+  return result
+}
+
+function generateMapValue(mapSchema: any, context: Context, rootFake: any): any {
+  const def = mapSchema._zod.def
+  const keyType = def.keyType
+  const valueType = def.valueType
+
+  const result = new Map()
+  const numEntries = Math.floor(Math.random() * 3) + 1 // Generate 1-3 entries
+
+  for (let i = 0; i < numEntries; i++) {
+    const key = rootFake(keyType, context)
+    const value = rootFake(valueType, context)
+    result.set(key, value)
   }
 
   return result

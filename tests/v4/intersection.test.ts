@@ -1607,3 +1607,128 @@ describe('v4 intersection faker', () => {
       })
     })
   })
+
+  describe('map intersection handler', () => {
+    it('should handle identical map schemas by returning a valid map', () => {
+      const map1 = z.map(z.string(), z.number())
+      const map2 = z.map(z.string(), z.number())
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(typeof value).toBe('number')
+      })
+    })
+
+    it('should handle map key type intersections', () => {
+      const map1 = z.map(z.string().min(3), z.number())
+      const map2 = z.map(z.string().max(10), z.number())
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(key.length).toBeGreaterThanOrEqual(3)
+        expect(key.length).toBeLessThanOrEqual(10)
+        expect(typeof value).toBe('number')
+      })
+    })
+
+    it('should handle map value type intersections', () => {
+      const map1 = z.map(z.string(), z.number().min(0))
+      const map2 = z.map(z.string(), z.number().max(100))
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(typeof value).toBe('number')
+        expect(value).toBeGreaterThanOrEqual(0)
+        expect(value).toBeLessThanOrEqual(100)
+      })
+    })
+
+    it('should throw error for incompatible key types', () => {
+      const map1 = z.map(z.string(), z.number())
+      const map2 = z.map(z.number(), z.number())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(map1, map2)
+        fake(intersectionSchema)
+      }).toThrow()
+    })
+
+    it('should throw error for incompatible value types', () => {
+      const map1 = z.map(z.string(), z.string())
+      const map2 = z.map(z.string(), z.number())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(map1, map2)
+        fake(intersectionSchema)
+      }).toThrow()
+    })
+
+    it('should handle map with any/unknown key types', () => {
+      const map1 = z.map(z.string(), z.number())
+      const map2 = z.map(z.any(), z.number())
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(typeof value).toBe('number')
+      })
+    })
+
+    it('should handle map with any/unknown value types', () => {
+      const map1 = z.map(z.string(), z.number())
+      const map2 = z.map(z.string(), z.any())
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(typeof value).toBe('number')
+      })
+    })
+
+    it('should throw error for map with incompatible type', () => {
+      const map1 = z.map(z.string(), z.number())
+      const array1 = z.array(z.string())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(map1, array1)
+        fake(intersectionSchema)
+      }).toThrow('Cannot intersect map with array')
+    })
+
+    it('should handle nested map intersections', () => {
+      const map1 = z.map(z.string(), z.map(z.string(), z.number()))
+      const map2 = z.map(z.string(), z.map(z.string(), z.number().min(0)))
+
+      const intersectionSchema = z.intersection(map1, map2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof Map).toBe(true)
+      result.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(value instanceof Map).toBe(true)
+        value.forEach((nestedValue, nestedKey) => {
+          expect(typeof nestedKey).toBe('string')
+          expect(typeof nestedValue).toBe('number')
+          expect(nestedValue).toBeGreaterThanOrEqual(0)
+        })
+      })
+    })
+  })

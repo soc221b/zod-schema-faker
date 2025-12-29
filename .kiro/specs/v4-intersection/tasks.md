@@ -189,12 +189,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
-- [ ] 18. Implement map intersection handler (TDD) - Collection
-  - [ ] 18.1 Write failing test for map intersection
+- [x] 18. Implement map intersection handler (TDD) - Collection
+  - [x] 18.1 Write failing test for map intersection
     - Test key/value type intersections for maps
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 18.2 Implement map intersection logic
+  - [x] 18.2 Implement map intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
