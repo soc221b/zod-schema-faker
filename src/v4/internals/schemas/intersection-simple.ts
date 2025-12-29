@@ -47,6 +47,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleNumberIntersection(left, right, context, rootFake)
     case 'bigint':
       return handleBigintIntersection(left, right, context, rootFake)
+    case 'boolean':
+      return handleBooleanIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -281,6 +283,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
       const bigintValues = leftValues.filter((value: any) => typeof value === 'bigint')
       if (bigintValues.length > 0) {
         return bigintValues[0]
+      }
+      break
+    case 'boolean':
+      const booleanValues = leftValues.filter((value: any) => typeof value === 'boolean')
+      if (booleanValues.length > 0) {
+        return booleanValues[0]
       }
       break
     case 'enum':
@@ -891,4 +899,35 @@ function generateBigintValue(bigintSchema: any, context: Context, rootFake: any)
   }
 
   return value
+}
+
+function handleBooleanIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'boolean':
+      // Boolean intersected with boolean should return a boolean
+      return Math.random() < 0.5
+
+    case 'literal':
+      // Check if the literal value is a boolean
+      const literalValues = right._zod.def.values
+      const booleanLiterals = literalValues.filter((value: any) => typeof value === 'boolean')
+
+      if (booleanLiterals.length > 0) {
+        return booleanLiterals[0]
+      } else {
+        throw new TypeError(
+          `Cannot intersect boolean with literal values [${literalValues.join(', ')}] - literals are not booleans`,
+        )
+      }
+
+    case 'any':
+    case 'unknown':
+      // Boolean intersected with any/unknown should return a boolean
+      return Math.random() < 0.5
+
+    default:
+      throw new TypeError(`Cannot intersect boolean with ${rightType}`)
+  }
 }

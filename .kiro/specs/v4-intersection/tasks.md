@@ -120,12 +120,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 
-- [ ] 10. Implement boolean intersection handler (TDD) - Primitive
-  - [ ] 10.1 Write failing test for boolean intersection
+- [x] 10. Implement boolean intersection handler (TDD) - Primitive
+  - [x] 10.1 Write failing test for boolean intersection
     - Test boolean intersection scenarios
     - _Requirements: 2.1_
 
-  - [ ] 10.2 Implement boolean intersection logic
+  - [x] 10.2 Implement boolean intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 

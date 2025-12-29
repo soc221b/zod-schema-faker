@@ -764,4 +764,71 @@ describe('v4 intersection faker', () => {
       expect(result).toBeLessThanOrEqual(100n) // min of maxes
     })
   })
+
+  describe('boolean intersection handler', () => {
+    it('should handle identical boolean schemas by returning a valid boolean', () => {
+      // Same boolean schema should intersect to a valid boolean
+      const booleanSchema1 = z.boolean()
+      const booleanSchema2 = z.boolean()
+
+      const intersectionSchema = z.intersection(booleanSchema1, booleanSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('boolean')
+    })
+
+    it('should handle boolean with compatible literal', () => {
+      // Boolean should work with boolean literal
+      const booleanSchema = z.boolean()
+      const trueLiteral = z.literal(true)
+      const falseLiteral = z.literal(false)
+
+      const trueIntersection = z.intersection(booleanSchema, trueLiteral)
+      const falseIntersection = z.intersection(booleanSchema, falseLiteral)
+
+      const trueResult = fake(trueIntersection)
+      const falseResult = fake(falseIntersection)
+
+      expect(trueResult).toBe(true)
+      expect(falseResult).toBe(false)
+    })
+
+    it('should throw error for boolean with incompatible literal', () => {
+      // Boolean with non-boolean literal should be impossible
+      const booleanSchema = z.boolean()
+      const stringLiteral = z.literal('hello')
+
+      const intersectionSchema = z.intersection(booleanSchema, stringLiteral)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect literal values [hello] with boolean type - types are incompatible',
+      )
+    })
+
+    it('should throw error for boolean with incompatible type', () => {
+      // Boolean with string should be impossible
+      const booleanSchema = z.boolean()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(booleanSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect boolean with string')
+    })
+
+    it('should handle boolean with any/unknown types', () => {
+      // Boolean should work with any/unknown
+      const booleanSchema = z.boolean()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const booleanAnyIntersection = z.intersection(booleanSchema, anySchema)
+      const booleanUnknownIntersection = z.intersection(booleanSchema, unknownSchema)
+
+      const anyResult = fake(booleanAnyIntersection)
+      const unknownResult = fake(booleanUnknownIntersection)
+
+      expect(typeof anyResult).toBe('boolean')
+      expect(typeof unknownResult).toBe('boolean')
+    })
+  })
 })
