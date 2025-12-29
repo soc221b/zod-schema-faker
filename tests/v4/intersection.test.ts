@@ -1207,644 +1207,809 @@ describe('v4 intersection faker', () => {
       expect(result[1]).toBeLessThanOrEqual(100)
     })
   })
-})
-  describe('object intersection handler', () => {
-    it('should handle identical object schemas by returning a valid object', () => {
-      // Same object schema should intersect to a valid object
-      const objectSchema1 = z.object({ name: z.string(), age: z.number() })
-      const objectSchema2 = z.object({ name: z.string(), age: z.number() })
 
-      const intersectionSchema = z.intersection(objectSchema1, objectSchema2)
-      const result = fake(intersectionSchema)
+  describe('Property 4: Recursive intersection resolution', () => {
+    it('**Feature: v4-intersection, Property 4: Recursive intersection resolution**', () => {
+      // **Validates: Requirements 2.4**
 
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(typeof result.age).toBe('number')
-    })
+      // Test that recursive intersection resolution works correctly
+      // This property validates that nested intersections are resolved properly
+      // and that the system can handle complex recursive structures
 
-    it('should handle object shape merging by combining properties', () => {
-      // Objects with different properties should merge their shapes
-      const object1 = z.object({ name: z.string(), age: z.number() })
-      const object2 = z.object({ email: z.string(), active: z.boolean() })
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(typeof result.age).toBe('number')
-      expect(typeof result.email).toBe('string')
-      expect(typeof result.active).toBe('boolean')
-    })
-
-    it('should handle overlapping object properties by intersecting property types', () => {
-      // Objects with same property names should intersect the property types
-      const object1 = z.object({ name: z.string().min(3), count: z.number().min(0) })
-      const object2 = z.object({ name: z.string().max(10), count: z.number().max(100) })
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(result.name.length).toBeGreaterThanOrEqual(3)
-      expect(result.name.length).toBeLessThanOrEqual(10)
-      expect(typeof result.count).toBe('number')
-      expect(result.count).toBeGreaterThanOrEqual(0)
-      expect(result.count).toBeLessThanOrEqual(100)
-    })
-
-    it('should throw error for conflicting property types', () => {
-      // Objects with same property names but incompatible types should fail
-      const object1 = z.object({ value: z.string() })
-      const object2 = z.object({ value: z.number() })
-
-      const intersectionSchema = z.intersection(object1, object2)
-
-      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with number')
-    })
-
-    it('should handle object with compatible literal properties', () => {
-      // Object should work with literal properties that match types
-      const object1 = z.object({ name: z.string(), status: z.string() })
-      const object2 = z.object({ name: z.literal('John'), status: z.literal('active') })
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(result.name).toBe('John')
-      expect(result.status).toBe('active')
-    })
-
-    it('should handle object with any/unknown properties', () => {
-      // Object should work with any/unknown property types
-      const object1 = z.object({ name: z.string(), data: z.any() })
-      const object2 = z.object({ name: z.string(), data: z.unknown() })
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(result.data).toBeDefined()
-    })
-
-    it('should throw error for object with incompatible type', () => {
-      // Object with non-object should be impossible
-      const objectSchema = z.object({ name: z.string() })
-      const stringSchema = z.string()
-
-      const intersectionSchema = z.intersection(objectSchema, stringSchema)
-
-      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect object with string')
-    })
-
-    it('should handle strict mode objects', () => {
-      // Test strict mode object intersection behavior
-      const object1 = z.object({ name: z.string() }).strict()
-      const object2 = z.object({ age: z.number() }).strict()
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(typeof result.age).toBe('number')
-      // Should only have the defined properties
-      expect(Object.keys(result)).toEqual(expect.arrayContaining(['name', 'age']))
-    })
-
-    it('should handle objects with catchall properties', () => {
-      // Test object intersection with catchall (passthrough) behavior
-      const object1 = z.object({ name: z.string() }).passthrough()
-      const object2 = z.object({ age: z.number() })
-
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.name).toBe('string')
-      expect(typeof result.age).toBe('number')
-    })
-
-    it('should handle complex nested object intersections', () => {
-      // Test nested object property intersections
-      const object1 = z.object({
-        user: z.object({ name: z.string().min(1) }),
-        settings: z.object({ theme: z.string() })
-      })
-      const object2 = z.object({
-        user: z.object({ name: z.string().max(20) }),
-        settings: z.object({ notifications: z.boolean() })
+      // Test nested object intersections with multiple levels
+      const deepObject1 = z.object({
+        level1: z.object({
+          level2: z.object({
+            value: z.string().min(5),
+          }),
+        }),
       })
 
-      const intersectionSchema = z.intersection(object1, object2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      expect(typeof result.user).toBe('object')
-      expect(typeof result.user.name).toBe('string')
-      expect(result.user.name.length).toBeGreaterThanOrEqual(1)
-      expect(result.user.name.length).toBeLessThanOrEqual(20)
-      expect(typeof result.settings).toBe('object')
-      expect(typeof result.settings.theme).toBe('string')
-      expect(typeof result.settings.notifications).toBe('boolean')
-    })
-  })
-
-  describe('array intersection handler', () => {
-    it('should handle identical array schemas by returning a valid array', () => {
-      const array1 = z.array(z.string())
-      const array2 = z.array(z.string())
-
-      const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
-
-      expect(Array.isArray(result)).toBe(true)
-      result.forEach((item: any) => {
-        expect(typeof item).toBe('string')
+      const deepObject2 = z.object({
+        level1: z.object({
+          level2: z.object({
+            value: z.string().max(15),
+            extra: z.number(),
+          }),
+        }),
       })
-    })
 
-    it('should handle array length constraints by merging them', () => {
-      const array1 = z.array(z.string()).min(2).max(5)
-      const array2 = z.array(z.string()).min(3).max(4)
+      const deepIntersection = z.intersection(deepObject1, deepObject2)
+      const deepResult = fake(deepIntersection)
 
-      const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
+      expect(typeof deepResult).toBe('object')
+      expect(typeof deepResult.level1).toBe('object')
+      expect(typeof deepResult.level1.level2).toBe('object')
+      expect(typeof deepResult.level1.level2.value).toBe('string')
+      expect(deepResult.level1.level2.value.length).toBeGreaterThanOrEqual(5)
+      expect(deepResult.level1.level2.value.length).toBeLessThanOrEqual(15)
+      expect(typeof deepResult.level1.level2.extra).toBe('number')
 
-      expect(Array.isArray(result)).toBe(true)
-      expect(result.length).toBeGreaterThanOrEqual(3)
-      expect(result.length).toBeLessThanOrEqual(4)
-      result.forEach((item: any) => {
-        expect(typeof item).toBe('string')
-      })
-    })
+      // Test nested array intersections with element constraints
+      const nestedArray1 = z.array(z.array(z.string().min(3)))
+      const nestedArray2 = z.array(z.array(z.string().max(10)))
 
-    it('should throw error for conflicting length constraints', () => {
-      const array1 = z.array(z.string()).min(5).max(10)
-      const array2 = z.array(z.string()).min(15).max(20)
+      const arrayIntersection = z.intersection(nestedArray1, nestedArray2)
+      const arrayResult = fake(arrayIntersection)
 
-      expect(() => {
-        const intersectionSchema = z.intersection(array1, array2)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect array constraints')
-    })
-
-    it('should handle array element type intersections', () => {
-      const array1 = z.array(z.string().min(3))
-      const array2 = z.array(z.string().max(10))
-
-      const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
-
-      expect(Array.isArray(result)).toBe(true)
-      result.forEach((item: any) => {
-        expect(typeof item).toBe('string')
-        expect(item.length).toBeGreaterThanOrEqual(3)
-        expect(item.length).toBeLessThanOrEqual(10)
-      })
-    })
-
-    it('should throw error for incompatible element types', () => {
-      const array1 = z.array(z.string())
-      const array2 = z.array(z.number())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(array1, array2)
-        fake(intersectionSchema)
-      }).toThrow()
-    })
-
-    it('should handle array with any/unknown element types', () => {
-      const array1 = z.array(z.string())
-      const array2 = z.array(z.any())
-
-      const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
-
-      expect(Array.isArray(result)).toBe(true)
-      result.forEach((item: any) => {
-        expect(typeof item).toBe('string')
-      })
-    })
-
-    it('should throw error for array with incompatible type', () => {
-      const array1 = z.array(z.string())
-      const object1 = z.object({ name: z.string() })
-
-      expect(() => {
-        const intersectionSchema = z.intersection(array1, object1)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect object with array')
-    })
-
-    it('should handle nested array intersections', () => {
-      const array1 = z.array(z.array(z.string()))
-      const array2 = z.array(z.array(z.string().min(2)))
-
-      const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
-
-      expect(Array.isArray(result)).toBe(true)
-      result.forEach((subArray: any) => {
+      expect(Array.isArray(arrayResult)).toBe(true)
+      arrayResult.forEach((subArray: any) => {
         expect(Array.isArray(subArray)).toBe(true)
         subArray.forEach((item: any) => {
           expect(typeof item).toBe('string')
-          expect(item.length).toBeGreaterThanOrEqual(2)
+          expect(item.length).toBeGreaterThanOrEqual(3)
+          expect(item.length).toBeLessThanOrEqual(10)
         })
       })
+
+      // Test tuple with nested object intersections
+      const tupleWithObjects1 = z.tuple([z.object({ name: z.string().min(2) }), z.object({ count: z.number().min(0) })])
+
+      const tupleWithObjects2 = z.tuple([
+        z.object({ name: z.string().max(20) }),
+        z.object({ count: z.number().max(100) }),
+      ])
+
+      const tupleIntersection = z.intersection(tupleWithObjects1, tupleWithObjects2)
+      const tupleResult = fake(tupleIntersection)
+
+      expect(Array.isArray(tupleResult)).toBe(true)
+      expect(tupleResult).toHaveLength(2)
+      expect(typeof tupleResult[0]).toBe('object')
+      expect(typeof tupleResult[0].name).toBe('string')
+      expect(tupleResult[0].name.length).toBeGreaterThanOrEqual(2)
+      expect(tupleResult[0].name.length).toBeLessThanOrEqual(20)
+      expect(typeof tupleResult[1]).toBe('object')
+      expect(typeof tupleResult[1].count).toBe('number')
+      expect(tupleResult[1].count).toBeGreaterThanOrEqual(0)
+      expect(tupleResult[1].count).toBeLessThanOrEqual(100)
+
+      // Test record with nested intersections
+      const recordWithNested1 = z.record(z.string(), z.object({ value: z.number().min(10) }))
+      const recordWithNested2 = z.record(z.string(), z.object({ value: z.number().max(50) }))
+
+      const recordIntersection = z.intersection(recordWithNested1, recordWithNested2)
+      const recordResult = fake(recordIntersection)
+
+      expect(typeof recordResult).toBe('object')
+      expect(recordResult).not.toBeNull()
+      Object.keys(recordResult).forEach(key => {
+        expect(typeof key).toBe('string')
+        expect(typeof recordResult[key]).toBe('object')
+        expect(typeof recordResult[key].value).toBe('number')
+        expect(recordResult[key].value).toBeGreaterThanOrEqual(10)
+        expect(recordResult[key].value).toBeLessThanOrEqual(50)
+      })
+
+      // Test map with nested intersections
+      const mapWithNested1 = z.map(z.string(), z.object({ data: z.string().min(1) }))
+      const mapWithNested2 = z.map(z.string(), z.object({ data: z.string().max(100) }))
+
+      const mapIntersection = z.intersection(mapWithNested1, mapWithNested2)
+      const mapResult = fake(mapIntersection)
+
+      expect(mapResult instanceof Map).toBe(true)
+      mapResult.forEach((value, key) => {
+        expect(typeof key).toBe('string')
+        expect(typeof value).toBe('object')
+        expect(typeof value.data).toBe('string')
+        expect(value.data.length).toBeGreaterThanOrEqual(1)
+        expect(value.data.length).toBeLessThanOrEqual(100)
+      })
+
+      // Test set with nested intersections
+      const setWithNested1 = z.set(z.object({ id: z.number().min(1) }))
+      const setWithNested2 = z.set(z.object({ id: z.number().max(1000) }))
+
+      const setIntersection = z.intersection(setWithNested1, setWithNested2)
+      const setResult = fake(setIntersection)
+
+      expect(setResult instanceof Set).toBe(true)
+      setResult.forEach(value => {
+        expect(typeof value).toBe('object')
+        expect(typeof value.id).toBe('number')
+        expect(value.id).toBeGreaterThanOrEqual(1)
+        expect(value.id).toBeLessThanOrEqual(1000)
+      })
+
+      // Test complex mixed nested structure
+      const complexNested1 = z.object({
+        users: z.array(
+          z.object({
+            profile: z.object({
+              name: z.string().min(1),
+              settings: z.record(z.string(), z.boolean()),
+            }),
+          }),
+        ),
+      })
+
+      const complexNested2 = z.object({
+        users: z.array(
+          z.object({
+            profile: z.object({
+              name: z.string().max(50),
+              age: z.number().min(0),
+            }),
+          }),
+        ),
+      })
+
+      const complexIntersection = z.intersection(complexNested1, complexNested2)
+      const complexResult = fake(complexIntersection)
+
+      expect(typeof complexResult).toBe('object')
+      expect(Array.isArray(complexResult.users)).toBe(true)
+      complexResult.users.forEach((user: any) => {
+        expect(typeof user).toBe('object')
+        expect(typeof user.profile).toBe('object')
+        expect(typeof user.profile.name).toBe('string')
+        expect(user.profile.name.length).toBeGreaterThanOrEqual(1)
+        expect(user.profile.name.length).toBeLessThanOrEqual(50)
+        expect(typeof user.profile.settings).toBe('object')
+        expect(typeof user.profile.age).toBe('number')
+        expect(user.profile.age).toBeGreaterThanOrEqual(0)
+      })
+    })
+  })
+})
+describe('object intersection handler', () => {
+  it('should handle identical object schemas by returning a valid object', () => {
+    // Same object schema should intersect to a valid object
+    const objectSchema1 = z.object({ name: z.string(), age: z.number() })
+    const objectSchema2 = z.object({ name: z.string(), age: z.number() })
+
+    const intersectionSchema = z.intersection(objectSchema1, objectSchema2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(typeof result.age).toBe('number')
+  })
+
+  it('should handle object shape merging by combining properties', () => {
+    // Objects with different properties should merge their shapes
+    const object1 = z.object({ name: z.string(), age: z.number() })
+    const object2 = z.object({ email: z.string(), active: z.boolean() })
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(typeof result.age).toBe('number')
+    expect(typeof result.email).toBe('string')
+    expect(typeof result.active).toBe('boolean')
+  })
+
+  it('should handle overlapping object properties by intersecting property types', () => {
+    // Objects with same property names should intersect the property types
+    const object1 = z.object({ name: z.string().min(3), count: z.number().min(0) })
+    const object2 = z.object({ name: z.string().max(10), count: z.number().max(100) })
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(result.name.length).toBeGreaterThanOrEqual(3)
+    expect(result.name.length).toBeLessThanOrEqual(10)
+    expect(typeof result.count).toBe('number')
+    expect(result.count).toBeGreaterThanOrEqual(0)
+    expect(result.count).toBeLessThanOrEqual(100)
+  })
+
+  it('should throw error for conflicting property types', () => {
+    // Objects with same property names but incompatible types should fail
+    const object1 = z.object({ value: z.string() })
+    const object2 = z.object({ value: z.number() })
+
+    const intersectionSchema = z.intersection(object1, object2)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with number')
+  })
+
+  it('should handle object with compatible literal properties', () => {
+    // Object should work with literal properties that match types
+    const object1 = z.object({ name: z.string(), status: z.string() })
+    const object2 = z.object({ name: z.literal('John'), status: z.literal('active') })
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(result.name).toBe('John')
+    expect(result.status).toBe('active')
+  })
+
+  it('should handle object with any/unknown properties', () => {
+    // Object should work with any/unknown property types
+    const object1 = z.object({ name: z.string(), data: z.any() })
+    const object2 = z.object({ name: z.string(), data: z.unknown() })
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(result.data).toBeDefined()
+  })
+
+  it('should throw error for object with incompatible type', () => {
+    // Object with non-object should be impossible
+    const objectSchema = z.object({ name: z.string() })
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(objectSchema, stringSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect object with string')
+  })
+
+  it('should handle strict mode objects', () => {
+    // Test strict mode object intersection behavior
+    const object1 = z.object({ name: z.string() }).strict()
+    const object2 = z.object({ age: z.number() }).strict()
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(typeof result.age).toBe('number')
+    // Should only have the defined properties
+    expect(Object.keys(result)).toEqual(expect.arrayContaining(['name', 'age']))
+  })
+
+  it('should handle objects with catchall properties', () => {
+    // Test object intersection with catchall (passthrough) behavior
+    const object1 = z.object({ name: z.string() }).passthrough()
+    const object2 = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(typeof result.age).toBe('number')
+  })
+
+  it('should handle complex nested object intersections', () => {
+    // Test nested object property intersections
+    const object1 = z.object({
+      user: z.object({ name: z.string().min(1) }),
+      settings: z.object({ theme: z.string() }),
+    })
+    const object2 = z.object({
+      user: z.object({ name: z.string().max(20) }),
+      settings: z.object({ notifications: z.boolean() }),
     })
 
-    it('should handle empty array constraints', () => {
-      const array1 = z.array(z.string()).length(0)
-      const array2 = z.array(z.string()).max(0)
+    const intersectionSchema = z.intersection(object1, object2)
+    const result = fake(intersectionSchema)
 
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.user).toBe('object')
+    expect(typeof result.user.name).toBe('string')
+    expect(result.user.name.length).toBeGreaterThanOrEqual(1)
+    expect(result.user.name.length).toBeLessThanOrEqual(20)
+    expect(typeof result.settings).toBe('object')
+    expect(typeof result.settings.theme).toBe('string')
+    expect(typeof result.settings.notifications).toBe('boolean')
+  })
+})
+
+describe('array intersection handler', () => {
+  it('should handle identical array schemas by returning a valid array', () => {
+    const array1 = z.array(z.string())
+    const array2 = z.array(z.string())
+
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+    })
+  })
+
+  it('should handle array length constraints by merging them', () => {
+    const array1 = z.array(z.string()).min(2).max(5)
+    const array2 = z.array(z.string()).min(3).max(4)
+
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBeGreaterThanOrEqual(3)
+    expect(result.length).toBeLessThanOrEqual(4)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+    })
+  })
+
+  it('should throw error for conflicting length constraints', () => {
+    const array1 = z.array(z.string()).min(5).max(10)
+    const array2 = z.array(z.string()).min(15).max(20)
+
+    expect(() => {
       const intersectionSchema = z.intersection(array1, array2)
-      const result = fake(intersectionSchema)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect array constraints')
+  })
 
-      expect(Array.isArray(result)).toBe(true)
-      expect(result.length).toBe(0)
+  it('should handle array element type intersections', () => {
+    const array1 = z.array(z.string().min(3))
+    const array2 = z.array(z.string().max(10))
+
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+      expect(item.length).toBeGreaterThanOrEqual(3)
+      expect(item.length).toBeLessThanOrEqual(10)
     })
   })
 
-  describe('record intersection handler', () => {
-    it('should handle identical record schemas by returning a valid record', () => {
-      const record1 = z.record(z.string(), z.number())
-      const record2 = z.record(z.string(), z.number())
+  it('should throw error for incompatible element types', () => {
+    const array1 = z.array(z.string())
+    const array2 = z.array(z.number())
 
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
+    expect(() => {
+      const intersectionSchema = z.intersection(array1, array2)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
 
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof result[key]).toBe('number')
-      })
+  it('should handle array with any/unknown element types', () => {
+    const array1 = z.array(z.string())
+    const array2 = z.array(z.any())
+
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
     })
+  })
 
-    it('should handle record key type intersections', () => {
-      const record1 = z.record(z.string().min(3), z.number())
-      const record2 = z.record(z.string().max(10), z.number())
+  it('should throw error for array with incompatible type', () => {
+    const array1 = z.array(z.string())
+    const object1 = z.object({ name: z.string() })
 
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
+    expect(() => {
+      const intersectionSchema = z.intersection(array1, object1)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect object with array')
+  })
 
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(key.length).toBeGreaterThanOrEqual(3)
-        expect(key.length).toBeLessThanOrEqual(10)
-        expect(typeof result[key]).toBe('number')
-      })
-    })
+  it('should handle nested array intersections', () => {
+    const array1 = z.array(z.array(z.string()))
+    const array2 = z.array(z.array(z.string().min(2)))
 
-    it('should handle record value type intersections', () => {
-      const record1 = z.record(z.string(), z.number().min(0))
-      const record2 = z.record(z.string(), z.number().max(100))
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
 
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof result[key]).toBe('number')
-        expect(result[key]).toBeGreaterThanOrEqual(0)
-        expect(result[key]).toBeLessThanOrEqual(100)
-      })
-    })
-
-    it('should throw error for incompatible key types', () => {
-      const record1 = z.record(z.string(), z.number())
-      const record2 = z.record(z.number(), z.number())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(record1, record2)
-        fake(intersectionSchema)
-      }).toThrow()
-    })
-
-    it('should throw error for incompatible value types', () => {
-      const record1 = z.record(z.string(), z.string())
-      const record2 = z.record(z.string(), z.number())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(record1, record2)
-        fake(intersectionSchema)
-      }).toThrow()
-    })
-
-    it('should handle record with any/unknown key types', () => {
-      const record1 = z.record(z.string(), z.number())
-      const record2 = z.record(z.any(), z.number())
-
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof result[key]).toBe('number')
-      })
-    })
-
-    it('should handle record with any/unknown value types', () => {
-      const record1 = z.record(z.string(), z.number())
-      const record2 = z.record(z.string(), z.any())
-
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof result[key]).toBe('number')
-      })
-    })
-
-    it('should throw error for record with incompatible type', () => {
-      const record1 = z.record(z.string(), z.number())
-      const array1 = z.array(z.string())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(record1, array1)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect record with array')
-    })
-
-    it('should handle nested record intersections', () => {
-      const record1 = z.record(z.string(), z.record(z.string(), z.number()))
-      const record2 = z.record(z.string(), z.record(z.string(), z.number().min(0)))
-
-      const intersectionSchema = z.intersection(record1, record2)
-      const result = fake(intersectionSchema)
-
-      expect(typeof result).toBe('object')
-      expect(result).not.toBeNull()
-      Object.keys(result).forEach((key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof result[key]).toBe('object')
-        Object.keys(result[key]).forEach((nestedKey) => {
-          expect(typeof nestedKey).toBe('string')
-          expect(typeof result[key][nestedKey]).toBe('number')
-          expect(result[key][nestedKey]).toBeGreaterThanOrEqual(0)
-        })
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((subArray: any) => {
+      expect(Array.isArray(subArray)).toBe(true)
+      subArray.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+        expect(item.length).toBeGreaterThanOrEqual(2)
       })
     })
   })
 
-  describe('map intersection handler', () => {
-    it('should handle identical map schemas by returning a valid map', () => {
-      const map1 = z.map(z.string(), z.number())
-      const map2 = z.map(z.string(), z.number())
+  it('should handle empty array constraints', () => {
+    const array1 = z.array(z.string()).length(0)
+    const array2 = z.array(z.string()).max(0)
 
-      const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
+    const intersectionSchema = z.intersection(array1, array2)
+    const result = fake(intersectionSchema)
 
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof value).toBe('number')
+    expect(Array.isArray(result)).toBe(true)
+    expect(result.length).toBe(0)
+  })
+})
+
+describe('record intersection handler', () => {
+  it('should handle identical record schemas by returning a valid record', () => {
+    const record1 = z.record(z.string(), z.number())
+    const record2 = z.record(z.string(), z.number())
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(typeof result[key]).toBe('number')
+    })
+  })
+
+  it('should handle record key type intersections', () => {
+    const record1 = z.record(z.string().min(3), z.number())
+    const record2 = z.record(z.string().max(10), z.number())
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(key.length).toBeGreaterThanOrEqual(3)
+      expect(key.length).toBeLessThanOrEqual(10)
+      expect(typeof result[key]).toBe('number')
+    })
+  })
+
+  it('should handle record value type intersections', () => {
+    const record1 = z.record(z.string(), z.number().min(0))
+    const record2 = z.record(z.string(), z.number().max(100))
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(typeof result[key]).toBe('number')
+      expect(result[key]).toBeGreaterThanOrEqual(0)
+      expect(result[key]).toBeLessThanOrEqual(100)
+    })
+  })
+
+  it('should throw error for incompatible key types', () => {
+    const record1 = z.record(z.string(), z.number())
+    const record2 = z.record(z.number(), z.number())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(record1, record2)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
+
+  it('should throw error for incompatible value types', () => {
+    const record1 = z.record(z.string(), z.string())
+    const record2 = z.record(z.string(), z.number())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(record1, record2)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
+
+  it('should handle record with any/unknown key types', () => {
+    const record1 = z.record(z.string(), z.number())
+    const record2 = z.record(z.any(), z.number())
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(typeof result[key]).toBe('number')
+    })
+  })
+
+  it('should handle record with any/unknown value types', () => {
+    const record1 = z.record(z.string(), z.number())
+    const record2 = z.record(z.string(), z.any())
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(typeof result[key]).toBe('number')
+    })
+  })
+
+  it('should throw error for record with incompatible type', () => {
+    const record1 = z.record(z.string(), z.number())
+    const array1 = z.array(z.string())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(record1, array1)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect record with array')
+  })
+
+  it('should handle nested record intersections', () => {
+    const record1 = z.record(z.string(), z.record(z.string(), z.number()))
+    const record2 = z.record(z.string(), z.record(z.string(), z.number().min(0)))
+
+    const intersectionSchema = z.intersection(record1, record2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    Object.keys(result).forEach(key => {
+      expect(typeof key).toBe('string')
+      expect(typeof result[key]).toBe('object')
+      Object.keys(result[key]).forEach(nestedKey => {
+        expect(typeof nestedKey).toBe('string')
+        expect(typeof result[key][nestedKey]).toBe('number')
+        expect(result[key][nestedKey]).toBeGreaterThanOrEqual(0)
       })
     })
+  })
+})
 
-    it('should handle map key type intersections', () => {
-      const map1 = z.map(z.string().min(3), z.number())
-      const map2 = z.map(z.string().max(10), z.number())
+describe('map intersection handler', () => {
+  it('should handle identical map schemas by returning a valid map', () => {
+    const map1 = z.map(z.string(), z.number())
+    const map2 = z.map(z.string(), z.number())
 
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(typeof value).toBe('number')
+    })
+  })
+
+  it('should handle map key type intersections', () => {
+    const map1 = z.map(z.string().min(3), z.number())
+    const map2 = z.map(z.string().max(10), z.number())
+
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(key.length).toBeGreaterThanOrEqual(3)
+      expect(key.length).toBeLessThanOrEqual(10)
+      expect(typeof value).toBe('number')
+    })
+  })
+
+  it('should handle map value type intersections', () => {
+    const map1 = z.map(z.string(), z.number().min(0))
+    const map2 = z.map(z.string(), z.number().max(100))
+
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(typeof value).toBe('number')
+      expect(value).toBeGreaterThanOrEqual(0)
+      expect(value).toBeLessThanOrEqual(100)
+    })
+  })
+
+  it('should throw error for incompatible key types', () => {
+    const map1 = z.map(z.string(), z.number())
+    const map2 = z.map(z.number(), z.number())
+
+    expect(() => {
       const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
 
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(key.length).toBeGreaterThanOrEqual(3)
-        expect(key.length).toBeLessThanOrEqual(10)
-        expect(typeof value).toBe('number')
+  it('should throw error for incompatible value types', () => {
+    const map1 = z.map(z.string(), z.string())
+    const map2 = z.map(z.string(), z.number())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(map1, map2)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
+
+  it('should handle map with any/unknown key types', () => {
+    const map1 = z.map(z.string(), z.number())
+    const map2 = z.map(z.any(), z.number())
+
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(typeof value).toBe('number')
+    })
+  })
+
+  it('should handle map with any/unknown value types', () => {
+    const map1 = z.map(z.string(), z.number())
+    const map2 = z.map(z.string(), z.any())
+
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(typeof value).toBe('number')
+    })
+  })
+
+  it('should throw error for map with incompatible type', () => {
+    const map1 = z.map(z.string(), z.number())
+    const array1 = z.array(z.string())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(map1, array1)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect map with array')
+  })
+
+  it('should handle nested map intersections', () => {
+    const map1 = z.map(z.string(), z.map(z.string(), z.number()))
+    const map2 = z.map(z.string(), z.map(z.string(), z.number().min(0)))
+
+    const intersectionSchema = z.intersection(map1, map2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Map).toBe(true)
+    result.forEach((value, key) => {
+      expect(typeof key).toBe('string')
+      expect(value instanceof Map).toBe(true)
+      value.forEach((nestedValue, nestedKey) => {
+        expect(typeof nestedKey).toBe('string')
+        expect(typeof nestedValue).toBe('number')
+        expect(nestedValue).toBeGreaterThanOrEqual(0)
       })
     })
+  })
+})
 
-    it('should handle map value type intersections', () => {
-      const map1 = z.map(z.string(), z.number().min(0))
-      const map2 = z.map(z.string(), z.number().max(100))
+describe('set intersection handler', () => {
+  it('should handle identical set schemas by returning a valid set', () => {
+    const set1 = z.set(z.string())
+    const set2 = z.set(z.string())
 
-      const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
 
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof value).toBe('number')
-        expect(value).toBeGreaterThanOrEqual(0)
-        expect(value).toBeLessThanOrEqual(100)
-      })
+    expect(result instanceof Set).toBe(true)
+    result.forEach(value => {
+      expect(typeof value).toBe('string')
     })
+  })
 
-    it('should throw error for incompatible key types', () => {
-      const map1 = z.map(z.string(), z.number())
-      const map2 = z.map(z.number(), z.number())
+  it('should handle set element type intersections', () => {
+    const set1 = z.set(z.string().min(3))
+    const set2 = z.set(z.string().max(10))
 
-      expect(() => {
-        const intersectionSchema = z.intersection(map1, map2)
-        fake(intersectionSchema)
-      }).toThrow()
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Set).toBe(true)
+    result.forEach(value => {
+      expect(typeof value).toBe('string')
+      expect(value.length).toBeGreaterThanOrEqual(3)
+      expect(value.length).toBeLessThanOrEqual(10)
     })
+  })
 
-    it('should throw error for incompatible value types', () => {
-      const map1 = z.map(z.string(), z.string())
-      const map2 = z.map(z.string(), z.number())
+  it('should handle set size constraints by merging them', () => {
+    const set1 = z.set(z.string()).min(2).max(5)
+    const set2 = z.set(z.string()).min(3).max(4)
 
-      expect(() => {
-        const intersectionSchema = z.intersection(map1, map2)
-        fake(intersectionSchema)
-      }).toThrow()
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Set).toBe(true)
+    expect(result.size).toBeGreaterThanOrEqual(3)
+    expect(result.size).toBeLessThanOrEqual(4)
+    result.forEach(value => {
+      expect(typeof value).toBe('string')
     })
+  })
 
-    it('should handle map with any/unknown key types', () => {
-      const map1 = z.map(z.string(), z.number())
-      const map2 = z.map(z.any(), z.number())
+  it('should throw error for conflicting size constraints', () => {
+    const set1 = z.set(z.string()).min(5).max(10)
+    const set2 = z.set(z.string()).min(15).max(20)
 
-      const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
+    expect(() => {
+      const intersectionSchema = z.intersection(set1, set2)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect set constraints')
+  })
 
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof value).toBe('number')
-      })
+  it('should throw error for incompatible element types', () => {
+    const set1 = z.set(z.string())
+    const set2 = z.set(z.number())
+
+    expect(() => {
+      const intersectionSchema = z.intersection(set1, set2)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
+
+  it('should handle set with any/unknown element types', () => {
+    const set1 = z.set(z.string())
+    const set2 = z.set(z.any())
+
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Set).toBe(true)
+    result.forEach(value => {
+      expect(typeof value).toBe('string')
     })
+  })
 
-    it('should handle map with any/unknown value types', () => {
-      const map1 = z.map(z.string(), z.number())
-      const map2 = z.map(z.string(), z.any())
+  it('should throw error for set with incompatible type', () => {
+    const set1 = z.set(z.string())
+    const array1 = z.array(z.string())
 
-      const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
+    expect(() => {
+      const intersectionSchema = z.intersection(set1, array1)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect set with array')
+  })
 
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(typeof value).toBe('number')
-      })
-    })
+  it('should handle nested set intersections', () => {
+    const set1 = z.set(z.set(z.string()))
+    const set2 = z.set(z.set(z.string().min(2)))
 
-    it('should throw error for map with incompatible type', () => {
-      const map1 = z.map(z.string(), z.number())
-      const array1 = z.array(z.string())
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
 
-      expect(() => {
-        const intersectionSchema = z.intersection(map1, array1)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect map with array')
-    })
-
-    it('should handle nested map intersections', () => {
-      const map1 = z.map(z.string(), z.map(z.string(), z.number()))
-      const map2 = z.map(z.string(), z.map(z.string(), z.number().min(0)))
-
-      const intersectionSchema = z.intersection(map1, map2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Map).toBe(true)
-      result.forEach((value, key) => {
-        expect(typeof key).toBe('string')
-        expect(value instanceof Map).toBe(true)
-        value.forEach((nestedValue, nestedKey) => {
-          expect(typeof nestedKey).toBe('string')
-          expect(typeof nestedValue).toBe('number')
-          expect(nestedValue).toBeGreaterThanOrEqual(0)
-        })
+    expect(result instanceof Set).toBe(true)
+    result.forEach(value => {
+      expect(value instanceof Set).toBe(true)
+      value.forEach(nestedValue => {
+        expect(typeof nestedValue).toBe('string')
+        expect(nestedValue.length).toBeGreaterThanOrEqual(2)
       })
     })
   })
 
-  describe('set intersection handler', () => {
-    it('should handle identical set schemas by returning a valid set', () => {
-      const set1 = z.set(z.string())
-      const set2 = z.set(z.string())
+  it('should handle empty set constraints', () => {
+    const set1 = z.set(z.string()).size(0)
+    const set2 = z.set(z.string()).max(0)
 
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
+    const intersectionSchema = z.intersection(set1, set2)
+    const result = fake(intersectionSchema)
 
-      expect(result instanceof Set).toBe(true)
-      result.forEach((value) => {
-        expect(typeof value).toBe('string')
-      })
-    })
-
-    it('should handle set element type intersections', () => {
-      const set1 = z.set(z.string().min(3))
-      const set2 = z.set(z.string().max(10))
-
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Set).toBe(true)
-      result.forEach((value) => {
-        expect(typeof value).toBe('string')
-        expect(value.length).toBeGreaterThanOrEqual(3)
-        expect(value.length).toBeLessThanOrEqual(10)
-      })
-    })
-
-    it('should handle set size constraints by merging them', () => {
-      const set1 = z.set(z.string()).min(2).max(5)
-      const set2 = z.set(z.string()).min(3).max(4)
-
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Set).toBe(true)
-      expect(result.size).toBeGreaterThanOrEqual(3)
-      expect(result.size).toBeLessThanOrEqual(4)
-      result.forEach((value) => {
-        expect(typeof value).toBe('string')
-      })
-    })
-
-    it('should throw error for conflicting size constraints', () => {
-      const set1 = z.set(z.string()).min(5).max(10)
-      const set2 = z.set(z.string()).min(15).max(20)
-
-      expect(() => {
-        const intersectionSchema = z.intersection(set1, set2)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect set constraints')
-    })
-
-    it('should throw error for incompatible element types', () => {
-      const set1 = z.set(z.string())
-      const set2 = z.set(z.number())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(set1, set2)
-        fake(intersectionSchema)
-      }).toThrow()
-    })
-
-    it('should handle set with any/unknown element types', () => {
-      const set1 = z.set(z.string())
-      const set2 = z.set(z.any())
-
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Set).toBe(true)
-      result.forEach((value) => {
-        expect(typeof value).toBe('string')
-      })
-    })
-
-    it('should throw error for set with incompatible type', () => {
-      const set1 = z.set(z.string())
-      const array1 = z.array(z.string())
-
-      expect(() => {
-        const intersectionSchema = z.intersection(set1, array1)
-        fake(intersectionSchema)
-      }).toThrow('Cannot intersect set with array')
-    })
-
-    it('should handle nested set intersections', () => {
-      const set1 = z.set(z.set(z.string()))
-      const set2 = z.set(z.set(z.string().min(2)))
-
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Set).toBe(true)
-      result.forEach((value) => {
-        expect(value instanceof Set).toBe(true)
-        value.forEach((nestedValue) => {
-          expect(typeof nestedValue).toBe('string')
-          expect(nestedValue.length).toBeGreaterThanOrEqual(2)
-        })
-      })
-    })
-
-    it('should handle empty set constraints', () => {
-      const set1 = z.set(z.string()).size(0)
-      const set2 = z.set(z.string()).max(0)
-
-      const intersectionSchema = z.intersection(set1, set2)
-      const result = fake(intersectionSchema)
-
-      expect(result instanceof Set).toBe(true)
-      expect(result.size).toBe(0)
-    })
+    expect(result instanceof Set).toBe(true)
+    expect(result.size).toBe(0)
   })
+})

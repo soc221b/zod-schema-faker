@@ -207,7 +207,7 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
-- [ ] 20. Write property test for recursive intersection resolution
+- [x] 20. Write property test for recursive intersection resolution
   - **Property 4: Recursive intersection resolution**
   - **Validates: Requirements 2.4**
 

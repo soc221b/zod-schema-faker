@@ -1389,7 +1389,8 @@ function mergeArrayConstraints(left: any, right: any, context: Context, rootFake
   const rightElement = rightDef.element || rightDef.type
 
   // Generate array with merged constraints
-  const length = mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
+  const length =
+    mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
   const result: any[] = []
 
   for (let i = 0; i < length; i++) {
@@ -1410,7 +1411,7 @@ function mergeArrayConstraints(left: any, right: any, context: Context, rootFake
       result.push(elementValue)
     } catch (error) {
       // If element intersection fails, throw a more specific error
-      throw new TypeError(`Cannot intersect array element types: ${error.message}`)
+      throw new TypeError(`Cannot intersect array element types: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
@@ -1426,7 +1427,8 @@ function generateArrayValue(arraySchema: any, context: Context, rootFake: any): 
   const maxLength = getArrayMaxLength(def.checks) ?? 5 // Default reasonable max
 
   // Generate array length
-  const length = minLength === maxLength ? minLength : Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength
+  const length =
+    minLength === maxLength ? minLength : Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength
   const result: any[] = []
 
   for (let i = 0; i < length; i++) {
@@ -1531,7 +1533,7 @@ function mergeRecordConstraints(left: any, right: any, context: Context, rootFak
       result[stringKey] = value
     } catch (error) {
       // If key or value intersection fails, throw a more specific error
-      throw new TypeError(`Cannot intersect record types: ${error.message}`)
+      throw new TypeError(`Cannot intersect record types: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
@@ -1620,7 +1622,7 @@ function mergeMapConstraints(left: any, right: any, context: Context, rootFake: 
       result.set(key, value)
     } catch (error) {
       // If key or value intersection fails, throw a more specific error
-      throw new TypeError(`Cannot intersect map types: ${error.message}`)
+      throw new TypeError(`Cannot intersect map types: ${error instanceof Error ? error.message : String(error)}`)
     }
   }
 
@@ -1698,6 +1700,14 @@ function mergeSetConstraints(left: any, right: any, context: Context, rootFake: 
     '"~standard"': {} as any, // Required by Zod v4 type system
   } as any
 
+  // First, test if the element intersection is possible by trying to generate one value
+  try {
+    fakeIntersection(elementIntersection, context, rootFake)
+  } catch (error) {
+    // If element intersection fails, throw a more specific error
+    throw new TypeError(`Cannot intersect set element types: ${error instanceof Error ? error.message : String(error)}`)
+  }
+
   // Generate set with merged constraints
   const size = mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
   const result = new Set()
@@ -1711,8 +1721,8 @@ function mergeSetConstraints(left: any, right: any, context: Context, rootFake: 
       const elementValue = fakeIntersection(elementIntersection, context, rootFake)
       result.add(elementValue)
     } catch (error) {
-      // If element intersection fails, throw a more specific error
-      throw new TypeError(`Cannot intersect set element types: ${error.message}`)
+      // If we get here, something went wrong after the initial test
+      throw new TypeError(`Cannot intersect set element types: ${error instanceof Error ? error.message : String(error)}`)
     }
     attempts++
   }
