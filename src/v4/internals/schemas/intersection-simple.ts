@@ -77,6 +77,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleUnionIntersection(left, right, context, rootFake)
     case 'lazy':
       return handleLazyIntersection(left, right, context, rootFake)
+    case 'pipe':
+      return handlePipeIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -99,6 +101,7 @@ function shouldSwap(left: any, right: any): boolean {
     any: 0,
     unknown: 1,
     lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
+    pipe: 2, // Pipe needs to use input schema, same level as lazy
     union: 2, // Combinators are less specific than primitives but more than any/unknown
     string: 3,
     number: 3,
@@ -181,6 +184,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'lazy':
       // String intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'pipe':
+      // String intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -393,6 +400,10 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     case 'lazy':
       // Literal intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'pipe':
+      // Literal intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
   }
 
   throw new TypeError(
@@ -686,6 +697,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'lazy':
       // Number intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'pipe':
+      // Number intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1296,6 +1311,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
 
+    case 'pipe':
+      // Object intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1417,6 +1436,10 @@ function handleArrayIntersection(left: any, right: any, context: Context, rootFa
     case 'lazy':
       // Array intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'pipe':
+      // Array intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect array with ${rightType}`)
@@ -2010,4 +2033,43 @@ function handleLazyWithSpecificType(lazySchema: any, specificSchema: any, contex
   } as any
 
   return fakeIntersection(resolvedIntersection, context, rootFake)
+}
+function handlePipeIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For pipe schemas, we intersect using the input schema (the schema before transformation)
+  // The pipe transformation is ignored for intersection purposes since we're generating fake data
+  const inputSchema = left._zod.def.in
+  const rightType = right._zod.def.type
+
+  // Create intersection with the input schema and the right schema
+  const inputIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: inputSchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(inputIntersection, context, rootFake)
+}
+function handlePipeWithSpecificType(pipeSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a pipe
+  // We need to use the pipe's input schema for intersection
+  const inputSchema = pipeSchema._zod.def.in
+
+  // Create intersection with the specific schema and pipe's input schema
+  const inputIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: inputSchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  return fakeIntersection(inputIntersection, context, rootFake)
 }

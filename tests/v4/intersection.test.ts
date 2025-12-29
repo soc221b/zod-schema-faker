@@ -2220,6 +2220,134 @@ describe('lazy intersection handler', () => {
   })
 })
 
+describe('pipe intersection handler', () => {
+  it('should handle pipe with compatible type by using input schema', () => {
+    // Pipe intersected with compatible type should use the input schema for intersection
+    const pipeSchema = z.string().pipe(z.string().transform(s => s.toUpperCase()))
+    const stringSchema = z.string().min(5)
+
+    const intersectionSchema = z.intersection(pipeSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(5)
+  })
+
+  it('should handle pipe with literal by checking input schema compatibility', () => {
+    // Pipe intersected with literal should check if literal is compatible with input schema
+    const pipeSchema = z.string().pipe(z.string().transform(s => s.toUpperCase()))
+    const stringLiteral = z.literal('hello')
+
+    const intersectionSchema = z.intersection(pipeSchema, stringLiteral)
+    const result = fake(intersectionSchema)
+
+    expect(result).toBe('hello')
+  })
+
+  it('should handle pipe with another pipe by intersecting input schemas', () => {
+    // Pipe intersected with another pipe should intersect their input schemas
+    const pipe1 = z.string().min(3).pipe(z.string().transform(s => s.toUpperCase()))
+    const pipe2 = z.string().max(10).pipe(z.string().transform(s => s.toLowerCase()))
+
+    const intersectionSchema = z.intersection(pipe1, pipe2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+    expect(result.length).toBeGreaterThanOrEqual(3)
+    expect(result.length).toBeLessThanOrEqual(10)
+  })
+
+  it('should throw error for pipe with incompatible type', () => {
+    // Pipe with incompatible type should throw error based on input schema
+    const pipeSchema = z.string().pipe(z.string().transform(s => s.toUpperCase()))
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(pipeSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow(/Cannot intersect (string with number|number with string)/)
+  })
+
+  it('should handle pipe with any/unknown types', () => {
+    // Pipe should work with any/unknown by using input schema
+    const pipeSchema = z.number().pipe(z.number().transform(n => n * 2))
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const pipeAnyIntersection = z.intersection(pipeSchema, anySchema)
+    const pipeUnknownIntersection = z.intersection(pipeSchema, unknownSchema)
+
+    const anyResult = fake(pipeAnyIntersection)
+    const unknownResult = fake(pipeUnknownIntersection)
+
+    expect(typeof anyResult).toBe('number')
+    expect(typeof unknownResult).toBe('number')
+  })
+
+  it('should handle pipe with object types by intersecting input schema', () => {
+    // Pipe object intersected with another object should intersect input schemas
+    const pipeSchema = z.object({ name: z.string() }).pipe(z.object({ name: z.string() }).transform(obj => ({ ...obj, processed: true })))
+    const objectSchema = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(pipeSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof (result as any).name).toBe('string')
+    expect(typeof (result as any).age).toBe('number')
+  })
+
+  it('should handle pipe with array types by intersecting input schema', () => {
+    // Pipe array intersected with another array should intersect input schemas
+    const pipeSchema = z.array(z.string()).pipe(z.array(z.string()).transform(arr => arr.map(s => s.toUpperCase())))
+    const arraySchema = z.array(z.string().min(2))
+
+    const intersectionSchema = z.intersection(pipeSchema, arraySchema)
+    const result = fake(intersectionSchema)
+
+    expect(Array.isArray(result)).toBe(true)
+    result.forEach((item: any) => {
+      expect(typeof item).toBe('string')
+      expect(item.length).toBeGreaterThanOrEqual(2)
+    })
+  })
+
+  it('should handle complex nested pipe intersections', () => {
+    // Test complex nested pipe structures
+    const pipeSchema = z.object({
+      data: z.array(z.object({ id: z.string() }))
+    }).pipe(z.object({
+      data: z.array(z.object({ id: z.string() }))
+    }).transform(obj => ({ ...obj, processed: true })))
+
+    const constraintSchema = z.object({
+      data: z.array(z.object({ id: z.string().min(5) }))
+    })
+
+    const intersectionSchema = z.intersection(pipeSchema, constraintSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(Array.isArray((result as any).data)).toBe(true)
+    ;(result as any).data.forEach((item: any) => {
+      expect(typeof item.id).toBe('string')
+      expect(item.id.length).toBeGreaterThanOrEqual(5)
+    })
+  })
+
+  it('should handle pipe with union types by intersecting input schema', () => {
+    // Pipe intersected with union should intersect input schema with union
+    const pipeSchema = z.string().pipe(z.string().transform(s => s.toUpperCase()))
+    const unionSchema = z.union([z.string(), z.number()])
+
+    const intersectionSchema = z.intersection(pipeSchema, unionSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+  })
+})
+
 describe('set intersection handler', () => {
   it('should handle identical set schemas by returning a valid set', () => {
     const set1 = z.set(z.string())

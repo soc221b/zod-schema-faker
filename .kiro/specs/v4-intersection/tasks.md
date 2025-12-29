@@ -233,12 +233,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.4, 3.2_
 
-- [ ] 24. Implement pipe intersection handler (TDD) - Combinator
-  - [ ] 24.1 Write failing test for pipe intersection
+- [x] 24. Implement pipe intersection handler (TDD) - Combinator
+  - [x] 24.1 Write failing test for pipe intersection
     - Test intersection logic with pipe transformations
     - _Requirements: 2.4_
 
-  - [ ] 24.2 Implement pipe intersection logic
+  - [x] 24.2 Implement pipe intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.4_
 
