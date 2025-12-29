@@ -49,6 +49,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleBigintIntersection(left, right, context, rootFake)
     case 'boolean':
       return handleBooleanIntersection(left, right, context, rootFake)
+    case 'date':
+      return handleDateIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -74,6 +76,7 @@ function shouldSwap(left: any, right: any): boolean {
     number: 2,
     bigint: 2,
     boolean: 2,
+    date: 2,
     template_literal: 3,
     enum: 4,
     nan: 5,
@@ -289,6 +292,12 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
       const booleanValues = leftValues.filter((value: any) => typeof value === 'boolean')
       if (booleanValues.length > 0) {
         return booleanValues[0]
+      }
+      break
+    case 'date':
+      const dateValues = leftValues.filter((value: any) => value instanceof Date)
+      if (dateValues.length > 0) {
+        return dateValues[0]
       }
       break
     case 'enum':
@@ -930,4 +939,150 @@ function handleBooleanIntersection(left: any, right: any, context: Context, root
     default:
       throw new TypeError(`Cannot intersect boolean with ${rightType}`)
   }
+}
+
+function handleDateIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'date':
+      // Merge date constraints (min/max)
+      return mergeDateConstraints(left, right, context, rootFake)
+
+    case 'literal':
+      // Check if the literal value is a date
+      const literalValues = right._zod.def.values
+      const dateLiterals = literalValues.filter((value: any) => value instanceof Date)
+
+      if (dateLiterals.length > 0) {
+        // Check if the date literal satisfies left date constraints
+        const literalValue = dateLiterals[0]
+        if (satisfiesDateConstraints(literalValue, left)) {
+          return literalValue
+        } else {
+          throw new TypeError(
+            `Cannot intersect date constraints with literal "${literalValue.toISOString()}" - literal does not satisfy date constraints`,
+          )
+        }
+      } else {
+        throw new TypeError(
+          `Cannot intersect date with literal values [${literalValues.join(', ')}] - literals are not dates`,
+        )
+      }
+
+    case 'any':
+    case 'unknown':
+      // Date intersected with any/unknown should return a date
+      return generateDateValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect date with ${rightType}`)
+  }
+}
+function mergeDateConstraints(left: any, right: any, context: Context, rootFake: any): Date {
+  // Extract constraints from both schemas (v4 structure uses checks array)
+  const leftMin = getMinDateFromChecks(left._zod.def.checks)
+  const leftMax = getMaxDateFromChecks(left._zod.def.checks)
+  const rightMin = getMinDateFromChecks(right._zod.def.checks)
+  const rightMax = getMaxDateFromChecks(right._zod.def.checks)
+
+  // Merge constraints (intersection means both must be satisfied)
+  const mergedMin = leftMin && rightMin ? (leftMin > rightMin ? leftMin : rightMin) : (leftMin || rightMin)
+  const mergedMax = leftMax && rightMax ? (leftMax < rightMax ? leftMax : rightMax) : (leftMax || rightMax)
+
+  // Check for impossible constraints
+  if (mergedMin && mergedMax && mergedMin > mergedMax) {
+    throw new TypeError(
+      `Cannot intersect date constraints - min date (${mergedMin.toISOString()}) is greater than max date (${mergedMax.toISOString()})`,
+    )
+  }
+
+  // Generate a date within the merged constraints
+  let value: Date
+  if (mergedMin && mergedMax && mergedMin.getTime() === mergedMax.getTime()) {
+    value = mergedMin
+  } else if (!mergedMin && !mergedMax) {
+    // No constraints, generate a reasonable date
+    const now = new Date()
+    const pastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
+    const futureYear = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())
+    const randomTime = pastYear.getTime() + Math.random() * (futureYear.getTime() - pastYear.getTime())
+    value = new Date(randomTime)
+  } else if (!mergedMin) {
+    // Only max constraint
+    const minTime = new Date(mergedMax.getFullYear() - 1, mergedMax.getMonth(), mergedMax.getDate()).getTime()
+    const randomTime = minTime + Math.random() * (mergedMax.getTime() - minTime)
+    value = new Date(randomTime)
+  } else if (!mergedMax) {
+    // Only min constraint
+    const maxTime = new Date(mergedMin.getFullYear() + 1, mergedMin.getMonth(), mergedMin.getDate()).getTime()
+    const randomTime = mergedMin.getTime() + Math.random() * (maxTime - mergedMin.getTime())
+    value = new Date(randomTime)
+  } else {
+    // Both min and max constraints
+    const randomTime = mergedMin.getTime() + Math.random() * (mergedMax.getTime() - mergedMin.getTime())
+    value = new Date(randomTime)
+  }
+
+  return value
+}
+
+function satisfiesDateConstraints(value: Date, dateSchema: any): boolean {
+  const minValue = getMinDateFromChecks(dateSchema._zod.def.checks)
+  const maxValue = getMaxDateFromChecks(dateSchema._zod.def.checks)
+
+  // Check range constraints
+  if (minValue && value < minValue) {
+    return false
+  }
+  if (maxValue && value > maxValue) {
+    return false
+  }
+
+  return true
+}
+
+function generateDateValue(dateSchema: any, context: Context, rootFake: any): Date {
+  const minValue = getMinDateFromChecks(dateSchema._zod.def.checks)
+  const maxValue = getMaxDateFromChecks(dateSchema._zod.def.checks)
+
+  let value: Date
+  if (minValue && maxValue && minValue.getTime() === maxValue.getTime()) {
+    value = minValue
+  } else if (!minValue && !maxValue) {
+    // No constraints, generate a reasonable date
+    const now = new Date()
+    const pastYear = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate())
+    const futureYear = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())
+    const randomTime = pastYear.getTime() + Math.random() * (futureYear.getTime() - pastYear.getTime())
+    value = new Date(randomTime)
+  } else if (!minValue) {
+    // Only max constraint
+    const minTime = new Date(maxValue.getFullYear() - 1, maxValue.getMonth(), maxValue.getDate()).getTime()
+    const randomTime = minTime + Math.random() * (maxValue.getTime() - minTime)
+    value = new Date(randomTime)
+  } else if (!maxValue) {
+    // Only min constraint
+    const maxTime = new Date(minValue.getFullYear() + 1, minValue.getMonth(), minValue.getDate()).getTime()
+    const randomTime = minValue.getTime() + Math.random() * (maxTime - minValue.getTime())
+    value = new Date(randomTime)
+  } else {
+    // Both min and max constraints
+    const randomTime = minValue.getTime() + Math.random() * (maxValue.getTime() - minValue.getTime())
+    value = new Date(randomTime)
+  }
+
+  return value
+}
+
+function getMinDateFromChecks(checks: any[]): Date | undefined {
+  if (!checks) return undefined
+  const minCheck = checks.find(check => check._zod?.def?.check === 'greater_than')
+  return minCheck?._zod?.def?.value
+}
+
+function getMaxDateFromChecks(checks: any[]): Date | undefined {
+  if (!checks) return undefined
+  const maxCheck = checks.find(check => check._zod?.def?.check === 'less_than')
+  return maxCheck?._zod?.def?.value
 }

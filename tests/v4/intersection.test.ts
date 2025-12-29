@@ -831,4 +831,104 @@ describe('v4 intersection faker', () => {
       expect(typeof unknownResult).toBe('boolean')
     })
   })
+
+  describe('date intersection handler', () => {
+    it('should handle identical date schemas by returning a valid date', () => {
+      // Same date schema should intersect to a valid date
+      const dateSchema1 = z.date()
+      const dateSchema2 = z.date()
+
+      const intersectionSchema = z.intersection(dateSchema1, dateSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBeInstanceOf(Date)
+    })
+
+    it('should handle date range constraints by merging them', () => {
+      // Date with min/max constraints should merge constraints
+      const minDate = z.date().min(new Date('2020-01-01'))
+      const maxDate = z.date().max(new Date('2025-12-31'))
+
+      const intersectionSchema = z.intersection(minDate, maxDate)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getTime()).toBeGreaterThanOrEqual(new Date('2020-01-01').getTime())
+      expect(result.getTime()).toBeLessThanOrEqual(new Date('2025-12-31').getTime())
+    })
+
+    it('should throw error for conflicting date constraints', () => {
+      // Conflicting constraints should be impossible
+      const minDate = z.date().min(new Date('2025-01-01'))
+      const maxDate = z.date().max(new Date('2020-12-31'))
+
+      const intersectionSchema = z.intersection(minDate, maxDate)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect date constraints - min date (2025-01-01T00:00:00.000Z) is greater than max date (2020-12-31T00:00:00.000Z)',
+      )
+    })
+
+    it('should handle date with compatible literal', () => {
+      // Date should work with date literal
+      const dateSchema = z.date()
+      const dateLiteral = z.literal(new Date('2023-06-15'))
+
+      const intersectionSchema = z.intersection(dateSchema, dateLiteral)
+      const result = fake(intersectionSchema)
+
+      expect(result).toEqual(new Date('2023-06-15'))
+    })
+
+    it('should throw error for date with incompatible literal', () => {
+      // Date with non-date literal should be impossible
+      const dateSchema = z.date()
+      const stringLiteral = z.literal('hello')
+
+      const intersectionSchema = z.intersection(dateSchema, stringLiteral)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot intersect literal values [hello] with date type - types are incompatible',
+      )
+    })
+
+    it('should throw error for date with incompatible type', () => {
+      // Date with string should be impossible
+      const dateSchema = z.date()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(dateSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect date with string')
+    })
+
+    it('should handle date with any/unknown types', () => {
+      // Date should work with any/unknown
+      const dateSchema = z.date()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const dateAnyIntersection = z.intersection(dateSchema, anySchema)
+      const dateUnknownIntersection = z.intersection(dateSchema, unknownSchema)
+
+      const anyResult = fake(dateAnyIntersection)
+      const unknownResult = fake(dateUnknownIntersection)
+
+      expect(anyResult).toBeInstanceOf(Date)
+      expect(unknownResult).toBeInstanceOf(Date)
+    })
+
+    it('should handle complex date constraints', () => {
+      // Test multiple constraints together
+      const constrainedDate = z.date().min(new Date('2020-01-01')).max(new Date('2025-12-31'))
+      const anotherConstrainedDate = z.date().min(new Date('2022-06-01')).max(new Date('2024-06-30'))
+
+      const intersectionSchema = z.intersection(constrainedDate, anotherConstrainedDate)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getTime()).toBeGreaterThanOrEqual(new Date('2022-06-01').getTime()) // max of mins
+      expect(result.getTime()).toBeLessThanOrEqual(new Date('2024-06-30').getTime()) // min of maxes
+    })
+  })
 })

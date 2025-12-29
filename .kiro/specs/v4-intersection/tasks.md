@@ -129,12 +129,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 
-- [ ] 11. Implement date intersection handler (TDD) - Primitive
-  - [ ] 11.1 Write failing test for date intersection
+- [x] 11. Implement date intersection handler (TDD) - Primitive
+  - [x] 11.1 Write failing test for date intersection
     - Test date constraint merging and validation
     - _Requirements: 2.1_
 
-  - [ ] 11.2 Implement date intersection logic
+  - [x] 11.2 Implement date intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1_
 
