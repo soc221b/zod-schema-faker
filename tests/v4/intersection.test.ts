@@ -1360,3 +1360,119 @@ describe('v4 intersection faker', () => {
       expect(typeof result.settings.notifications).toBe('boolean')
     })
   })
+
+  describe('array intersection handler', () => {
+    it('should handle identical array schemas by returning a valid array', () => {
+      const array1 = z.array(z.string())
+      const array2 = z.array(z.string())
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+      })
+    })
+
+    it('should handle array length constraints by merging them', () => {
+      const array1 = z.array(z.string()).min(2).max(5)
+      const array2 = z.array(z.string()).min(3).max(4)
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result.length).toBeGreaterThanOrEqual(3)
+      expect(result.length).toBeLessThanOrEqual(4)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+      })
+    })
+
+    it('should throw error for conflicting length constraints', () => {
+      const array1 = z.array(z.string()).min(5).max(10)
+      const array2 = z.array(z.string()).min(15).max(20)
+
+      expect(() => {
+        const intersectionSchema = z.intersection(array1, array2)
+        fake(intersectionSchema)
+      }).toThrow('Cannot intersect array constraints')
+    })
+
+    it('should handle array element type intersections', () => {
+      const array1 = z.array(z.string().min(3))
+      const array2 = z.array(z.string().max(10))
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+        expect(item.length).toBeGreaterThanOrEqual(3)
+        expect(item.length).toBeLessThanOrEqual(10)
+      })
+    })
+
+    it('should throw error for incompatible element types', () => {
+      const array1 = z.array(z.string())
+      const array2 = z.array(z.number())
+
+      expect(() => {
+        const intersectionSchema = z.intersection(array1, array2)
+        fake(intersectionSchema)
+      }).toThrow()
+    })
+
+    it('should handle array with any/unknown element types', () => {
+      const array1 = z.array(z.string())
+      const array2 = z.array(z.any())
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+      })
+    })
+
+    it('should throw error for array with incompatible type', () => {
+      const array1 = z.array(z.string())
+      const object1 = z.object({ name: z.string() })
+
+      expect(() => {
+        const intersectionSchema = z.intersection(array1, object1)
+        fake(intersectionSchema)
+      }).toThrow('Cannot intersect object with array')
+    })
+
+    it('should handle nested array intersections', () => {
+      const array1 = z.array(z.array(z.string()))
+      const array2 = z.array(z.array(z.string().min(2)))
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((subArray: any) => {
+        expect(Array.isArray(subArray)).toBe(true)
+        subArray.forEach((item: any) => {
+          expect(typeof item).toBe('string')
+          expect(item.length).toBeGreaterThanOrEqual(2)
+        })
+      })
+    })
+
+    it('should handle empty array constraints', () => {
+      const array1 = z.array(z.string()).length(0)
+      const array2 = z.array(z.string()).max(0)
+
+      const intersectionSchema = z.intersection(array1, array2)
+      const result = fake(intersectionSchema)
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result.length).toBe(0)
+    })
+  })

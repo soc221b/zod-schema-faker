@@ -160,23 +160,23 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
-- [ ] 15. Implement object intersection handler (TDD) - Collection
-  - [ ] 15.1 Write failing test for object intersection
+- [x] 15. Implement object intersection handler (TDD) - Collection
+  - [x] 15.1 Write failing test for object intersection
     - Test object shape merging and property conflicts
     - Test strict mode and catchall properties
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 15.2 Implement object intersection logic
+  - [x] 15.2 Implement object intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 
-- [ ] 16. Implement array intersection handler (TDD) - Collection
-  - [ ] 16.1 Write failing test for array intersection
+- [x] 16. Implement array intersection handler (TDD) - Collection
+  - [x] 16.1 Write failing test for array intersection
     - Test length constraints and element type merging
     - Test nested array intersections
     - _Requirements: 2.1, 2.4_
 
-  - [ ] 16.2 Implement array intersection logic
+  - [x] 16.2 Implement array intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.1, 2.4_
 

@@ -60,6 +60,9 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'object':
       return handleObjectIntersection(left, right, context, rootFake)
 
+    case 'array':
+      return handleArrayIntersection(left, right, context, rootFake)
+
     // Most general types
     case 'any':
       return handleAnyIntersection(left, right, context, rootFake)
@@ -1332,4 +1335,124 @@ function handleUnknownIntersection(left: any, right: any, context: Context, root
       // unknown intersected with specific type should return that type
       return rootFake(right, context)
   }
+}
+function handleArrayIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'array':
+      // Merge array constraints (length and element type intersection)
+      return mergeArrayConstraints(left, right, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Array intersected with any/unknown should return an array
+      return generateArrayValue(left, context, rootFake)
+
+    default:
+      throw new TypeError(`Cannot intersect array with ${rightType}`)
+  }
+}
+
+function mergeArrayConstraints(left: any, right: any, context: Context, rootFake: any): any {
+  const leftDef = left._zod.def
+  const rightDef = right._zod.def
+
+  // Extract length constraints from both arrays
+  const leftMin = getArrayMinLength(leftDef.checks) ?? 0
+  const leftMax = getArrayMaxLength(leftDef.checks) ?? 5 // Default reasonable max
+  const rightMin = getArrayMinLength(rightDef.checks) ?? 0
+  const rightMax = getArrayMaxLength(rightDef.checks) ?? 5 // Default reasonable max
+
+  // Merge constraints (intersection means both must be satisfied)
+  const mergedMin = Math.max(leftMin, rightMin)
+  const mergedMax = Math.min(leftMax, rightMax)
+
+  // Check for impossible constraints
+  if (mergedMin > mergedMax) {
+    throw new TypeError(
+      `Cannot intersect array constraints - min length (${mergedMin}) is greater than max length (${mergedMax})`,
+    )
+  }
+
+  // Get element types - in v4, it's stored in def.element, not def.type
+  const leftElement = leftDef.element || leftDef.type
+  const rightElement = rightDef.element || rightDef.type
+
+  // Generate array with merged constraints
+  const length = mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
+  const result: any[] = []
+
+  for (let i = 0; i < length; i++) {
+    // Create intersection of element types and generate value
+    const elementIntersection = {
+      _zod: {
+        def: {
+          type: 'intersection' as const,
+          left: leftElement,
+          right: rightElement,
+        },
+      },
+      '"~standard"': {} as any, // Required by Zod v4 type system
+    } as any
+
+    try {
+      const elementValue = fakeIntersection(elementIntersection, context, rootFake)
+      result.push(elementValue)
+    } catch (error) {
+      // If element intersection fails, throw a more specific error
+      throw new TypeError(`Cannot intersect array element types: ${error.message}`)
+    }
+  }
+
+  return result
+}
+
+function generateArrayValue(arraySchema: any, context: Context, rootFake: any): any {
+  const def = arraySchema._zod.def
+  const elementType = def.element || def.type // v4 uses element, fallback to type
+
+  // Extract length constraints
+  const minLength = getArrayMinLength(def.checks) ?? 0
+  const maxLength = getArrayMaxLength(def.checks) ?? 5 // Default reasonable max
+
+  // Generate array length
+  const length = minLength === maxLength ? minLength : Math.floor(Math.random() * (maxLength - minLength + 1)) + minLength
+  const result: any[] = []
+
+  for (let i = 0; i < length; i++) {
+    const elementValue = rootFake(elementType, context)
+    result.push(elementValue)
+  }
+
+  return result
+}
+
+// Helper functions to extract array length constraints
+function getArrayMinLength(checks: any[]): number | undefined {
+  if (!checks || !Array.isArray(checks)) return undefined
+
+  for (const check of checks) {
+    if (check._zod?.def?.check === 'min_length') {
+      return check._zod.def.minimum
+    }
+    if (check._zod?.def?.check === 'length_equals') {
+      return check._zod.def.length
+    }
+  }
+  return undefined
+}
+
+function getArrayMaxLength(checks: any[]): number | undefined {
+  if (!checks || !Array.isArray(checks)) return undefined
+
+  for (const check of checks) {
+    if (check._zod?.def?.check === 'max_length') {
+      return check._zod.def.maximum
+    }
+    if (check._zod?.def?.check === 'length_equals') {
+      return check._zod.def.length
+    }
+  }
+  return undefined
 }
