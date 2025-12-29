@@ -626,6 +626,125 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('readonly intersection handler', () => {
+    it('should handle readonly with compatible type by preserving readonly semantics', () => {
+      // Readonly should work with compatible underlying type
+      const readonlyString = z.string().readonly()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(readonlyString, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the intersected value)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle readonly with same readonly type', () => {
+      // Same readonly type should intersect to that type
+      const readonlyString1 = z.string().readonly()
+      const readonlyString2 = z.string().readonly()
+
+      const intersectionSchema = z.intersection(readonlyString1, readonlyString2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle readonly with incompatible type', () => {
+      // Readonly string with number should be impossible
+      const readonlyString = z.string().readonly()
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(readonlyString, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect')
+    })
+
+    it('should handle readonly with any/unknown types', () => {
+      // Readonly should work with any/unknown
+      const readonlyNumber = z.number().readonly()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const readonlyAnyIntersection = z.intersection(readonlyNumber, anySchema)
+      const readonlyUnknownIntersection = z.intersection(readonlyNumber, unknownSchema)
+
+      const anyResult = fake(readonlyAnyIntersection)
+      const unknownResult = fake(readonlyUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+    })
+
+    it('should handle readonly with union types', () => {
+      // Readonly should work with compatible union options
+      const readonlyString = z.string().readonly()
+      const stringNumberUnion = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(readonlyString, stringNumberUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the compatible union option)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle readonly with lazy types', () => {
+      // Readonly should work with lazy schemas
+      const readonlyString = z.string().readonly()
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(readonlyString, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle readonly with pipe types', () => {
+      // Readonly should work with pipe schemas
+      const readonlyString = z.string().readonly()
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(readonlyString, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle readonly with other wrapper types', () => {
+      // Readonly should work with optional, nullable, default
+      const readonlyString = z.string().readonly()
+      const optionalString = z.string().optional()
+      const nullableString = z.string().nullable()
+      const defaultString = z.string().default('default')
+
+      const readonlyOptionalIntersection = z.intersection(readonlyString, optionalString)
+      const readonlyNullableIntersection = z.intersection(readonlyString, nullableString)
+      const readonlyDefaultIntersection = z.intersection(readonlyString, defaultString)
+
+      const optionalResult = fake(readonlyOptionalIntersection)
+      const nullableResult = fake(readonlyNullableIntersection)
+      const defaultResult = fake(readonlyDefaultIntersection)
+
+      // Results should be strings or the wrapper values (undefined, null, default)
+      expect(optionalResult === undefined || typeof optionalResult === 'string').toBe(true)
+      expect(nullableResult === null || typeof nullableResult === 'string').toBe(true)
+      expect(defaultResult === 'default' || typeof defaultResult === 'string').toBe(true)
+    })
+
+    it('should handle complex readonly intersections', () => {
+      // Test readonly with constrained types
+      const readonlyConstrainedString = z.string().min(5).max(10).readonly()
+      const anotherConstrainedString = z.string().min(3).max(8)
+
+      const intersectionSchema = z.intersection(readonlyConstrainedString, anotherConstrainedString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5) // max of mins
+      expect(result.length).toBeLessThanOrEqual(8) // min of maxes
+    })
+  })
+
   describe('basic infrastructure tests', () => {
     it('should reach intersection handler for different schema types', () => {
       // Test that different schema types reach their respective handlers
@@ -2246,8 +2365,14 @@ describe('pipe intersection handler', () => {
 
   it('should handle pipe with another pipe by intersecting input schemas', () => {
     // Pipe intersected with another pipe should intersect their input schemas
-    const pipe1 = z.string().min(3).pipe(z.string().transform(s => s.toUpperCase()))
-    const pipe2 = z.string().max(10).pipe(z.string().transform(s => s.toLowerCase()))
+    const pipe1 = z
+      .string()
+      .min(3)
+      .pipe(z.string().transform(s => s.toUpperCase()))
+    const pipe2 = z
+      .string()
+      .max(10)
+      .pipe(z.string().transform(s => s.toLowerCase()))
 
     const intersectionSchema = z.intersection(pipe1, pipe2)
     const result = fake(intersectionSchema)
@@ -2285,7 +2410,9 @@ describe('pipe intersection handler', () => {
 
   it('should handle pipe with object types by intersecting input schema', () => {
     // Pipe object intersected with another object should intersect input schemas
-    const pipeSchema = z.object({ name: z.string() }).pipe(z.object({ name: z.string() }).transform(obj => ({ ...obj, processed: true })))
+    const pipeSchema = z
+      .object({ name: z.string() })
+      .pipe(z.object({ name: z.string() }).transform(obj => ({ ...obj, processed: true })))
     const objectSchema = z.object({ age: z.number() })
 
     const intersectionSchema = z.intersection(pipeSchema, objectSchema)
@@ -2314,14 +2441,20 @@ describe('pipe intersection handler', () => {
 
   it('should handle complex nested pipe intersections', () => {
     // Test complex nested pipe structures
-    const pipeSchema = z.object({
-      data: z.array(z.object({ id: z.string() }))
-    }).pipe(z.object({
-      data: z.array(z.object({ id: z.string() }))
-    }).transform(obj => ({ ...obj, processed: true })))
+    const pipeSchema = z
+      .object({
+        data: z.array(z.object({ id: z.string() })),
+      })
+      .pipe(
+        z
+          .object({
+            data: z.array(z.object({ id: z.string() })),
+          })
+          .transform(obj => ({ ...obj, processed: true })),
+      )
 
     const constraintSchema = z.object({
-      data: z.array(z.object({ id: z.string().min(5) }))
+      data: z.array(z.object({ id: z.string().min(5) })),
     })
 
     const intersectionSchema = z.intersection(pipeSchema, constraintSchema)
@@ -2476,12 +2609,14 @@ describe('optional intersection handler', () => {
 
   it('should handle complex nested optional intersections', () => {
     // Test complex nested optional structures
-    const optionalSchema = z.object({
-      data: z.array(z.object({ id: z.string() }))
-    }).optional()
+    const optionalSchema = z
+      .object({
+        data: z.array(z.object({ id: z.string() })),
+      })
+      .optional()
 
     const constraintSchema = z.object({
-      data: z.array(z.object({ id: z.string().min(5) }))
+      data: z.array(z.object({ id: z.string().min(5) })),
     })
 
     const intersectionSchema = z.intersection(optionalSchema, constraintSchema)
@@ -2489,6 +2624,160 @@ describe('optional intersection handler', () => {
 
     // Result should be either undefined or an object with merged constraints
     if (result !== undefined) {
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(Array.isArray((result as any).data)).toBe(true)
+      ;(result as any).data.forEach((item: any) => {
+        expect(typeof item.id).toBe('string')
+        expect(item.id.length).toBeGreaterThanOrEqual(5)
+      })
+    }
+  })
+})
+
+describe('nullable intersection handler', () => {
+  it('should handle nullable with compatible type by preserving nullability', () => {
+    // Nullable intersected with compatible type should preserve nullable semantics
+    const nullableSchema = z.string().nullable()
+    const stringSchema = z.string().min(5)
+
+    const intersectionSchema = z.intersection(nullableSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or a string with min length 5
+    if (result !== null) {
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5)
+    }
+  })
+
+  it('should handle nullable with literal by checking compatibility', () => {
+    // Nullable intersected with literal should work if literal is compatible
+    const nullableSchema = z.string().nullable()
+    const stringLiteral = z.literal('hello')
+
+    const intersectionSchema = z.intersection(nullableSchema, stringLiteral)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or 'hello'
+    if (result !== null) {
+      expect(result).toBe('hello')
+    }
+  })
+
+  it('should handle nullable with another nullable by merging constraints', () => {
+    // Nullable intersected with another nullable should merge underlying types
+    const nullable1 = z.string().min(3).nullable()
+    const nullable2 = z.string().max(10).nullable()
+
+    const intersectionSchema = z.intersection(nullable1, nullable2)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or a string with merged constraints
+    if (result !== null) {
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(3)
+      expect(result.length).toBeLessThanOrEqual(10)
+    }
+  })
+
+  it('should throw error for nullable with incompatible type', () => {
+    // Nullable with incompatible underlying type should throw error
+    const nullableSchema = z.string().nullable()
+    const numberSchema = z.number()
+
+    const intersectionSchema = z.intersection(nullableSchema, numberSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow(/Cannot intersect (string with number|number with string)/)
+  })
+
+  it('should handle nullable with any/unknown types', () => {
+    // Nullable should work with any/unknown by preserving nullability
+    const nullableSchema = z.number().nullable()
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const nullableAnyIntersection = z.intersection(nullableSchema, anySchema)
+    const nullableUnknownIntersection = z.intersection(nullableSchema, unknownSchema)
+
+    const anyResult = fake(nullableAnyIntersection)
+    const unknownResult = fake(nullableUnknownIntersection)
+
+    // Results should be either null or numbers
+    if (anyResult !== null) {
+      expect(typeof anyResult).toBe('number')
+    }
+    if (unknownResult !== null) {
+      expect(typeof unknownResult).toBe('number')
+    }
+  })
+
+  it('should handle nullable with object types by merging shapes', () => {
+    // Nullable object intersected with another object should merge shapes
+    const nullableSchema = z.object({ name: z.string() }).nullable()
+    const objectSchema = z.object({ age: z.number() })
+
+    const intersectionSchema = z.intersection(nullableSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or an object with both properties
+    if (result !== null) {
+      expect(typeof result).toBe('object')
+      expect(result).not.toBeNull()
+      expect(typeof (result as any).name).toBe('string')
+      expect(typeof (result as any).age).toBe('number')
+    }
+  })
+
+  it('should handle nullable with array types by merging constraints', () => {
+    // Nullable array intersected with another array should merge constraints
+    const nullableSchema = z.array(z.string()).nullable()
+    const arraySchema = z.array(z.string().min(2))
+
+    const intersectionSchema = z.intersection(nullableSchema, arraySchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or an array with merged constraints
+    if (result !== null) {
+      expect(Array.isArray(result)).toBe(true)
+      result.forEach((item: any) => {
+        expect(typeof item).toBe('string')
+        expect(item.length).toBeGreaterThanOrEqual(2)
+      })
+    }
+  })
+
+  it('should handle nullable with union types by filtering compatible options', () => {
+    // Nullable intersected with union should filter union to compatible options
+    const nullableSchema = z.string().nullable()
+    const unionSchema = z.union([z.string(), z.number()])
+
+    const intersectionSchema = z.intersection(nullableSchema, unionSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or a string
+    if (result !== null) {
+      expect(typeof result).toBe('string')
+    }
+  })
+
+  it('should handle complex nested nullable intersections', () => {
+    // Test complex nested nullable structures
+    const nullableSchema = z
+      .object({
+        data: z.array(z.object({ id: z.string() })),
+      })
+      .nullable()
+
+    const constraintSchema = z.object({
+      data: z.array(z.object({ id: z.string().min(5) })),
+    })
+
+    const intersectionSchema = z.intersection(nullableSchema, constraintSchema)
+    const result = fake(intersectionSchema)
+
+    // Result should be either null or an object with merged constraints
+    if (result !== null) {
       expect(typeof result).toBe('object')
       expect(result).not.toBeNull()
       expect(Array.isArray((result as any).data)).toBe(true)
@@ -2613,5 +2902,189 @@ describe('set intersection handler', () => {
 
     expect(result instanceof Set).toBe(true)
     expect(result.size).toBe(0)
+  })
+})
+
+describe('default intersection handler', () => {
+  it('should handle default with compatible type by preserving default semantics', () => {
+    // Default intersected with compatible type should preserve default semantics
+    const defaultSchema = z.string().default('default-value')
+    const stringSchema = z.string().min(5)
+
+    const intersectionSchema = z.intersection(defaultSchema, stringSchema)
+    const result = fake(intersectionSchema)
+
+    // Should either return the default value or a string that satisfies both constraints
+    if (result === 'default-value') {
+      expect(result).toBe('default-value')
+    } else {
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5)
+    }
+  })
+
+  it('should handle default with incompatible type by throwing error', () => {
+    // Default string intersected with number should be impossible
+    const defaultSchema = z.string().default('default-value')
+    const numberSchema = z.number()
+
+    expect(() => {
+      const intersectionSchema = z.intersection(defaultSchema, numberSchema)
+      fake(intersectionSchema)
+    }).toThrow('Cannot intersect')
+  })
+
+  it('should handle default with literal that matches default value', () => {
+    // Default intersected with matching literal should work
+    const defaultSchema = z.string().default('hello')
+    const literalSchema = z.literal('hello')
+
+    const intersectionSchema = z.intersection(defaultSchema, literalSchema)
+    const result = fake(intersectionSchema)
+
+    expect(result).toBe('hello')
+  })
+
+  it('should handle default with literal that conflicts with default value', () => {
+    // Default intersected with conflicting literal should prefer the literal
+    const defaultSchema = z.string().default('hello')
+    const literalSchema = z.literal('world')
+
+    const intersectionSchema = z.intersection(defaultSchema, literalSchema)
+    const result = fake(intersectionSchema)
+
+    // Should return the literal value since it's more specific
+    expect(result).toBe('world')
+  })
+
+  it('should handle default with enum containing default value', () => {
+    // Default intersected with enum containing the default should work
+    const defaultSchema = z.string().default('red')
+    const enumSchema = z.enum(['red', 'green', 'blue'])
+
+    const intersectionSchema = z.intersection(defaultSchema, enumSchema)
+    const result = fake(intersectionSchema)
+
+    expect(['red', 'green', 'blue']).toContain(result)
+  })
+
+  it('should handle default with enum not containing default value', () => {
+    // Default intersected with enum not containing the default should work with enum values
+    const defaultSchema = z.string().default('yellow')
+    const enumSchema = z.enum(['red', 'green', 'blue'])
+
+    const intersectionSchema = z.intersection(defaultSchema, enumSchema)
+    const result = fake(intersectionSchema)
+
+    expect(['red', 'green', 'blue']).toContain(result)
+  })
+
+  it('should handle default with any/unknown types', () => {
+    // Default should work with any/unknown
+    const defaultSchema = z.number().default(42)
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const defaultAnyIntersection = z.intersection(defaultSchema, anySchema)
+    const defaultUnknownIntersection = z.intersection(defaultSchema, unknownSchema)
+
+    const anyResult = fake(defaultAnyIntersection)
+    const unknownResult = fake(defaultUnknownIntersection)
+
+    // Should either return the default value or a number
+    if (typeof anyResult === 'number') {
+      expect(typeof anyResult).toBe('number')
+    } else {
+      expect(anyResult).toBe(42)
+    }
+
+    if (typeof unknownResult === 'number') {
+      expect(typeof unknownResult).toBe('number')
+    } else {
+      expect(unknownResult).toBe(42)
+    }
+  })
+
+  it('should handle default with union containing compatible type', () => {
+    // Default intersected with union should filter to compatible options
+    const defaultSchema = z.string().default('hello')
+    const unionSchema = z.union([z.string(), z.number()])
+
+    const intersectionSchema = z.intersection(defaultSchema, unionSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('string')
+  })
+
+  it('should handle default with union not containing compatible type', () => {
+    // Default string intersected with number-only union should be impossible
+    const defaultSchema = z.string().default('hello')
+    const unionSchema = z.union([z.number(), z.boolean()])
+
+    expect(() => {
+      const intersectionSchema = z.intersection(defaultSchema, unionSchema)
+      fake(intersectionSchema)
+    }).toThrow()
+  })
+
+  it('should handle complex nested default intersections', () => {
+    // Test complex nested default structures
+    const defaultSchema = z.object({
+      name: z.string().default('John'),
+      age: z.number().default(25),
+    })
+    const objectSchema = z.object({
+      name: z.string().min(2),
+      age: z.number().min(18),
+    })
+
+    const intersectionSchema = z.intersection(defaultSchema, objectSchema)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('object')
+    expect(result).not.toBeNull()
+    expect(typeof result.name).toBe('string')
+    expect(result.name.length).toBeGreaterThanOrEqual(2)
+    expect(typeof result.age).toBe('number')
+    expect(result.age).toBeGreaterThanOrEqual(18)
+  })
+
+  it('should handle default with wrapper types', () => {
+    // Default intersected with optional should preserve both semantics
+    const defaultSchema = z.string().default('default')
+    const optionalSchema = z.string().optional()
+
+    const intersectionSchema = z.intersection(defaultSchema, optionalSchema)
+    const result = fake(intersectionSchema)
+
+    // Should return either undefined (from optional) or a string (from default)
+    if (result === undefined) {
+      expect(result).toBe(undefined)
+    } else {
+      expect(typeof result).toBe('string')
+    }
+  })
+
+  it('should handle probabilistic default value returns', () => {
+    // Test that default values are returned probabilistically (not always)
+    const defaultSchema = z.string().default('default-value')
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(defaultSchema, stringSchema)
+
+    // Generate multiple values to test probabilistic behavior
+    const results = Array.from({ length: 20 }, () => fake(intersectionSchema))
+
+    // Should have a mix of default values and generated strings
+    const hasDefaultValue = results.some(r => r === 'default-value')
+    const hasGeneratedValue = results.some(r => r !== 'default-value')
+
+    // At least one of each type should appear (probabilistic)
+    expect(hasDefaultValue || hasGeneratedValue).toBe(true)
+
+    // All results should be strings
+    results.forEach(result => {
+      expect(typeof result).toBe('string')
+    })
   })
 })

@@ -83,6 +83,12 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     // Wrappers
     case 'optional':
       return handleOptionalIntersection(left, right, context, rootFake)
+    case 'nullable':
+      return handleNullableIntersection(left, right, context, rootFake)
+    case 'default':
+      return handleDefaultIntersection(left, right, context, rootFake)
+    case 'readonly':
+      return handleReadonlyIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -105,6 +111,9 @@ function shouldSwap(left: any, right: any): boolean {
     any: 0,
     unknown: 1,
     optional: 1, // Wrappers are less specific than concrete types
+    nullable: 1, // Wrappers are less specific than concrete types
+    default: 1, // Wrappers are less specific than concrete types
+    readonly: 1, // Wrappers are less specific than concrete types
     lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
     pipe: 2, // Pipe needs to use input schema, same level as lazy
     union: 2, // Combinators are less specific than primitives but more than any/unknown
@@ -197,6 +206,18 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'optional':
       // String intersected with optional should use optional's underlying schema
       return handleOptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'nullable':
+      // String intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // String intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // String intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -417,6 +438,18 @@ function handleLiteralIntersection(left: any, right: any, context: Context, root
     case 'optional':
       // Literal intersected with optional should use optional's underlying schema
       return handleOptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'nullable':
+      // Literal intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // Literal intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // Literal intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
   }
 
   throw new TypeError(
@@ -519,6 +552,14 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
     case 'lazy':
       // Enum intersected with lazy should resolve lazy first then intersect
       return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // Enum intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // Enum intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect enum with ${rightType}`)
@@ -718,6 +759,18 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'optional':
       // Number intersected with optional should use optional's underlying schema
       return handleOptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'nullable':
+      // Number intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // Number intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // Number intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1336,6 +1389,18 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with optional should use optional's underlying schema
       return handleOptionalWithSpecificType(right, left, context, rootFake)
 
+    case 'nullable':
+      // Object intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // Object intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // Object intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1465,6 +1530,18 @@ function handleArrayIntersection(left: any, right: any, context: Context, rootFa
     case 'optional':
       // Array intersected with optional should use optional's underlying schema
       return handleOptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'nullable':
+      // Array intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // Array intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // Array intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect array with ${rightType}`)
@@ -2127,7 +2204,42 @@ function handleOptionalIntersection(left: any, right: any, context: Context, roo
 
   return intersectedValue
 }
-function handleOptionalWithSpecificType(optionalSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+
+function handleNullableIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For nullable schemas, we intersect the underlying schema with the right schema
+  // The result preserves nullability - it can be null or the intersected value
+  const underlyingSchema = left._zod.def.innerType
+  const rightType = right._zod.def.type
+
+  // Create intersection with the underlying schema and the right schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For nullable schemas, we can return null sometimes to preserve nullability
+  // Use a 20% chance of returning null to simulate nullable behavior
+  if (Math.random() < 0.2) {
+    return null
+  }
+
+  return intersectedValue
+}
+function handleOptionalWithSpecificType(
+  optionalSchema: any,
+  specificSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
   // This is the reverse case where a specific type is intersected with an optional
   // We need to use the optional's underlying schema for intersection
   const underlyingSchema = optionalSchema._zod.def.innerType
@@ -2154,4 +2266,150 @@ function handleOptionalWithSpecificType(optionalSchema: any, specificSchema: any
   }
 
   return intersectedValue
+}
+
+function handleNullableWithSpecificType(
+  nullableSchema: any,
+  specificSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
+  // This is the reverse case where a specific type is intersected with a nullable
+  // We need to use the nullable's underlying schema for intersection
+  const underlyingSchema = nullableSchema._zod.def.innerType
+
+  // Create intersection with the specific schema and nullable's underlying schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: underlyingSchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For nullable schemas, we can return null sometimes to preserve nullability
+  // Use a 20% chance of returning null to simulate nullable behavior
+  if (Math.random() < 0.2) {
+    return null
+  }
+
+  return intersectedValue
+}
+function handleDefaultIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For default schemas, we intersect the underlying schema with the right schema
+  // The result preserves default semantics - it can be the default value or the intersected value
+  const underlyingSchema = left._zod.def.innerType
+  const defaultValue = left._zod.def.defaultValue
+  const rightType = right._zod.def.type
+
+  // Create intersection with the underlying schema and the right schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For default schemas, we can return the default value sometimes to preserve default behavior
+  // Use a 20% chance of returning the default value to simulate default behavior
+  if (Math.random() < 0.2) {
+    return defaultValue
+  }
+
+  return intersectedValue
+}
+
+function handleDefaultWithSpecificType(defaultSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a default
+  // We need to use the default's underlying schema for intersection
+  const underlyingSchema = defaultSchema._zod.def.innerType
+  const defaultValue = defaultSchema._zod.def.defaultValue
+
+  // Create intersection with the specific schema and default's underlying schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: underlyingSchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+
+  // For default schemas, we can return the default value sometimes to preserve default behavior
+  // Use a 20% chance of returning the default value to simulate default behavior
+  if (Math.random() < 0.2) {
+    return defaultValue
+  }
+
+  return intersectedValue
+}
+
+function handleReadonlyIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For readonly schemas, we intersect the underlying schema with the right schema
+  // The result preserves readonly semantics - the value is the same as the underlying intersection
+  const underlyingSchema = left._zod.def.innerType
+  const rightType = right._zod.def.type
+
+  // Create intersection with the underlying schema and the right schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: right,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  // For readonly, we don't need probabilistic behavior like optional/nullable/default
+  // The readonly modifier doesn't change the runtime value, just the type-level immutability
+  return fakeIntersection(underlyingIntersection, context, rootFake)
+}
+
+function handleReadonlyWithSpecificType(
+  readonlySchema: any,
+  specificSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
+  // This is the reverse case where a specific type is intersected with a readonly
+  // We need to use the readonly's underlying schema for intersection
+  const underlyingSchema = readonlySchema._zod.def.innerType
+
+  // Create intersection with the specific schema and readonly's underlying schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: specificSchema,
+        right: underlyingSchema,
+      },
+    },
+    '"~standard"': {} as any, // Required by Zod v4 type system
+  } as any
+
+  // Generate the intersected value
+  // For readonly, we don't need probabilistic behavior like optional/nullable/default
+  // The readonly modifier doesn't change the runtime value, just the type-level immutability
+  return fakeIntersection(underlyingIntersection, context, rootFake)
 }

@@ -251,30 +251,30 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 26. Implement nullable intersection handler (TDD) - Wrapper
-  - [ ] 26.1 Write failing test for nullable intersection
+- [x] 26. Implement nullable intersection handler (TDD) - Wrapper
+  - [x] 26.1 Write failing test for nullable intersection
     - Test nullable wrapper semantics preservation
     - _Requirements: 2.3_
 
-  - [ ] 26.2 Implement nullable intersection logic
+  - [x] 26.2 Implement nullable intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 27. Implement default intersection handler (TDD) - Wrapper
-  - [ ] 27.1 Write failing test for default intersection
+- [x] 27. Implement default intersection handler (TDD) - Wrapper
+  - [x] 27.1 Write failing test for default intersection
     - Test default value handling in intersections
     - _Requirements: 2.3_
 
-  - [ ] 27.2 Implement default intersection logic
+  - [x] 27.2 Implement default intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 28. Implement readonly intersection handler (TDD) - Wrapper
-  - [ ] 28.1 Write failing test for readonly intersection
+- [x] 28. Implement readonly intersection handler (TDD) - Wrapper
+  - [x] 28.1 Write failing test for readonly intersection
     - Test readonly wrapper semantics preservation
     - _Requirements: 2.3_
 
-  - [ ] 28.2 Implement readonly intersection logic
+  - [x] 28.2 Implement readonly intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
