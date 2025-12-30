@@ -287,12 +287,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 30. Implement catch intersection handler (TDD) - Error Wrapper
-  - [ ] 30.1 Write failing test for catch intersection
+- [x] 30. Implement catch intersection handler (TDD) - Error Wrapper
+  - [x] 30.1 Write failing test for catch intersection
     - Test catch wrapper semantics preservation
     - _Requirements: 2.3_
 
-  - [ ] 30.2 Implement catch intersection logic
+  - [x] 30.2 Implement catch intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 

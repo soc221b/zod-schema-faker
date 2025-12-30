@@ -91,6 +91,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleReadonlyIntersection(left, right, context, rootFake)
     case 'nonoptional':
       return handleNonoptionalIntersection(left, right, context, rootFake)
+    case 'catch':
+      return handleCatchIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -117,6 +119,7 @@ function shouldSwap(left: any, right: any): boolean {
     default: 1, // Wrappers are less specific than concrete types
     readonly: 1, // Wrappers are less specific than concrete types
     nonoptional: 1, // Wrappers are less specific than concrete types
+    catch: 1, // Catch wrapper is less specific than concrete types
     lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
     pipe: 2, // Pipe needs to use input schema, same level as lazy
     union: 2, // Combinators are less specific than primitives but more than any/unknown
@@ -225,6 +228,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'nonoptional':
       // String intersected with nonoptional should use nonoptional's underlying schema
       return handleNonoptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'catch':
+      // String intersected with catch should use catch's underlying schema
+      return handleCatchWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -790,6 +797,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'nonoptional':
       // Number intersected with nonoptional should use nonoptional's underlying schema
       return handleNonoptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'catch':
+      // Number intersected with catch should use catch's underlying schema
+      return handleCatchWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1423,6 +1434,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
     case 'nonoptional':
       // Object intersected with nonoptional should use nonoptional's underlying schema
       return handleNonoptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'catch':
+      // Object intersected with catch should use catch's underlying schema
+      return handleCatchWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
@@ -2546,4 +2561,68 @@ function handleNonoptionalWithSpecificType(
   }
 
   return intersectedValue
+}
+function handleCatchIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For catch schemas, we intersect the underlying schema with the right schema
+  // The catch wrapper provides a fallback value if the underlying schema fails validation
+  // For fake data generation, we focus on the underlying schema intersection
+
+  const underlyingSchema = left._zod.def.innerType
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'catch':
+      // Both are catch schemas - intersect their inner types
+      const rightInnerType = right._zod.def.innerType
+      const innerIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: underlyingSchema,
+            right: rightInnerType,
+          },
+          '"~standard"': {} as any, // Required by Zod v4 type system
+        },
+      } as any
+      return fakeIntersection(innerIntersection, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept any catch value - generate from underlying schema
+      return rootFake(underlyingSchema, context)
+
+    default:
+      // For other types, intersect the underlying schema with the right schema
+      const intersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: underlyingSchema,
+            right: right,
+          },
+          '"~standard"': {} as any, // Required by Zod v4 type system
+        },
+      } as any
+      return fakeIntersection(intersection, context, rootFake)
+  }
+}
+function handleCatchWithSpecificType(catchSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a catch
+  // We need to use the catch's underlying schema for intersection
+
+  const underlyingSchema = catchSchema._zod.def.innerType
+
+  // Create intersection between the underlying schema and the specific schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: specificSchema,
+      },
+      '"~standard"': {} as any, // Required by Zod v4 type system
+    },
+  } as any
+
+  return fakeIntersection(underlyingIntersection, context, rootFake)
 }

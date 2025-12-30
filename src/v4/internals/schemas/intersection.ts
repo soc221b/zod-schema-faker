@@ -638,6 +638,12 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
 
       return anyResult
 
+    case 'catch':
+      // Catch wrapper - intersect with the inner type
+      const catchInnerType = right._zod.def.innerType
+      const catchIntersection = createIntersection(left, catchInnerType)
+      return fakeIntersection(catchIntersection, context, rootFake)
+
     case 'number':
     case 'boolean':
     case 'object':
@@ -763,7 +769,29 @@ function handleWrapperIntersection(left: any, right: any, context: Context, root
 }
 
 function handleCatchIntersection(left: any, right: any, context: Context, rootFake: any): any {
-  throw new Error('handleCatchIntersection not yet implemented')
+  // Extract the inner type from the catch schema
+  const leftInnerType = left._zod.def.innerType
+
+  // Handle intersection with right schema based on its type
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'catch':
+      // Both are catch schemas - intersect their inner types
+      const rightInnerType = right._zod.def.innerType
+      const innerIntersection = createIntersection(leftInnerType, rightInnerType)
+      return fakeIntersection(innerIntersection, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept any catch value - generate from inner type
+      return rootFake(leftInnerType, context)
+
+    default:
+      // For other types, intersect the inner type with the right schema
+      const intersection = createIntersection(leftInnerType, right)
+      return fakeIntersection(intersection, context, rootFake)
+  }
 }
 
 function handlePrefaultIntersection(left: any, right: any, context: Context, rootFake: any): any {

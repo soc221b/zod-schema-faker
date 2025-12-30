@@ -3214,4 +3214,153 @@ describe('default intersection handler', () => {
       expect(typeof result).toBe('string')
     })
   })
+
+  describe('catch intersection handler', () => {
+    it('should handle catch with compatible type by preserving catch semantics', () => {
+      // Catch should work with compatible underlying type
+      const catchString = z.string().catch('fallback')
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(catchString, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the intersected value)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle catch with same catch type', () => {
+      // Same catch type should intersect to that type
+      const catchString1 = z.string().catch('fallback1')
+      const catchString2 = z.string().catch('fallback2')
+
+      const intersectionSchema = z.intersection(catchString1, catchString2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle catch with incompatible type', () => {
+      // Catch string with number should be impossible
+      const catchString = z.string().catch('fallback')
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(catchString, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect')
+    })
+
+    it('should handle catch with any/unknown types', () => {
+      // Catch should work with any/unknown
+      const catchNumber = z.number().catch(42)
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const catchAnyIntersection = z.intersection(catchNumber, anySchema)
+      const catchUnknownIntersection = z.intersection(catchNumber, unknownSchema)
+
+      const anyResult = fake(catchAnyIntersection)
+      const unknownResult = fake(catchUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+    })
+
+    it('should handle catch with union types', () => {
+      // Catch should work with compatible union options
+      const catchString = z.string().catch('fallback')
+      const stringNumberUnion = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(catchString, stringNumberUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the compatible union option)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle catch with lazy types', () => {
+      // Catch should work with lazy schemas
+      const catchString = z.string().catch('fallback')
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(catchString, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle catch with pipe types', () => {
+      // Catch should work with pipe schemas
+      const catchString = z.string().catch('fallback')
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(catchString, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle catch with other wrapper types', () => {
+      // Catch should work with optional, nullable, default, readonly
+      const catchString = z.string().catch('fallback')
+      const optionalString = z.string().optional()
+      const nullableString = z.string().nullable()
+      const defaultString = z.string().default('default')
+      const readonlyString = z.string().readonly()
+
+      const catchOptionalIntersection = z.intersection(catchString, optionalString)
+      const catchNullableIntersection = z.intersection(catchString, nullableString)
+      const catchDefaultIntersection = z.intersection(catchString, defaultString)
+      const catchReadonlyIntersection = z.intersection(catchString, readonlyString)
+
+      const optionalResult = fake(catchOptionalIntersection)
+      const nullableResult = fake(catchNullableIntersection)
+      const defaultResult = fake(catchDefaultIntersection)
+      const readonlyResult = fake(catchReadonlyIntersection)
+
+      // Results should be strings or the wrapper values (undefined, null, default)
+      expect(optionalResult === undefined || typeof optionalResult === 'string').toBe(true)
+      expect(nullableResult === null || typeof nullableResult === 'string').toBe(true)
+      expect(defaultResult === 'default' || typeof defaultResult === 'string').toBe(true)
+      expect(typeof readonlyResult).toBe('string')
+    })
+
+    it('should handle complex catch intersections', () => {
+      // Test catch with constrained types
+      const catchConstrainedString = z.string().min(5).max(10).catch('fallback')
+      const anotherConstrainedString = z.string().min(3).max(8)
+
+      const intersectionSchema = z.intersection(catchConstrainedString, anotherConstrainedString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5) // max of mins
+      expect(result.length).toBeLessThanOrEqual(8) // min of maxes
+    })
+
+    it('should handle catch with function fallback', () => {
+      // Test catch with function fallback
+      const catchWithFunction = z.number().catch(() => 42)
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(catchWithFunction, numberSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+    })
+
+    it('should handle nested catch intersections', () => {
+      // Test catch with nested schemas
+      const catchObject = z.object({ name: z.string() }).catch({ name: 'fallback' })
+      const objectSchema = z.object({ name: z.string(), age: z.number() })
+
+      const intersectionSchema = z.intersection(catchObject, objectSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).toHaveProperty('name')
+      expect(result).toHaveProperty('age')
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+    })
+  })
 })
