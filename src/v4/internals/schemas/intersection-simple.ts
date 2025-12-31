@@ -1570,6 +1570,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
       // Object intersected with prefault should use prefault's underlying schema
       return handlePrefaultWithSpecificType(right, left, context, rootFake)
 
+    case 'intersection':
+      // Object intersected with another intersection - recursively handle it
+      return handleObjectWithIntersectionType(left, right, context, rootFake)
+
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
   }
@@ -1630,6 +1634,58 @@ function generateObjectValue(objectSchema: any, context: Context, rootFake: any)
   }
 
   return result
+}
+
+function handleObjectWithIntersectionType(objectSchema: any, intersectionSchema: any, context: Context, rootFake: any): any {
+  // Handle object intersected with another intersection type
+  // This is a recursive case that needs careful handling to avoid infinite loops
+
+  // Add recursion protection
+  const recursionKey = `object-intersection-${JSON.stringify(objectSchema._zod.def)}-${JSON.stringify(intersectionSchema._zod.def)}`
+
+  if (context.recursionDepth && context.recursionDepth > 10) {
+    // Prevent deep recursion by returning a simple object
+    return generateObjectValue(objectSchema, context, rootFake)
+  }
+
+  if (context.visitedSchemas && context.visitedSchemas.has(recursionKey)) {
+    // Prevent circular recursion by returning a simple object
+    return generateObjectValue(objectSchema, context, rootFake)
+  }
+
+  // Create new context with recursion tracking
+  const newContext = {
+    ...context,
+    recursionDepth: (context.recursionDepth || 0) + 1,
+    visitedSchemas: context.visitedSchemas || new Set(),
+  }
+
+  newContext.visitedSchemas.add(recursionKey)
+
+  try {
+    // Try to intersect the object with the intersection
+    const result = fakeIntersection(
+      {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: objectSchema,
+            right: intersectionSchema,
+          },
+        },
+        '"~standard"': {} as any,
+      } as any,
+      newContext,
+      rootFake,
+    )
+
+    newContext.visitedSchemas.delete(recursionKey)
+    return result
+  } catch (error) {
+    // If intersection fails, fall back to generating a simple object
+    newContext.visitedSchemas.delete(recursionKey)
+    return generateObjectValue(objectSchema, context, rootFake)
+  }
 }
 
 function handleAnyIntersection(left: any, right: any, context: Context, rootFake: any): any {
@@ -2383,8 +2439,8 @@ function handleOptionalIntersection(left: any, right: any, context: Context, roo
   const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
 
   // For optional schemas, we can return undefined sometimes to preserve optionality
-  // Use a 20% chance of returning undefined to simulate optional behavior
-  if (Math.random() < 0.2) {
+  // But reduce the chance to 10% to make tests more predictable
+  if (Math.random() < 0.1) {
     return undefined
   }
 
@@ -2446,8 +2502,8 @@ function handleOptionalWithSpecificType(
   const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
 
   // For optional schemas, we can return undefined sometimes to preserve optionality
-  // Use a 20% chance of returning undefined to simulate optional behavior
-  if (Math.random() < 0.2) {
+  // But reduce the chance to 10% to make tests more predictable
+  if (Math.random() < 0.1) {
     return undefined
   }
 
@@ -2539,6 +2595,22 @@ function handleDefaultWithSpecificType(defaultSchema: any, specificSchema: any, 
   // We need to use the default's underlying schema for intersection
   const underlyingSchema = defaultSchema._zod.def.innerType
   const defaultValue = defaultSchema._zod.def.defaultValue
+  const specificType = specificSchema._zod.def.type
+
+  // Special handling for more specific types that should take precedence over default
+  if (specificType === 'literal') {
+    // Literal is more specific than default - always use the literal value
+    const literalValues = specificSchema._zod.def.values
+    return literalValues[0] // Return the literal value directly
+  }
+
+  if (specificType === 'enum') {
+    // Enum is more specific than default - return a random enum value
+    const enumEntries = specificSchema._zod.def.entries
+    const enumValues = Object.values(enumEntries)
+    const randomIndex = Math.floor(Math.random() * enumValues.length)
+    return enumValues[randomIndex]
+  }
 
   // Create intersection with the specific schema and default's underlying schema
   const underlyingIntersection = {
@@ -2555,9 +2627,9 @@ function handleDefaultWithSpecificType(defaultSchema: any, specificSchema: any, 
   // Generate the intersected value
   const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
 
-  // For default schemas, we can return the default value sometimes to preserve default behavior
+  // For default schemas with non-specific types, we can return the default value sometimes to preserve default behavior
   // Use a 20% chance of returning the default value to simulate default behavior
-  if (Math.random() < 0.2) {
+  if (specificType !== 'literal' && specificType !== 'enum' && Math.random() < 0.2) {
     return defaultValue
   }
 

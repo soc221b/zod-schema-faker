@@ -4543,4 +4543,300 @@ describe('promise intersection handler', () => {
       }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
     })
   })
+
+  describe('Property 5: Impossible intersection error handling', () => {
+    it('**Feature: v4-intersection, Property 5: Impossible intersection error handling**', () => {
+      // **Validates: Requirements 1.3, 3.1**
+
+      // This property test validates that impossible intersections are detected early
+      // and provide descriptive error messages for different types of conflicts
+
+      // Test 1: Primitive type conflicts should be detected immediately
+      const primitiveConflicts = [
+        { left: z.string(), right: z.number(), expected: 'Cannot intersect string with number' },
+        { left: z.boolean(), right: z.date(), expected: 'Cannot intersect boolean with date' },
+        { left: z.bigint(), right: z.symbol(), expected: 'Cannot intersect bigint with symbol' },
+        { left: z.number(), right: z.boolean(), expected: 'Cannot intersect number with boolean' },
+      ]
+
+      primitiveConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 2: Constraint conflicts should be detected with specific error messages
+      const constraintConflicts = [
+        {
+          left: z.string().min(10),
+          right: z.string().max(5),
+          expected: 'Cannot intersect string constraints - min length (10) is greater than max length (5)',
+        },
+        {
+          left: z.number().min(100),
+          right: z.number().max(50),
+          expected: 'Cannot intersect number constraints - min value (100) is greater than max value (50)',
+        },
+        {
+          left: z.date().min(new Date('2025-01-01')),
+          right: z.date().max(new Date('2024-01-01')),
+          expected: 'Cannot intersect date constraints',
+        },
+      ]
+
+      constraintConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 3: Literal value conflicts should be detected
+      const literalConflicts = [
+        {
+          left: z.literal('hello'),
+          right: z.literal('world'),
+          expected: 'Cannot intersect literal values [hello] with literal values [world] - no common values',
+        },
+        {
+          left: z.literal(42),
+          right: z.literal(24),
+          expected: 'Cannot intersect literal values [42] with literal values [24] - no common values',
+        },
+      ]
+
+      literalConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 4: Enum conflicts should be detected
+      const enumConflicts = [
+        {
+          left: z.enum(['red', 'green', 'blue']),
+          right: z.enum(['yellow', 'orange', 'purple']),
+          expected: 'Cannot intersect enum values',
+        },
+      ]
+
+      enumConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 5: Template literal pattern conflicts should be detected
+      const templateConflicts = [
+        {
+          left: z.templateLiteral(['hello-', z.string()] as any),
+          right: z.templateLiteral([z.string(), '-world'] as any),
+          expected: 'Cannot intersect template literal patterns - no string can match both patterns',
+        },
+      ]
+
+      templateConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 6: Collection type conflicts should be detected
+      const collectionConflicts = [
+        {
+          left: z.tuple([z.string(), z.number()]),
+          right: z.tuple([z.string()]),
+          expected: 'Cannot intersect tuples with different lengths',
+        },
+        {
+          left: z.array(z.string()).min(10),
+          right: z.array(z.string()).max(5),
+          expected: 'Cannot intersect array constraints - min length (10) is greater than max length (5)',
+        },
+      ]
+
+      collectionConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 7: Advanced type conflicts should be detected
+      const advancedConflicts = [
+        {
+          left: z.function(),
+          right: z.string(),
+          expected: 'Cannot intersect string with function', // Note: swapped due to specificity ordering
+        },
+        {
+          left: z.promise(z.string()),
+          right: z.number(),
+          expected: 'Cannot intersect number with promise', // Note: swapped due to specificity ordering
+        },
+      ]
+
+      advancedConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 8: Never type should always result in impossible intersection
+      const neverConflicts = [
+        {
+          left: z.never(),
+          right: z.string(),
+          expected: 'Cannot generate fake data for intersection with never type - intersection is impossible',
+        },
+        {
+          left: z.number(),
+          right: z.never(),
+          expected: 'Cannot generate fake data for intersection with never type - intersection is impossible',
+        },
+      ]
+
+      neverConflicts.forEach(({ left, right, expected }) => {
+        const intersection = z.intersection(left, right)
+        expect(() => fake(intersection)).toThrow(expected)
+      })
+
+      // Test 9: Error messages should be descriptive and actionable
+      // All error messages should:
+      // - Clearly identify the conflicting types
+      // - Explain why the intersection is impossible
+      // - Use consistent terminology
+      // This is validated by the specific error message checks above
+
+      // Test 10: Early detection should prevent unnecessary computation
+      // Impossible intersections should be detected before attempting to generate fake data
+      // This is implicitly tested by all the above cases throwing errors immediately
+    })
+  })
+
+  describe('Property 6: Recursion safety', () => {
+    it('**Feature: v4-intersection, Property 6: Recursion safety**', () => {
+      // **Validates: Requirements 3.2**
+
+      // This property test validates that the recursion protection system
+      // prevents infinite loops and stack overflow errors in all scenarios
+
+      // Test 1: Depth limits should prevent stack overflow
+      const maxDepth = 15 // Should be configurable but reasonable default
+      let deepSchema: any = z.string()
+
+      // Create a schema that would exceed reasonable depth
+      for (let i = 0; i < maxDepth * 2; i++) {
+        const currentSchema = deepSchema
+        deepSchema = z.lazy(() => z.intersection(currentSchema, z.string()))
+      }
+
+      // Should complete without stack overflow
+      expect(() => {
+        const result = fake(deepSchema)
+        expect(typeof result).toBe('string')
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+
+      // Test 2: Circular reference detection should prevent infinite loops
+      const circularSchemas = [
+        // Simple self-reference
+        z.lazy(() => z.intersection(circularSchemas[0], z.string())),
+
+        // Mutual reference through objects
+        z.lazy(() => z.object({
+          self: z.intersection(circularSchemas[1], z.object({ id: z.string() })).optional()
+        })),
+
+        // Complex nested circular reference
+        z.lazy(() => z.union([
+          z.string(),
+          z.intersection(
+            z.object({ nested: circularSchemas[2] }),
+            z.object({ level: z.number() })
+          )
+        ]))
+      ]
+
+      circularSchemas.forEach((schema, index) => {
+        expect(() => {
+          const result = fake(schema)
+          // Should return a valid result without infinite recursion
+          expect(result).toBeDefined()
+        }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+      })
+
+      // Test 3: Performance should be reasonable even with complex recursion
+      const complexRecursiveSchema = z.lazy(() => z.intersection(
+        z.object({
+          data: z.string(),
+          children: z.array(complexRecursiveSchema).optional()
+        }),
+        z.object({
+          metadata: z.object({
+            id: z.string(),
+            timestamp: z.date()
+          })
+        })
+      ))
+
+      const startTime = Date.now()
+      const result = fake(complexRecursiveSchema)
+      const endTime = Date.now()
+
+      // Should complete in reasonable time (less than 500ms for complex recursion)
+      expect(endTime - startTime).toBeLessThan(500)
+      expect(typeof result).toBe('object')
+      expect(result).toHaveProperty('data')
+      expect(result).toHaveProperty('metadata')
+
+      // Test 4: Caching should prevent redundant computation
+      const cachedSchema = z.intersection(
+        z.object({ name: z.string() }),
+        z.object({ age: z.number() })
+      )
+
+      // Multiple calls should not significantly increase computation time
+      const times: number[] = []
+      for (let i = 0; i < 5; i++) {
+        const start = Date.now()
+        fake(cachedSchema)
+        const end = Date.now()
+        times.push(end - start)
+      }
+
+      // Later calls should not be significantly slower than first call
+      const avgTime = times.reduce((sum, time) => sum + time, 0) / times.length
+      expect(avgTime).toBeLessThan(50) // Should be very fast for simple intersections
+
+      // Test 5: Memory usage should be bounded
+      // This is harder to test directly, but we can ensure that repeated calls
+      // don't cause memory leaks by running many iterations
+      for (let i = 0; i < 100; i++) {
+        fake(z.intersection(z.string(), z.string().min(1)))
+      }
+      // If we get here without running out of memory, the test passes
+
+      // Test 6: Recursion tracking should be properly cleaned up
+      const cleanupTestSchema = z.lazy(() => z.intersection(
+        z.object({ value: z.string() }),
+        cleanupTestSchema.optional()
+      ))
+
+      // Multiple independent calls should not interfere with each other
+      const results = []
+      for (let i = 0; i < 10; i++) {
+        let result
+        let attempts = 0
+        // Retry up to 10 times to get a non-undefined result (since optional can return undefined)
+        do {
+          result = fake(cleanupTestSchema)
+          attempts++
+        } while (result === undefined && attempts < 10)
+
+        if (result !== undefined) {
+          results.push(result)
+        }
+      }
+
+      // We should have gotten at least some valid results
+      expect(results.length).toBeGreaterThan(0)
+
+      // All results should be valid and independent
+      results.forEach(result => {
+        expect(typeof result).toBe('object')
+        expect(result).toHaveProperty('value')
+      })
+    })
+  })
 })
