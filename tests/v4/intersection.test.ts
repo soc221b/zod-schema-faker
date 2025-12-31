@@ -3964,4 +3964,238 @@ describe('promise intersection handler', () => {
       )
     })
   })
+
+  describe('unknown intersection handler', () => {
+    it('should handle identical unknown schemas by returning a valid unknown value', () => {
+      // Same unknown schema should intersect to a valid unknown value
+      const unknownSchema1 = z.unknown()
+      const unknownSchema2 = z.unknown()
+
+      const intersectionSchema = z.intersection(unknownSchema1, unknownSchema2)
+      const result = fake(intersectionSchema)
+
+      // Unknown can be any type, so we just check it's not undefined
+      expect(result).toBeDefined()
+    })
+
+    it('should handle unknown with specific types by returning the specific type', () => {
+      // Unknown intersected with specific types should return the specific type
+      const unknownSchema = z.unknown()
+      const stringSchema = z.string()
+      const numberSchema = z.number()
+      const booleanSchema = z.boolean()
+
+      const unknownStringIntersection = z.intersection(unknownSchema, stringSchema)
+      const unknownNumberIntersection = z.intersection(unknownSchema, numberSchema)
+      const unknownBooleanIntersection = z.intersection(unknownSchema, booleanSchema)
+
+      const stringResult = fake(unknownStringIntersection)
+      const numberResult = fake(unknownNumberIntersection)
+      const booleanResult = fake(unknownBooleanIntersection)
+
+      expect(typeof stringResult).toBe('string')
+      expect(typeof numberResult).toBe('number')
+      expect(typeof booleanResult).toBe('boolean')
+    })
+
+    it('should handle unknown with literal types', () => {
+      // Unknown intersected with literal should return the literal value
+      const unknownSchema = z.unknown()
+      const literalSchema = z.literal('test')
+
+      const intersectionSchema = z.intersection(unknownSchema, literalSchema)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe('test')
+    })
+
+    it('should handle unknown with enum types', () => {
+      // Unknown intersected with enum should return an enum value
+      const unknownSchema = z.unknown()
+      const enumSchema = z.enum(['red', 'green', 'blue'])
+
+      const intersectionSchema = z.intersection(unknownSchema, enumSchema)
+      const result = fake(intersectionSchema)
+
+      expect(['red', 'green', 'blue']).toContain(result)
+    })
+
+    it('should handle unknown with union types', () => {
+      // Unknown intersected with union should return a union option
+      const unknownSchema = z.unknown()
+      const unionSchema = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(unknownSchema, unionSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result === 'string' || typeof result === 'number').toBe(true)
+    })
+
+    it('should handle unknown with lazy types', () => {
+      // Unknown intersected with lazy should resolve lazy and use that type
+      const unknownSchema = z.unknown()
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(unknownSchema, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle unknown with pipe types', () => {
+      // Unknown intersected with pipe should use pipe's input schema
+      const unknownSchema = z.unknown()
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(unknownSchema, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle unknown with wrapper types', () => {
+      // Unknown intersected with wrapper types should use the wrapper's underlying schema
+      const unknownSchema = z.unknown()
+      const optionalString = z.string().optional()
+      const nullableNumber = z.number().nullable()
+
+      const unknownOptionalIntersection = z.intersection(unknownSchema, optionalString)
+      const unknownNullableIntersection = z.intersection(unknownSchema, nullableNumber)
+
+      const optionalResult = fake(unknownOptionalIntersection)
+      const nullableResult = fake(unknownNullableIntersection)
+
+      expect(typeof optionalResult === 'string' || optionalResult === undefined).toBe(true)
+      expect(typeof nullableResult === 'number' || nullableResult === null).toBe(true)
+    })
+
+    it('should handle unknown with never type', () => {
+      // Unknown with never should be impossible
+      const unknownSchema = z.unknown()
+      const neverSchema = z.never()
+
+      const intersectionSchema = z.intersection(unknownSchema, neverSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
+    })
+  })
+
+  describe('any intersection handler', () => {
+    it('should handle identical any schemas by returning a valid any value', () => {
+      // Same any schema should intersect to a valid any value
+      const anySchema1 = z.any()
+      const anySchema2 = z.any()
+
+      const intersectionSchema = z.intersection(anySchema1, anySchema2)
+      const result = fake(intersectionSchema)
+
+      // Any can be any type, so we just check it's not undefined
+      expect(result).toBeDefined()
+    })
+
+    it('should handle any with specific types by returning the specific type', () => {
+      // Any intersected with specific types should return the specific type
+      const anySchema = z.any()
+      const stringSchema = z.string()
+      const numberSchema = z.number()
+      const booleanSchema = z.boolean()
+
+      const anyStringIntersection = z.intersection(anySchema, stringSchema)
+      const anyNumberIntersection = z.intersection(anySchema, numberSchema)
+      const anyBooleanIntersection = z.intersection(anySchema, booleanSchema)
+
+      const stringResult = fake(anyStringIntersection)
+      const numberResult = fake(anyNumberIntersection)
+      const booleanResult = fake(anyBooleanIntersection)
+
+      expect(typeof stringResult).toBe('string')
+      expect(typeof numberResult).toBe('number')
+      expect(typeof booleanResult).toBe('boolean')
+    })
+
+    it('should handle any with literal types', () => {
+      // Any intersected with literal should return the literal value
+      const anySchema = z.any()
+      const literalSchema = z.literal('test')
+
+      const intersectionSchema = z.intersection(anySchema, literalSchema)
+      const result = fake(intersectionSchema)
+
+      expect(result).toBe('test')
+    })
+
+    it('should handle any with enum types', () => {
+      // Any intersected with enum should return an enum value
+      const anySchema = z.any()
+      const enumSchema = z.enum(['red', 'green', 'blue'])
+
+      const intersectionSchema = z.intersection(anySchema, enumSchema)
+      const result = fake(intersectionSchema)
+
+      expect(['red', 'green', 'blue']).toContain(result)
+    })
+
+    it('should handle any with union types', () => {
+      // Any intersected with union should return a union option
+      const anySchema = z.any()
+      const unionSchema = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(anySchema, unionSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result === 'string' || typeof result === 'number').toBe(true)
+    })
+
+    it('should handle any with lazy types', () => {
+      // Any intersected with lazy should resolve lazy and use that type
+      const anySchema = z.any()
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(anySchema, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle any with pipe types', () => {
+      // Any intersected with pipe should use pipe's input schema
+      const anySchema = z.any()
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(anySchema, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle any with wrapper types', () => {
+      // Any intersected with wrapper types should use the wrapper's underlying schema
+      const anySchema = z.any()
+      const optionalString = z.string().optional()
+      const nullableNumber = z.number().nullable()
+
+      const anyOptionalIntersection = z.intersection(anySchema, optionalString)
+      const anyNullableIntersection = z.intersection(anySchema, nullableNumber)
+
+      const optionalResult = fake(anyOptionalIntersection)
+      const nullableResult = fake(anyNullableIntersection)
+
+      expect(typeof optionalResult === 'string' || optionalResult === undefined).toBe(true)
+      expect(typeof nullableResult === 'number' || nullableResult === null).toBe(true)
+    })
+
+    it('should handle any with never type', () => {
+      // Any with never should be impossible
+      const anySchema = z.any()
+      const neverSchema = z.never()
+
+      const intersectionSchema = z.intersection(anySchema, neverSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
+    })
+  })
 })

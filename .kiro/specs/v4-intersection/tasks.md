@@ -345,21 +345,21 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 37. Implement unknown intersection handler (TDD) - General
-  - [ ] 37.1 Write failing test for unknown intersection
+- [x] 37. Implement unknown intersection handler (TDD) - General
+  - [x] 37.1 Write failing test for unknown intersection
     - Test unknown schema intersection semantics
     - _Requirements: 2.2_
 
-  - [ ] 37.2 Implement unknown intersection logic
+  - [x] 37.2 Implement unknown intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 38. Implement any intersection handler (TDD) - Most General
-  - [ ] 38.1 Write failing test for any intersection
+- [x] 38. Implement any intersection handler (TDD) - Most General
+  - [x] 38.1 Write failing test for any intersection
     - Test any schema intersection semantics
     - _Requirements: 2.2_
 
-  - [ ] 38.2 Implement any intersection logic
+  - [x] 38.2 Implement any intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
