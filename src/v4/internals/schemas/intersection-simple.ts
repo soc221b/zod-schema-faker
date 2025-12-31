@@ -3,6 +3,66 @@ import { Context } from '../context'
 import { rootFake as internalFake } from '../fake'
 import { Infer } from '../type'
 
+// Utility function to determine if a schema type has a specific handler
+export function hasSpecificHandler(schemaType: string | null | undefined): boolean {
+  if (!schemaType || typeof schemaType !== 'string') {
+    return false
+  }
+
+  // Schema types that have specific handlers in the intersection logic
+  const typesWithHandlers = new Set([
+    // Most specific types
+    'never',
+    'literal',
+    'nan',
+    'null',
+    'undefined',
+    'void',
+
+    // Constrained types
+    'enum',
+    'template_literal',
+
+    // Primitives
+    'string',
+    'number',
+    'bigint',
+    'boolean',
+    'date',
+    'symbol',
+
+    // Collections
+    'tuple',
+    'object',
+    'array',
+    'record',
+    'map',
+    'set',
+
+    // Combinators
+    'union',
+    'lazy',
+    'pipe',
+
+    // Wrappers
+    'optional',
+    'nullable',
+    'default',
+    'readonly',
+    'nonoptional',
+    'catch',
+    'prefault',
+
+    // Advanced types
+    'function',
+    'promise',
+    'file',
+    'custom'
+  ])
+
+  return typesWithHandlers.has(schemaType)
+}
+
 export function fakeIntersection<T extends core.$ZodIntersection>(
   schema: T,
   context: Context,
@@ -3037,7 +3097,7 @@ function handlePromiseIntersection(left: any, right: any, context: Context, root
         return Promise.resolve(innerValue)
       } catch (error) {
         // If inner types are incompatible, throw a promise-specific error
-        throw new TypeError(`Cannot intersect promise inner types - ${error.message}`)
+        throw new TypeError(`Cannot intersect promise inner types - ${error instanceof Error ? error.message : String(error)}`)
       }
 
     case 'any':

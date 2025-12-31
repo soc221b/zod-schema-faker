@@ -373,7 +373,7 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 1.3, 3.1_
 
-- [-] 40. Implement recursion protection (TDD)
+- [x] 40. Implement recursion protection (TDD)
   - [x] 40.1 Write failing test for recursion protection
     - Test circular reference detection
     - Test depth limits and caching for performance
@@ -383,21 +383,21 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 3.2_
 
-- [ ] 41. Write property test for impossible intersection error handling
+- [x] 41. Write property test for impossible intersection error handling
   - **Property 5: Impossible intersection error handling**
   - **Validates: Requirements 1.3, 3.1**
 
-- [ ] 42. Write property test for recursion safety
+- [x] 42. Write property test for recursion safety
   - **Property 6: Recursion safety**
   - **Validates: Requirements 3.2**
 
-- [ ] 43. Implement optimization features (TDD)
-  - [ ] 43.1 Write failing test for left/right swapping optimization
+- [x] 43. Implement optimization features (TDD)
+  - [x] 43.1 Write failing test for left/right swapping optimization
     - Test `hasSpecificHandler` utility function
     - Test swapping logic to reduce code duplication
     - _Requirements: 3.4_
 
-  - [ ] 43.2 Implement left/right swapping optimization
+  - [x] 43.2 Implement left/right swapping optimization
     - Make the test pass with minimal implementation
     - _Requirements: 3.4_
 

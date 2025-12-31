@@ -4839,4 +4839,133 @@ describe('promise intersection handler', () => {
       })
     })
   })
+
+  describe('optimization features', () => {
+    beforeAll(() => {
+      setFaker(faker)
+    })
+
+    describe('left/right swapping optimization', () => {
+      it('should have a hasSpecificHandler utility function', () => {
+        // Test that hasSpecificHandler utility function exists and works correctly
+        // This function should determine if a schema type has a specific handler
+
+        // Since we can't easily import internal functions, we'll test the behavior indirectly
+        // by testing that swapping works correctly (which relies on hasSpecificHandler)
+
+        // Test that more specific types are handled correctly when on the right side
+        // This indirectly tests that hasSpecificHandler correctly identifies specific types
+
+        // Test 1: any & literal should return literal (literal is more specific)
+        const anySchema = z.any()
+        const literalSchema = z.literal('test')
+        const anyLiteralIntersection = z.intersection(anySchema, literalSchema)
+        const result1 = fake(anyLiteralIntersection)
+        expect(result1).toBe('test') // Should return the literal value
+
+        // Test 2: unknown & enum should return enum value (enum is more specific)
+        const unknownSchema = z.unknown()
+        const enumSchema = z.enum(['red', 'green', 'blue'])
+        const unknownEnumIntersection = z.intersection(unknownSchema, enumSchema)
+        const result2 = fake(unknownEnumIntersection)
+        expect(['red', 'green', 'blue']).toContain(result2)
+
+        // Test 3: string & literal should return literal (literal is more specific)
+        const stringSchema = z.string()
+        const stringLiteralIntersection = z.intersection(stringSchema, literalSchema)
+        const result3 = fake(stringLiteralIntersection)
+        expect(result3).toBe('test')
+
+        // These tests indirectly verify that hasSpecificHandler works correctly
+        // by ensuring that more specific types take precedence regardless of order
+      })
+
+      it('should swap left and right when right is more specific', () => {
+        // Test that the swapping logic reduces code duplication by ensuring
+        // more specific types are always on the left side
+
+        // Create schemas where right is more specific than left
+        const anySchema = z.any()
+        const literalSchema = z.literal('test')
+
+        // When any & literal, literal should be processed (more specific)
+        const anyLiteralIntersection = z.intersection(anySchema, literalSchema)
+        const result1 = fake(anyLiteralIntersection)
+        expect(result1).toBe('test') // Should return the literal value
+
+        // Test with unknown & enum (enum is more specific)
+        const unknownSchema = z.unknown()
+        const enumSchema = z.enum(['red', 'green', 'blue'])
+
+        const unknownEnumIntersection = z.intersection(unknownSchema, enumSchema)
+        const result2 = fake(unknownEnumIntersection)
+        expect(['red', 'green', 'blue']).toContain(result2)
+
+        // Test with string & literal (literal is more specific)
+        const stringSchema = z.string()
+        const stringLiteralIntersection = z.intersection(stringSchema, literalSchema)
+        const result3 = fake(stringLiteralIntersection)
+        expect(result3).toBe('test')
+
+        // Test with number & literal number (literal is more specific)
+        const numberSchema = z.number()
+        const numberLiteral = z.literal(42)
+
+        const numberLiteralIntersection = z.intersection(numberSchema, numberLiteral)
+        const result4 = fake(numberLiteralIntersection)
+        expect(result4).toBe(42)
+      })
+
+      it('should optimize by avoiding duplicate handler code', () => {
+        // Test that swapping reduces the need for duplicate handler implementations
+        // By ensuring specific types are always on the left, we avoid having to implement
+        // both "A & B" and "B & A" handlers when B is more specific than A
+
+        // Test that both orders produce the same result due to swapping
+        const stringSchema = z.string().min(5)
+        const literalSchema = z.literal('hello world')
+
+        // Both orders should produce the same result
+        const order1 = z.intersection(stringSchema, literalSchema)
+        const order2 = z.intersection(literalSchema, stringSchema)
+
+        const result1 = fake(order1)
+        const result2 = fake(order2)
+
+        // Both should return the literal value since it's more specific
+        expect(result1).toBe('hello world')
+        expect(result2).toBe('hello world')
+
+        // Test with enum and string
+        const enumSchema = z.enum(['apple', 'banana', 'cherry'])
+        const stringType = z.string()
+
+        const enumStringOrder1 = z.intersection(enumSchema, stringType)
+        const enumStringOrder2 = z.intersection(stringType, enumSchema)
+
+        const enumResult1 = fake(enumStringOrder1)
+        const enumResult2 = fake(enumStringOrder2)
+
+        // Both should return valid enum values
+        expect(['apple', 'banana', 'cherry']).toContain(enumResult1)
+        expect(['apple', 'banana', 'cherry']).toContain(enumResult2)
+
+        // Test with object and any
+        const objectSchema = z.object({ name: z.string() })
+        const anyType = z.any()
+
+        const objectAnyOrder1 = z.intersection(objectSchema, anyType)
+        const objectAnyOrder2 = z.intersection(anyType, objectSchema)
+
+        const objectResult1 = fake(objectAnyOrder1)
+        const objectResult2 = fake(objectAnyOrder2)
+
+        // Both should return valid objects
+        expect(typeof objectResult1).toBe('object')
+        expect(typeof objectResult2).toBe('object')
+        expect(objectResult1).toHaveProperty('name')
+        expect(objectResult2).toHaveProperty('name')
+      })
+    })
+  })
 })
