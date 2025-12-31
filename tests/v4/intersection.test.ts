@@ -4969,3 +4969,142 @@ describe('promise intersection handler', () => {
     })
   })
 })
+
+describe('future v4 type support', () => {
+  beforeAll(() => {
+    setFaker(faker)
+  })
+
+  describe('placeholder handlers for future types', () => {
+    it('should handle int type with descriptive error', () => {
+      // Test that int type (future v4 type) throws descriptive error
+      // Since int is not yet implemented in Zod v4, we simulate the schema structure
+
+      // Create a mock int schema structure (this would be the actual structure when int is added to v4)
+      const mockIntSchema = {
+        _zod: {
+          def: {
+            type: 'int' as const,
+            // int-specific properties would go here
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      const stringSchema = z.string()
+
+      // Create intersection with the mock int schema
+      const intIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: mockIntSchema,
+            right: stringSchema,
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      // Should throw descriptive error for unsupported int type
+      expect(() => fake(intIntersection)).toThrow('Intersection with int not yet supported')
+    })
+
+    it('should handle success type with descriptive error', () => {
+      // Test that success type (future v4 type) throws descriptive error
+      // Since success is not yet implemented in Zod v4, we simulate the schema structure
+
+      // Create a mock success schema structure
+      const mockSuccessSchema = {
+        _zod: {
+          def: {
+            type: 'success' as const,
+            // success-specific properties would go here
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      const numberSchema = z.number()
+
+      // Create intersection with the mock success schema
+      const successIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: mockSuccessSchema,
+            right: numberSchema,
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      // Should throw descriptive error for unsupported success type
+      expect(() => fake(successIntersection)).toThrow('Intersection with success not yet supported')
+    })
+
+    it('should handle transform type with descriptive error', () => {
+      // Test that transform type (future v4 type) throws descriptive error
+      // Since transform is not yet implemented in Zod v4, we simulate the schema structure
+
+      // Create a mock transform schema structure
+      const mockTransformSchema = {
+        _zod: {
+          def: {
+            type: 'transform' as const,
+            // transform-specific properties would go here
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      const booleanSchema = z.boolean()
+
+      // Create intersection with the mock transform schema
+      const transformIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: mockTransformSchema,
+            right: booleanSchema,
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      // Should throw descriptive error for unsupported transform type
+      expect(() => fake(transformIntersection)).toThrow('Intersection with transform not yet supported')
+    })
+
+    it('should handle unknown future types with generic error', () => {
+      // Test that completely unknown future types throw generic descriptive error
+
+      // Create a mock unknown future type schema structure
+      const mockUnknownSchema = {
+        _zod: {
+          def: {
+            type: 'future_unknown_type' as const,
+            // unknown type properties
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      const anySchema = z.any()
+
+      // Create intersection with the mock unknown schema
+      const unknownIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: mockUnknownSchema,
+            right: anySchema,
+          },
+        },
+        '"~standard"': {} as any,
+      } as any
+
+      // Should throw generic error for completely unknown types
+      expect(() => fake(unknownIntersection)).toThrow('Intersection with future_unknown_type not yet supported')
+    })
+  })
+})

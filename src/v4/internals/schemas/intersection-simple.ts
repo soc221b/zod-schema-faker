@@ -172,6 +172,14 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     case 'unknown':
       return handleUnknownIntersection(left, right, context, rootFake)
 
+    // Future v4 types (placeholder handlers)
+    case 'int':
+      throw new TypeError('Intersection with int not yet supported')
+    case 'success':
+      throw new TypeError('Intersection with success not yet supported')
+    case 'transform':
+      throw new TypeError('Intersection with transform not yet supported')
+
     default:
       throw new TypeError(`Intersection with ${left._zod.def.type} not yet supported`)
   }
@@ -186,6 +194,10 @@ function shouldSwap(left: any, right: any): boolean {
   const specificity: Record<string, number> = {
     any: 0,
     unknown: 1,
+    // Future v4 types (low specificity to ensure they get swapped to left side)
+    int: 0.5,
+    success: 0.5,
+    transform: 0.5,
     function: 2, // Advanced types are less specific than primitives but more than any/unknown
     promise: 2, // Advanced types are less specific than primitives but more than any/unknown
     file: 2, // Advanced types are less specific than primitives but more than any/unknown
@@ -321,6 +333,14 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'intersection':
       // String intersected with another intersection - recursively handle it
       return handleStringWithIntersectionType(left, right, context, rootFake)
+
+    // Future v4 types - throw descriptive errors
+    case 'int':
+      throw new TypeError('Intersection with int not yet supported')
+    case 'success':
+      throw new TypeError('Intersection with success not yet supported')
+    case 'transform':
+      throw new TypeError('Intersection with transform not yet supported')
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -989,6 +1009,14 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
       // Number intersected with prefault should use prefault's underlying schema
       return handlePrefaultWithSpecificType(right, left, context, rootFake)
 
+    // Future v4 types - throw descriptive errors
+    case 'int':
+      throw new TypeError('Intersection with int not yet supported')
+    case 'success':
+      throw new TypeError('Intersection with success not yet supported')
+    case 'transform':
+      throw new TypeError('Intersection with transform not yet supported')
+
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
   }
@@ -1310,6 +1338,14 @@ function handleBooleanIntersection(left: any, right: any, context: Context, root
     case 'unknown':
       // Boolean intersected with any/unknown should return a boolean
       return Math.random() < 0.5
+
+    // Future v4 types - throw descriptive errors
+    case 'int':
+      throw new TypeError('Intersection with int not yet supported')
+    case 'success':
+      throw new TypeError('Intersection with success not yet supported')
+    case 'transform':
+      throw new TypeError('Intersection with transform not yet supported')
 
     default:
       throw new TypeError(`Cannot intersect boolean with ${rightType}`)

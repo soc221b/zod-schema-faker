@@ -401,13 +401,13 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 3.4_
 
-- [ ] 44. Add support for future v4 types (TDD)
-  - [ ] 44.1 Write failing test for future type handling
+- [x] 44. Add support for future v4 types (TDD)
+  - [x] 44.1 Write failing test for future type handling
     - Test placeholder handlers for int, success, transform
     - Test descriptive errors for unsupported types
     - _Requirements: 1.3_
 
-  - [ ] 44.2 Implement future type placeholders
+  - [x] 44.2 Implement future type placeholders
     - Make the test pass with minimal implementation
     - _Requirements: 1.3_
 
