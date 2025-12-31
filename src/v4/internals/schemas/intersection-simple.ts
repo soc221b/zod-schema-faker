@@ -101,6 +101,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleFunctionIntersection(left, right, context, rootFake)
     case 'promise':
       return handlePromiseIntersection(left, right, context, rootFake)
+    case 'file':
+      return handleFileIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -2531,20 +2533,21 @@ function handleNonoptionalIntersection(left: any, right: any, context: Context, 
       '"~standard"': {} as any, // Required by Zod v4 type system
     } as any
 
-    const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
-
-    // Ensure we never return undefined for nonoptional schemas
-    if (intersectedValue === undefined) {
-      // Generate a non-undefined value from the underlying schema
-      let fallbackValue = rootFake(underlyingSchema, context)
-      // If the underlying schema is optional and returns undefined, try the base type
-      if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
-        fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+    // Retry multiple times to avoid undefined from optional schemas
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+      if (intersectedValue !== undefined) {
+        return intersectedValue
       }
-      return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
     }
 
-    return intersectedValue
+    // If all attempts failed, generate a fallback value
+    let fallbackValue = rootFake(underlyingSchema, context)
+    // If the underlying schema is optional and returns undefined, try the base type
+    if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
+      fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+    }
+    return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
   }
 
   // Create intersection with the underlying schema and the right schema
@@ -2559,25 +2562,24 @@ function handleNonoptionalIntersection(left: any, right: any, context: Context, 
     '"~standard"': {} as any, // Required by Zod v4 type system
   } as any
 
-  // Generate the intersected value
-  const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
-
-  // Ensure we never return undefined for nonoptional schemas
-  if (intersectedValue === undefined) {
-    // If the intersection would result in undefined, generate a value from the right schema instead
-    // since the right schema is more specific and should be compatible
-    let fallbackValue = rootFake(right, context)
-
-    // If that also fails, try the underlying schema's inner type (in case it's optional)
-    if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
-      fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+  // Retry multiple times to avoid undefined from optional schemas
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
+    if (intersectedValue !== undefined) {
+      return intersectedValue
     }
-
-    // Final fallback
-    return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
   }
 
-  return intersectedValue
+  // If all attempts failed, generate a fallback value
+  let fallbackValue = rootFake(right, context)
+
+  // If that also fails, try the underlying schema's inner type (in case it's optional)
+  if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
+    fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+  }
+
+  // Final fallback
+  return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
 }
 
 function handleNonoptionalWithSpecificType(
@@ -2807,5 +2809,64 @@ function handleFunctionIntersection(left: any, right: any, context: Context, roo
     default:
       // Function cannot be intersected with non-function types
       throw new TypeError(`Cannot intersect function with ${rightType}`)
+  }
+}
+
+function handleFileIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'file':
+      // Both are file schemas - return a simple file
+      return new File(['file content'], 'test.txt', { type: 'text/plain' })
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept files - generate a file
+      return new File(['file content'], 'test.txt', { type: 'text/plain' })
+
+    case 'union':
+      // File intersected with union should filter union to file-compatible options
+      return handleUnionWithSpecificType(right, left, context, rootFake)
+
+    case 'lazy':
+      // File intersected with lazy should resolve lazy first then intersect
+      return handleLazyWithSpecificType(right, left, context, rootFake)
+
+    case 'pipe':
+      // File intersected with pipe should use pipe's input schema
+      return handlePipeWithSpecificType(right, left, context, rootFake)
+
+    case 'optional':
+      // File intersected with optional should use optional's underlying schema
+      return handleOptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'nullable':
+      // File intersected with nullable should use nullable's underlying schema
+      return handleNullableWithSpecificType(right, left, context, rootFake)
+
+    case 'default':
+      // File intersected with default should use default's underlying schema
+      return handleDefaultWithSpecificType(right, left, context, rootFake)
+
+    case 'readonly':
+      // File intersected with readonly should use readonly's underlying schema
+      return handleReadonlyWithSpecificType(right, left, context, rootFake)
+
+    case 'nonoptional':
+      // File intersected with nonoptional should use nonoptional's underlying schema
+      return handleNonoptionalWithSpecificType(right, left, context, rootFake)
+
+    case 'catch':
+      // File intersected with catch should use catch's underlying schema
+      return handleCatchWithSpecificType(right, left, context, rootFake)
+
+    case 'prefault':
+      // File intersected with prefault should use prefault's underlying schema
+      return handlePrefaultWithSpecificType(right, left, context, rootFake)
+
+    default:
+      // File cannot be intersected with non-file types
+      throw new TypeError(`Cannot intersect file with ${rightType}`)
   }
 }

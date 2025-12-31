@@ -327,12 +327,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 35. Implement file intersection handler (TDD) - Advanced
-  - [ ] 35.1 Write failing test for file intersection
+- [x] 35. Implement file intersection handler (TDD) - Advanced
+  - [x] 35.1 Write failing test for file intersection
     - Test file schema intersection behavior
     - _Requirements: 2.2_
 
-  - [ ] 35.2 Implement file intersection logic
+  - [x] 35.2 Implement file intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 

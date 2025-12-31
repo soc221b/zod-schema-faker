@@ -3760,4 +3760,106 @@ describe('promise intersection handler', () => {
       expect(value).toHaveProperty('age')
     })
   })
+
+  describe('file intersection handler', () => {
+    it('should handle identical file schemas by returning a valid file', () => {
+      // Same file schema should intersect to a valid file
+      const fileSchema1 = z.file()
+      const fileSchema2 = z.file()
+
+      const intersectionSchema = z.intersection(fileSchema1, fileSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof File).toBe(true)
+    })
+
+    it('should handle file with any/unknown types', () => {
+      // File should work with any/unknown
+      const fileSchema = z.file()
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const fileAnyIntersection = z.intersection(fileSchema, anySchema)
+      const fileUnknownIntersection = z.intersection(fileSchema, unknownSchema)
+
+      const anyResult = fake(fileAnyIntersection)
+      const unknownResult = fake(fileUnknownIntersection)
+
+      expect(anyResult instanceof File).toBe(true)
+      expect(unknownResult instanceof File).toBe(true)
+    })
+
+    it('should throw error for file with incompatible type', () => {
+      // File with non-file should be impossible
+      const fileSchema = z.file()
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(fileSchema, stringSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with file')
+    })
+
+    it('should handle file with union types', () => {
+      // File should work with compatible union options
+      const fileSchema = z.file()
+      const fileUnion = z.union([z.file(), z.string()])
+
+      const intersectionSchema = z.intersection(fileSchema, fileUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a file (the compatible union option)
+      expect(result instanceof File).toBe(true)
+    })
+
+    it('should handle file with lazy types', () => {
+      // File should work with lazy schemas
+      const fileSchema = z.file()
+      const lazyFile = z.lazy(() => z.file())
+
+      const intersectionSchema = z.intersection(fileSchema, lazyFile)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof File).toBe(true)
+    })
+
+    it('should handle file with pipe types', () => {
+      // File should work with pipe schemas
+      const fileSchema = z.file()
+      const pipeFile = z.file().pipe(z.file())
+
+      const intersectionSchema = z.intersection(fileSchema, pipeFile)
+      const result = fake(intersectionSchema)
+
+      expect(result instanceof File).toBe(true)
+    })
+
+    it('should handle file with other wrapper types', () => {
+      // File should work with optional, nullable, default
+      const fileSchema = z.file()
+      const optionalFile = z.file().optional()
+      const nullableFile = z.file().nullable()
+
+      const fileOptionalIntersection = z.intersection(fileSchema, optionalFile)
+      const fileNullableIntersection = z.intersection(fileSchema, nullableFile)
+
+      const optionalResult = fake(fileOptionalIntersection)
+      const nullableResult = fake(fileNullableIntersection)
+
+      // Results should be files or compatible wrapper values
+      expect(optionalResult instanceof File || optionalResult === undefined).toBe(true)
+      expect(nullableResult instanceof File || nullableResult === null).toBe(true)
+    })
+
+    it('should handle file with never type', () => {
+      // File with never should be impossible
+      const fileSchema = z.file()
+      const neverSchema = z.never()
+
+      const intersectionSchema = z.intersection(fileSchema, neverSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
+    })
+  })
 })
