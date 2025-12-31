@@ -336,12 +336,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 36. Implement custom intersection handler (TDD) - Advanced
-  - [ ] 36.1 Write failing test for custom intersection
+- [x] 36. Implement custom intersection handler (TDD) - Advanced
+  - [x] 36.1 Write failing test for custom intersection
     - Test custom schema intersection semantics
     - _Requirements: 2.2_
 
-  - [ ] 36.2 Implement custom intersection logic
+  - [x] 36.2 Implement custom intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 

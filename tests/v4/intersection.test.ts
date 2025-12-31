@@ -3862,4 +3862,106 @@ describe('promise intersection handler', () => {
       )
     })
   })
+
+  describe('custom intersection handler', () => {
+    it('should handle identical custom schemas by returning a valid custom value', () => {
+      // Same custom schema should intersect to a valid custom value
+      const customSchema1 = z.custom<string>((val) => typeof val === 'string')
+      const customSchema2 = z.custom<string>((val) => typeof val === 'string')
+
+      const intersectionSchema = z.intersection(customSchema1, customSchema2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle custom with any/unknown types', () => {
+      // Custom should work with any/unknown
+      const customSchema = z.custom<number>((val) => typeof val === 'number')
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const customAnyIntersection = z.intersection(customSchema, anySchema)
+      const customUnknownIntersection = z.intersection(customSchema, unknownSchema)
+
+      const anyResult = fake(customAnyIntersection)
+      const unknownResult = fake(customUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+    })
+
+    it('should throw error for custom with incompatible type', () => {
+      // Custom with incompatible type should be impossible
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(customSchema, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect number with custom')
+    })
+
+    it('should handle custom with union types', () => {
+      // Custom should work with compatible union options
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const stringUnion = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(customSchema, stringUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the compatible union option)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle custom with lazy types', () => {
+      // Custom should work with lazy schemas
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(customSchema, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle custom with pipe types', () => {
+      // Custom should work with pipe schemas
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(customSchema, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle custom with other wrapper types', () => {
+      // Custom should work with optional, nullable, default
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const optionalString = z.string().optional()
+      const nullableString = z.string().nullable()
+
+      const customOptionalIntersection = z.intersection(customSchema, optionalString)
+      const customNullableIntersection = z.intersection(customSchema, nullableString)
+
+      const optionalResult = fake(customOptionalIntersection)
+      const nullableResult = fake(customNullableIntersection)
+
+      // Results should be strings or compatible wrapper values
+      expect(typeof optionalResult === 'string' || optionalResult === undefined).toBe(true)
+      expect(typeof nullableResult === 'string' || nullableResult === null).toBe(true)
+    })
+
+    it('should handle custom with never type', () => {
+      // Custom with never should be impossible
+      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const neverSchema = z.never()
+
+      const intersectionSchema = z.intersection(customSchema, neverSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
+    })
+  })
 })
