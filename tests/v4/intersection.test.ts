@@ -3680,3 +3680,84 @@ describe('function intersection handler', () => {
     expect(typeof result).toBe('function')
   })
 })
+
+describe('promise intersection handler', () => {
+  it('should handle identical promise schemas by returning a valid promise', () => {
+    // Same promise schema should intersect to a valid promise
+    const promiseSchema1 = z.promise(z.string())
+    const promiseSchema2 = z.promise(z.string())
+
+    const intersectionSchema = z.intersection(promiseSchema1, promiseSchema2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Promise).toBe(true)
+  })
+
+  it('should handle promise with compatible inner types by merging constraints', () => {
+    // Promises with compatible inner types should merge constraints
+    const promise1 = z.promise(z.string())
+    const promise2 = z.promise(z.string().min(3))
+
+    const intersectionSchema = z.intersection(promise1, promise2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Promise).toBe(true)
+    // Test that the promise resolves to the merged constraint
+    return result.then(value => {
+      expect(typeof value).toBe('string')
+      expect(value.length).toBeGreaterThanOrEqual(3)
+    })
+  })
+
+  it('should throw error for promises with incompatible inner types', () => {
+    // Promises with incompatible inner types should fail
+    const promise1 = z.promise(z.string())
+    const promise2 = z.promise(z.number())
+
+    const intersectionSchema = z.intersection(promise1, promise2)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect promise')
+  })
+
+  it('should handle promise with any/unknown types', () => {
+    // Promise should work with any/unknown
+    const promiseSchema = z.promise(z.string())
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const promiseAnyIntersection = z.intersection(promiseSchema, anySchema)
+    const promiseUnknownIntersection = z.intersection(promiseSchema, unknownSchema)
+
+    const anyResult = fake(promiseAnyIntersection)
+    const unknownResult = fake(promiseUnknownIntersection)
+
+    expect(anyResult instanceof Promise).toBe(true)
+    expect(unknownResult instanceof Promise).toBe(true)
+  })
+
+  it('should throw error for promise with incompatible type', () => {
+    // Promise with non-promise should be impossible
+    const promiseSchema = z.promise(z.string())
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(promiseSchema, stringSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with promise')
+  })
+
+  it('should handle nested promise intersections', () => {
+    // Test nested promise constraint merging
+    const promise1 = z.promise(z.object({ name: z.string() }))
+    const promise2 = z.promise(z.object({ name: z.string(), age: z.number() }))
+
+    const intersectionSchema = z.intersection(promise1, promise2)
+    const result = fake(intersectionSchema)
+
+    expect(result instanceof Promise).toBe(true)
+    return result.then(value => {
+      expect(typeof value).toBe('object')
+      expect(value).toHaveProperty('name')
+      expect(value).toHaveProperty('age')
+    })
+  })
+})

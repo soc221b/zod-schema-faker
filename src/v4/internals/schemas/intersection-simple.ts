@@ -99,6 +99,8 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
     // Advanced types
     case 'function':
       return handleFunctionIntersection(left, right, context, rootFake)
+    case 'promise':
+      return handlePromiseIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -587,8 +589,9 @@ function handleEnumIntersection(left: any, right: any, context: Context, rootFak
       return handleLazyWithSpecificType(right, left, context, rootFake)
 
     case 'default':
-      // Enum intersected with default should use default's underlying schema
-      return handleDefaultWithSpecificType(right, left, context, rootFake)
+      // Enum intersected with default should return an enum value (enum is more specific)
+      const defaultRandomIndex = Math.floor(Math.random() * leftValues.length)
+      return leftValues[defaultRandomIndex]
 
     case 'readonly':
       // Enum intersected with readonly should use readonly's underlying schema
@@ -1638,6 +1641,26 @@ function mergeArrayConstraints(left: any, right: any, context: Context, rootFake
   const leftElement = leftDef.element || leftDef.type
   const rightElement = rightDef.element || rightDef.type
 
+  // Check if element types can be intersected by trying a test intersection
+  try {
+    const elementIntersection = {
+      _zod: {
+        def: {
+          type: 'intersection' as const,
+          left: leftElement,
+          right: rightElement,
+        },
+      },
+      '"~standard"': {} as any, // Required by Zod v4 type system
+    } as any
+
+    // Try to generate one element to test compatibility
+    fakeIntersection(elementIntersection, context, rootFake)
+  } catch (error) {
+    // If element intersection fails, throw a specific array error
+    throw new TypeError('Cannot intersect array element types - element types are incompatible')
+  }
+
   // Generate array with merged constraints
   const length =
     mergedMin === mergedMax ? mergedMin : Math.floor(Math.random() * (mergedMax - mergedMin + 1)) + mergedMin
@@ -1656,15 +1679,8 @@ function mergeArrayConstraints(left: any, right: any, context: Context, rootFake
       '"~standard"': {} as any, // Required by Zod v4 type system
     } as any
 
-    try {
-      const elementValue = fakeIntersection(elementIntersection, context, rootFake)
-      result.push(elementValue)
-    } catch (error) {
-      // If element intersection fails, throw a more specific error
-      throw new TypeError(
-        `Cannot intersect array element types: ${error instanceof Error ? error.message : String(error)}`,
-      )
-    }
+    const elementValue = fakeIntersection(elementIntersection, context, rootFake)
+    result.push(elementValue)
   }
 
   return result
@@ -2373,6 +2389,21 @@ function handleDefaultIntersection(left: any, right: any, context: Context, root
   const defaultValue = left._zod.def.defaultValue
   const rightType = right._zod.def.type
 
+  // Special handling for more specific types that should take precedence over default
+  if (rightType === 'literal') {
+    // Literal is more specific than default - always use the literal value
+    const literalValues = right._zod.def.values
+    return literalValues[0] // Return the literal value directly
+  }
+
+  if (rightType === 'enum') {
+    // Enum is more specific than default - return a random enum value
+    const enumEntries = right._zod.def.entries
+    const enumValues = Object.values(enumEntries)
+    const randomIndex = Math.floor(Math.random() * enumValues.length)
+    return enumValues[randomIndex]
+  }
+
   // Create intersection with the underlying schema and the right schema
   const underlyingIntersection = {
     _zod: {
@@ -2388,27 +2419,11 @@ function handleDefaultIntersection(left: any, right: any, context: Context, root
   // Generate the intersected value
   const intersectedValue = fakeIntersection(underlyingIntersection, context, rootFake)
 
-  // For default schemas, we can return the default value sometimes to preserve default behavior
+  // For default schemas with compatible types, we can return the default value sometimes to preserve default behavior
   // But only if the default value is compatible with the intersection
   if (Math.random() < 0.2) {
-    // Check if the default value is compatible with the right schema
-    if (rightType === 'enum') {
-      const enumEntries = right._zod.def.entries
-      const enumValues = Object.values(enumEntries)
-      if (enumValues.includes(defaultValue)) {
-        return defaultValue
-      }
-      // If default is not in enum, return the intersected value instead
-    } else if (rightType === 'literal') {
-      const literalValues = right._zod.def.values
-      if (literalValues.includes(defaultValue)) {
-        return defaultValue
-      }
-      // If default doesn't match literal, return the intersected value instead
-    } else {
-      // For other types, assume the default is compatible
-      return defaultValue
-    }
+    // For other types, assume the default is compatible
+    return defaultValue
   }
 
   return intersectedValue
@@ -2520,7 +2535,13 @@ function handleNonoptionalIntersection(left: any, right: any, context: Context, 
 
     // Ensure we never return undefined for nonoptional schemas
     if (intersectedValue === undefined) {
-      return rootFake(underlyingSchema, context)
+      // Generate a non-undefined value from the underlying schema
+      let fallbackValue = rootFake(underlyingSchema, context)
+      // If the underlying schema is optional and returns undefined, try the base type
+      if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
+        fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+      }
+      return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
     }
 
     return intersectedValue
@@ -2543,9 +2564,16 @@ function handleNonoptionalIntersection(left: any, right: any, context: Context, 
 
   // Ensure we never return undefined for nonoptional schemas
   if (intersectedValue === undefined) {
-    // If the intersection would result in undefined, generate a value from the underlying schema instead
-    const fallbackValue = rootFake(underlyingSchema, context)
-    // Double-check that the fallback is not undefined
+    // If the intersection would result in undefined, generate a value from the right schema instead
+    // since the right schema is more specific and should be compatible
+    let fallbackValue = rootFake(right, context)
+
+    // If that also fails, try the underlying schema's inner type (in case it's optional)
+    if (fallbackValue === undefined && underlyingSchema._zod?.def?.innerType) {
+      fallbackValue = rootFake(underlyingSchema._zod.def.innerType, context)
+    }
+
+    // Final fallback
     return fallbackValue !== undefined ? fallbackValue : 'nonoptional-fallback'
   }
 
@@ -2712,6 +2740,52 @@ function handlePrefaultWithSpecificType(prefaultSchema: any, specificSchema: any
   } as any
 
   return fakeIntersection(underlyingIntersection, context, rootFake)
+}
+
+function handlePromiseIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For promise schemas, we intersect the inner types and wrap in a promise
+
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'promise':
+      // Both are promise schemas - intersect their inner types
+      const leftInnerSchema = left._zod.def.innerType
+      const rightInnerSchema = right._zod.def.innerType
+
+      // Try to intersect the inner types, but catch errors and re-throw with promise context
+      try {
+        // Create intersection of inner types
+        const innerIntersection = {
+          _zod: {
+            def: {
+              type: 'intersection' as const,
+              left: leftInnerSchema,
+              right: rightInnerSchema,
+            },
+            '"~standard"': {} as any, // Required by Zod v4 type system
+          },
+        } as any
+
+        // Generate the inner value and wrap in a promise
+        const innerValue = fakeIntersection(innerIntersection, context, rootFake)
+        return Promise.resolve(innerValue)
+      } catch (error) {
+        // If inner types are incompatible, throw a promise-specific error
+        throw new TypeError(`Cannot intersect promise inner types - ${error.message}`)
+      }
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept promises - generate from left promise inner type
+      const leftInnerSchema2 = left._zod.def.innerType
+      const innerResult = rootFake(leftInnerSchema2, context)
+      return Promise.resolve(innerResult)
+
+    default:
+      // Promise cannot be intersected with non-promise types
+      throw new TypeError(`Cannot intersect promise with ${rightType}`)
+  }
 }
 
 function handleFunctionIntersection(left: any, right: any, context: Context, rootFake: any): any {

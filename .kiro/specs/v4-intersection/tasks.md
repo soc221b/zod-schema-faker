@@ -318,12 +318,12 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 34. Implement promise intersection handler (TDD) - Advanced
-  - [ ] 34.1 Write failing test for promise intersection
+- [-] 34. Implement promise intersection handler (TDD) - Advanced
+  - [x] 34.1 Write failing test for promise intersection
     - Test promise schema intersection behavior
     - _Requirements: 2.2_
 
-  - [ ] 34.2 Implement promise intersection logic
+  - [x] 34.2 Implement promise intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
