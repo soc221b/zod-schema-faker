@@ -3690,7 +3690,7 @@ describe('promise intersection handler', () => {
     const intersectionSchema = z.intersection(promiseSchema1, promiseSchema2)
     const result = fake(intersectionSchema)
 
-    expect(result instanceof Promise).toBe(true)
+    expect((result as any) instanceof Promise).toBe(true)
   })
 
   it('should handle promise with compatible inner types by merging constraints', () => {
@@ -3701,9 +3701,9 @@ describe('promise intersection handler', () => {
     const intersectionSchema = z.intersection(promise1, promise2)
     const result = fake(intersectionSchema)
 
-    expect(result instanceof Promise).toBe(true)
+    expect((result as any) instanceof Promise).toBe(true)
     // Test that the promise resolves to the merged constraint
-    return result.then(value => {
+    return (result as unknown as Promise<any>).then((value: any) => {
       expect(typeof value).toBe('string')
       expect(value.length).toBeGreaterThanOrEqual(3)
     })
@@ -3731,8 +3731,8 @@ describe('promise intersection handler', () => {
     const anyResult = fake(promiseAnyIntersection)
     const unknownResult = fake(promiseUnknownIntersection)
 
-    expect(anyResult instanceof Promise).toBe(true)
-    expect(unknownResult instanceof Promise).toBe(true)
+    expect((anyResult as any) instanceof Promise).toBe(true)
+    expect((unknownResult as any) instanceof Promise).toBe(true)
   })
 
   it('should throw error for promise with incompatible type', () => {
@@ -3753,8 +3753,8 @@ describe('promise intersection handler', () => {
     const intersectionSchema = z.intersection(promise1, promise2)
     const result = fake(intersectionSchema)
 
-    expect(result instanceof Promise).toBe(true)
-    return result.then(value => {
+    expect((result as any) instanceof Promise).toBe(true)
+    return (result as unknown as Promise<any>).then((value: any) => {
       expect(typeof value).toBe('object')
       expect(value).toHaveProperty('name')
       expect(value).toHaveProperty('age')
@@ -3866,8 +3866,8 @@ describe('promise intersection handler', () => {
   describe('custom intersection handler', () => {
     it('should handle identical custom schemas by returning a valid custom value', () => {
       // Same custom schema should intersect to a valid custom value
-      const customSchema1 = z.custom<string>((val) => typeof val === 'string')
-      const customSchema2 = z.custom<string>((val) => typeof val === 'string')
+      const customSchema1 = z.custom<string>(val => typeof val === 'string')
+      const customSchema2 = z.custom<string>(val => typeof val === 'string')
 
       const intersectionSchema = z.intersection(customSchema1, customSchema2)
       const result = fake(intersectionSchema)
@@ -3877,7 +3877,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with any/unknown types', () => {
       // Custom should work with any/unknown
-      const customSchema = z.custom<number>((val) => typeof val === 'number')
+      const customSchema = z.custom<number>(val => typeof val === 'number')
       const anySchema = z.any()
       const unknownSchema = z.unknown()
 
@@ -3893,7 +3893,7 @@ describe('promise intersection handler', () => {
 
     it('should throw error for custom with incompatible type', () => {
       // Custom with incompatible type should be impossible
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const numberSchema = z.number()
 
       const intersectionSchema = z.intersection(customSchema, numberSchema)
@@ -3903,7 +3903,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with union types', () => {
       // Custom should work with compatible union options
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const stringUnion = z.union([z.string(), z.number()])
 
       const intersectionSchema = z.intersection(customSchema, stringUnion)
@@ -3915,7 +3915,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with lazy types', () => {
       // Custom should work with lazy schemas
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const lazyString = z.lazy(() => z.string())
 
       const intersectionSchema = z.intersection(customSchema, lazyString)
@@ -3926,7 +3926,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with pipe types', () => {
       // Custom should work with pipe schemas
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const pipeString = z.string().pipe(z.string())
 
       const intersectionSchema = z.intersection(customSchema, pipeString)
@@ -3937,7 +3937,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with other wrapper types', () => {
       // Custom should work with optional, nullable, default
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const optionalString = z.string().optional()
       const nullableString = z.string().nullable()
 
@@ -3954,7 +3954,7 @@ describe('promise intersection handler', () => {
 
     it('should handle custom with never type', () => {
       // Custom with never should be impossible
-      const customSchema = z.custom<string>((val) => typeof val === 'string')
+      const customSchema = z.custom<string>(val => typeof val === 'string')
       const neverSchema = z.never()
 
       const intersectionSchema = z.intersection(customSchema, neverSchema)
@@ -4371,7 +4371,7 @@ describe('promise intersection handler', () => {
       // Create a recursive schema that could cause infinite loops
 
       // Simple circular reference through lazy schemas
-      const circularSchema = z.lazy(() => z.intersection(circularSchema, z.string()))
+      const circularSchema: any = z.lazy(() => z.intersection(circularSchema, z.string()))
 
       // This should not cause infinite recursion - it should either:
       // 1. Detect the cycle and throw an error, or
@@ -4381,7 +4381,7 @@ describe('promise intersection handler', () => {
       }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
 
       // More complex circular reference
-      const nodeSchema = z.lazy(() =>
+      const nodeSchema: any = z.lazy(() =>
         z.object({
           value: z.string(),
           children: z.array(nodeSchema),
@@ -4470,14 +4470,14 @@ describe('promise intersection handler', () => {
       // Test complex patterns that might cause recursion issues
 
       // Mutually recursive schemas
-      const schemaA = z.lazy(() =>
+      const schemaA: any = z.lazy(() =>
         z.object({
           type: z.literal('A'),
           b: schemaB.optional(),
         }),
       )
 
-      const schemaB = z.lazy(() =>
+      const schemaB: any = z.lazy(() =>
         z.object({
           type: z.literal('B'),
           a: schemaA.optional(),
@@ -4515,7 +4515,7 @@ describe('promise intersection handler', () => {
       // Test self-referential patterns that could cause infinite loops
 
       // Schema that references itself through intersection
-      const selfRefSchema = z.lazy(() => {
+      const selfRefSchema: any = z.lazy(() => {
         const base = z.object({
           value: z.string(),
         })
@@ -4528,14 +4528,8 @@ describe('promise intersection handler', () => {
       }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
 
       // More complex self-reference through union and intersection
-      const complexSelfRef = z.lazy(() =>
-        z.union([
-          z.string(),
-          z.intersection(
-            z.object({ nested: complexSelfRef }),
-            z.object({ level: z.number() }),
-          ),
-        ]),
+      const complexSelfRef: any = z.lazy(() =>
+        z.union([z.string(), z.intersection(z.object({ nested: complexSelfRef }), z.object({ level: z.number() }))]),
       )
 
       expect(() => {
@@ -4729,26 +4723,27 @@ describe('promise intersection handler', () => {
       }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
 
       // Test 2: Circular reference detection should prevent infinite loops
-      const circularSchemas = [
+      const circularSchemas: any[] = [
         // Simple self-reference
         z.lazy(() => z.intersection(circularSchemas[0], z.string())),
 
         // Mutual reference through objects
-        z.lazy(() => z.object({
-          self: z.intersection(circularSchemas[1], z.object({ id: z.string() })).optional()
-        })),
+        z.lazy(() =>
+          z.object({
+            self: z.intersection(circularSchemas[1], z.object({ id: z.string() })).optional(),
+          }),
+        ),
 
         // Complex nested circular reference
-        z.lazy(() => z.union([
-          z.string(),
-          z.intersection(
-            z.object({ nested: circularSchemas[2] }),
-            z.object({ level: z.number() })
-          )
-        ]))
+        z.lazy(() =>
+          z.union([
+            z.string(),
+            z.intersection(z.object({ nested: circularSchemas[2] }), z.object({ level: z.number() })),
+          ]),
+        ),
       ]
 
-      circularSchemas.forEach((schema, index) => {
+      circularSchemas.forEach((schema: any, index: number) => {
         expect(() => {
           const result = fake(schema)
           // Should return a valid result without infinite recursion
@@ -4757,18 +4752,20 @@ describe('promise intersection handler', () => {
       })
 
       // Test 3: Performance should be reasonable even with complex recursion
-      const complexRecursiveSchema = z.lazy(() => z.intersection(
-        z.object({
-          data: z.string(),
-          children: z.array(complexRecursiveSchema).optional()
-        }),
-        z.object({
-          metadata: z.object({
-            id: z.string(),
-            timestamp: z.date()
-          })
-        })
-      ))
+      const complexRecursiveSchema: any = z.lazy(() =>
+        z.intersection(
+          z.object({
+            data: z.string(),
+            children: z.array(complexRecursiveSchema).optional(),
+          }),
+          z.object({
+            metadata: z.object({
+              id: z.string(),
+              timestamp: z.date(),
+            }),
+          }),
+        ),
+      )
 
       const startTime = Date.now()
       const result = fake(complexRecursiveSchema)
@@ -4781,10 +4778,7 @@ describe('promise intersection handler', () => {
       expect(result).toHaveProperty('metadata')
 
       // Test 4: Caching should prevent redundant computation
-      const cachedSchema = z.intersection(
-        z.object({ name: z.string() }),
-        z.object({ age: z.number() })
-      )
+      const cachedSchema = z.intersection(z.object({ name: z.string() }), z.object({ age: z.number() }))
 
       // Multiple calls should not significantly increase computation time
       const times: number[] = []
@@ -4808,10 +4802,9 @@ describe('promise intersection handler', () => {
       // If we get here without running out of memory, the test passes
 
       // Test 6: Recursion tracking should be properly cleaned up
-      const cleanupTestSchema = z.lazy(() => z.intersection(
-        z.object({ value: z.string() }),
-        cleanupTestSchema.optional()
-      ))
+      const cleanupTestSchema: any = z.lazy(() =>
+        z.intersection(z.object({ value: z.string() }), cleanupTestSchema.optional()),
+      )
 
       // Multiple independent calls should not interfere with each other
       const results = []

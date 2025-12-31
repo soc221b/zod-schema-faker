@@ -136,7 +136,7 @@ describe('v4 intersection integration tests', () => {
             expect(typeof result).toBe('string')
             expect(result.length).toBeGreaterThanOrEqual(1)
             expect(result.length).toBeLessThanOrEqual(10)
-          }
+          },
         },
         {
           name: 'number intersection',
@@ -145,29 +145,29 @@ describe('v4 intersection integration tests', () => {
             expect(typeof result).toBe('number')
             expect(result).toBeGreaterThanOrEqual(0)
             expect(result).toBeLessThanOrEqual(100)
-          }
+          },
         },
         {
           name: 'boolean intersection',
           schema: z.intersection(z.boolean(), z.boolean()),
           validator: (result: any) => {
             expect(typeof result).toBe('boolean')
-          }
+          },
         },
         {
           name: 'date intersection',
           schema: z.intersection(z.date(), z.date()),
           validator: (result: any) => {
             expect(result).toBeInstanceOf(Date)
-          }
+          },
         },
         {
           name: 'bigint intersection',
           schema: z.intersection(z.bigint(), z.bigint()),
           validator: (result: any) => {
             expect(typeof result).toBe('bigint')
-          }
-        }
+          },
+        },
       ]
 
       primitiveTests.forEach(({ name, schema, validator }) => {
@@ -190,7 +190,7 @@ describe('v4 intersection integration tests', () => {
               expect(typeof result).toBe('string')
               expect(result.length).toBeGreaterThanOrEqual(1)
             }
-          }
+          },
         },
         {
           name: 'nullable intersection',
@@ -201,7 +201,7 @@ describe('v4 intersection integration tests', () => {
               expect(typeof result).toBe('string')
               expect(result.length).toBeGreaterThanOrEqual(1)
             }
-          }
+          },
         },
         {
           name: 'default intersection',
@@ -209,7 +209,7 @@ describe('v4 intersection integration tests', () => {
           validator: (result: any) => {
             expect(typeof result).toBe('string')
             expect(result.length).toBeGreaterThanOrEqual(1)
-          }
+          },
         },
         {
           name: 'readonly intersection',
@@ -217,8 +217,8 @@ describe('v4 intersection integration tests', () => {
           validator: (result: any) => {
             expect(typeof result).toBe('string')
             expect(result.length).toBeGreaterThanOrEqual(1)
-          }
-        }
+          },
+        },
       ]
 
       wrapperTests.forEach(({ name, schema, validator }) => {
@@ -242,35 +242,29 @@ describe('v4 intersection integration tests', () => {
             expect(result.length).toBeGreaterThanOrEqual(1)
             expect(result.length).toBeLessThanOrEqual(3)
             result.forEach((item: any) => expect(typeof item).toBe('string'))
-          }
+          },
         },
         {
           name: 'object intersection',
-          schema: z.intersection(
-            z.object({ name: z.string() }),
-            z.object({ age: z.number() })
-          ),
+          schema: z.intersection(z.object({ name: z.string() }), z.object({ age: z.number() })),
           validator: (result: any) => {
             expect(typeof result).toBe('object')
             expect(result).toHaveProperty('name')
             expect(result).toHaveProperty('age')
             expect(typeof result.name).toBe('string')
             expect(typeof result.age).toBe('number')
-          }
+          },
         },
         {
           name: 'tuple intersection',
-          schema: z.intersection(
-            z.tuple([z.string(), z.number()]),
-            z.tuple([z.string(), z.number()])
-          ),
+          schema: z.intersection(z.tuple([z.string(), z.number()]), z.tuple([z.string(), z.number()])),
           validator: (result: any) => {
             expect(Array.isArray(result)).toBe(true)
             expect(result).toHaveLength(2)
             expect(typeof result[0]).toBe('string')
             expect(typeof result[1]).toBe('number')
-          }
-        }
+          },
+        },
       ]
 
       collectionTests.forEach(({ name, schema, validator }) => {
@@ -300,20 +294,22 @@ describe('v4 intersection integration tests', () => {
       // Test that context and configuration are properly passed through intersections
       const complexSchema = z.intersection(
         z.object({
-          users: z.array(z.object({
-            id: z.number(),
-            profile: z.object({
-              name: z.string(),
-              settings: z.record(z.string(), z.any())
-            })
-          }))
+          users: z.array(
+            z.object({
+              id: z.number(),
+              profile: z.object({
+                name: z.string(),
+                settings: z.record(z.string(), z.any()),
+              }),
+            }),
+          ),
         }),
         z.object({
           metadata: z.object({
             version: z.string(),
-            timestamp: z.date()
-          })
-        })
+            timestamp: z.date(),
+          }),
+        }),
       )
 
       const result = fake(complexSchema)
@@ -346,7 +342,7 @@ describe('v4 intersection integration tests', () => {
       const baseResponseSchema = z.object({
         status: z.number(),
         message: z.string(),
-        timestamp: z.date()
+        timestamp: z.date(),
       })
 
       const userDataSchema = z.object({
@@ -356,9 +352,9 @@ describe('v4 intersection integration tests', () => {
           profile: z.object({
             firstName: z.string(),
             lastName: z.string(),
-            avatar: z.string().optional() // Simplified from url() constraint
-          })
-        })
+            avatar: z.string().optional(), // Simplified from url() constraint
+          }),
+        }),
       })
 
       const userResponseSchema = z.intersection(baseResponseSchema, userDataSchema)
@@ -391,13 +387,13 @@ describe('v4 intersection integration tests', () => {
         updatedAt: z.date(),
         createdBy: z.string(),
         updatedBy: z.string(),
-        version: z.number().int().positive()
+        version: z.number().int().positive(),
       })
 
       const auditConstraintsSchema = z.object({
         createdBy: z.string().min(1),
         updatedBy: z.string().min(1),
-        version: z.number().int().positive()
+        version: z.number().int().positive(),
       })
 
       const fullProductSchema = z.intersection(productWithTimestampsSchema, auditConstraintsSchema)
@@ -431,14 +427,14 @@ describe('v4 intersection integration tests', () => {
       // Simulate form validation with base rules and specific constraints
       const baseFormSchema = z.object({
         email: z.string().email(),
-        password: z.string().min(8)
+        password: z.string().min(8),
       })
 
       const registrationFormSchema = z.object({
         confirmPassword: z.string(),
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        acceptTerms: z.boolean()
+        acceptTerms: z.boolean(),
       })
 
       const fullRegistrationSchema = z.intersection(baseFormSchema, registrationFormSchema)

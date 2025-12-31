@@ -57,7 +57,7 @@ export function hasSpecificHandler(schemaType: string | null | undefined): boole
     'function',
     'promise',
     'file',
-    'custom'
+    'custom',
   ])
 
   return typesWithHandlers.has(schemaType)
@@ -347,7 +347,12 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
   }
 }
 
-function handleStringWithIntersectionType(stringSchema: any, intersectionSchema: any, context: Context, rootFake: any): any {
+function handleStringWithIntersectionType(
+  stringSchema: any,
+  intersectionSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
   // Handle string intersected with another intersection type
   // This is a recursive case that needs careful handling to avoid infinite loops
 
@@ -1732,7 +1737,12 @@ function generateObjectValue(objectSchema: any, context: Context, rootFake: any)
   return result
 }
 
-function handleObjectWithIntersectionType(objectSchema: any, intersectionSchema: any, context: Context, rootFake: any): any {
+function handleObjectWithIntersectionType(
+  objectSchema: any,
+  intersectionSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
   // Handle object intersected with another intersection type
   // This is a recursive case that needs careful handling to avoid infinite loops
 
@@ -3082,7 +3092,12 @@ function handlePrefaultIntersection(left: any, right: any, context: Context, roo
       return fakeIntersection(intersection, context, rootFake)
   }
 }
-function handlePrefaultWithSpecificType(prefaultSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+function handlePrefaultWithSpecificType(
+  prefaultSchema: any,
+  specificSchema: any,
+  context: Context,
+  rootFake: any,
+): any {
   // This is the reverse case where a specific type is intersected with a prefault
   // We need to use the prefault's underlying schema for intersection
 
@@ -3133,7 +3148,9 @@ function handlePromiseIntersection(left: any, right: any, context: Context, root
         return Promise.resolve(innerValue)
       } catch (error) {
         // If inner types are incompatible, throw a promise-specific error
-        throw new TypeError(`Cannot intersect promise inner types - ${error instanceof Error ? error.message : String(error)}`)
+        throw new TypeError(
+          `Cannot intersect promise inner types - ${error instanceof Error ? error.message : String(error)}`,
+        )
       }
 
     case 'any':
