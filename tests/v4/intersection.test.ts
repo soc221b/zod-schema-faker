@@ -45,6 +45,119 @@ describe('v4 intersection faker', () => {
     })
   })
 
+  describe('Property 3: Cross-type intersection handling', () => {
+    it('**Feature: v4-intersection, Property 3: Cross-type intersection handling**', () => {
+      // **Validates: Requirements 2.2, 2.3**
+
+      // Test cross-type intersection handling across different schema categories
+      // This property test validates that intersections between different schema types
+      // follow the correct precedence rules and error handling
+
+      // Test 1: Wrapper types preserve semantics when intersected with compatible types
+      const optionalString = z.string().optional()
+      const constrainedString = z.string().min(5)
+      const optionalIntersection = z.intersection(optionalString, constrainedString)
+
+      const optionalResult = fake(optionalIntersection)
+      if (optionalResult !== undefined) {
+        expect(typeof optionalResult).toBe('string')
+        expect(optionalResult.length).toBeGreaterThanOrEqual(5)
+      }
+
+      // Test 2: Literal types have higher precedence than primitive types
+      const literalValue = z.literal('test')
+      const stringType = z.string()
+      const literalStringIntersection = z.intersection(literalValue, stringType)
+
+      const literalResult = fake(literalStringIntersection)
+      expect(literalResult).toBe('test')
+
+      // Test 3: Enum types have higher precedence than primitive types
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const stringEnum = z.string()
+      const enumStringIntersection = z.intersection(colorEnum, stringEnum)
+
+      const enumResult = fake(enumStringIntersection)
+      expect(['red', 'green', 'blue']).toContain(enumResult)
+
+      // Test 4: Never type always results in never (impossible intersection)
+      const neverType = z.never()
+      const numberType = z.number()
+
+      expect(() => {
+        const neverIntersection = z.intersection(neverType, numberType)
+        fake(neverIntersection)
+      }).toThrow('Cannot generate fake data for intersection with never type - intersection is impossible')
+
+      // Test 5: Any/Unknown types are compatible with all other types
+      const anyType = z.any()
+      const unknownType = z.unknown()
+      const specificString = z.string().min(3)
+
+      const anyIntersection = z.intersection(anyType, specificString)
+      const unknownIntersection = z.intersection(unknownType, specificString)
+
+      const anyIntersectionResult = fake(anyIntersection)
+      const unknownIntersectionResult = fake(unknownIntersection)
+
+      expect(typeof anyIntersectionResult).toBe('string')
+      expect(anyIntersectionResult.length).toBeGreaterThanOrEqual(3)
+      expect(typeof unknownIntersectionResult).toBe('string')
+      expect(unknownIntersectionResult.length).toBeGreaterThanOrEqual(3)
+
+      // Test 6: Incompatible primitive types throw descriptive errors
+      expect(() => {
+        const stringNumber = z.intersection(z.string(), z.number())
+        fake(stringNumber)
+      }).toThrow('Cannot intersect string with number')
+
+      expect(() => {
+        const booleanDate = z.intersection(z.boolean(), z.date())
+        fake(booleanDate)
+      }).toThrow('Cannot intersect boolean with date')
+
+      // Test 7: Collection types merge constraints properly
+      const array1 = z.array(z.string()).min(2)
+      const array2 = z.array(z.string()).max(5)
+      const arrayIntersection = z.intersection(array1, array2)
+
+      const arrayResult = fake(arrayIntersection)
+      expect(Array.isArray(arrayResult)).toBe(true)
+      expect(arrayResult.length).toBeGreaterThanOrEqual(2)
+      expect(arrayResult.length).toBeLessThanOrEqual(5)
+
+      // Test 8: Object types merge shapes correctly
+      const obj1 = z.object({ name: z.string() })
+      const obj2 = z.object({ age: z.number() })
+      const objectIntersection = z.intersection(obj1, obj2)
+
+      const objectResult = fake(objectIntersection)
+      expect(typeof objectResult).toBe('object')
+      expect(objectResult).toHaveProperty('name')
+      expect(objectResult).toHaveProperty('age')
+      expect(typeof (objectResult as any).name).toBe('string')
+      expect(typeof (objectResult as any).age).toBe('number')
+
+      // Test 9: Union types filter to compatible options
+      const union = z.union([z.string(), z.number(), z.boolean()])
+      const stringConstraint = z.string().min(1)
+      const unionIntersection = z.intersection(union, stringConstraint)
+
+      const unionResult = fake(unionIntersection)
+      expect(typeof unionResult).toBe('string')
+      expect(unionResult.length).toBeGreaterThanOrEqual(1)
+
+      // Test 10: Wrapper type precedence (more specific wrappers take precedence)
+      const catchWrapper = z.string().catch('fallback')
+      const optionalWrapper = z.string().optional()
+      const wrapperIntersection = z.intersection(catchWrapper, optionalWrapper)
+
+      const wrapperResult = fake(wrapperIntersection)
+      // Should preserve both wrapper semantics
+      expect(typeof wrapperResult === 'string' || wrapperResult === undefined).toBe(true)
+    })
+  })
+
   describe('constant type intersection handlers', () => {
     it('should handle nan intersections', () => {
       // nan & nan should return NaN
@@ -3362,5 +3475,208 @@ describe('default intersection handler', () => {
       expect(typeof result.name).toBe('string')
       expect(typeof result.age).toBe('number')
     })
+  })
+
+  describe('prefault intersection handler', () => {
+    it('should handle prefault with compatible type by preserving prefault semantics', () => {
+      // Prefault should work with compatible underlying type
+      const prefaultString = z.string().prefault('fallback')
+      const stringSchema = z.string()
+
+      const intersectionSchema = z.intersection(prefaultString, stringSchema)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the intersected value)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle prefault with same prefault type', () => {
+      // Same prefault type should intersect to that type
+      const prefaultString1 = z.string().prefault('fallback1')
+      const prefaultString2 = z.string().prefault('fallback2')
+
+      const intersectionSchema = z.intersection(prefaultString1, prefaultString2)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle prefault with incompatible type', () => {
+      // Prefault string with number should be impossible
+      const prefaultString = z.string().prefault('fallback')
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(prefaultString, numberSchema)
+
+      expect(() => fake(intersectionSchema)).toThrow('Cannot intersect')
+    })
+
+    it('should handle prefault with any/unknown types', () => {
+      // Prefault should work with any/unknown
+      const prefaultNumber = z.number().prefault(42)
+      const anySchema = z.any()
+      const unknownSchema = z.unknown()
+
+      const prefaultAnyIntersection = z.intersection(prefaultNumber, anySchema)
+      const prefaultUnknownIntersection = z.intersection(prefaultNumber, unknownSchema)
+
+      const anyResult = fake(prefaultAnyIntersection)
+      const unknownResult = fake(prefaultUnknownIntersection)
+
+      expect(typeof anyResult).toBe('number')
+      expect(typeof unknownResult).toBe('number')
+    })
+
+    it('should handle prefault with union types', () => {
+      // Prefault should work with compatible union options
+      const prefaultString = z.string().prefault('fallback')
+      const stringNumberUnion = z.union([z.string(), z.number()])
+
+      const intersectionSchema = z.intersection(prefaultString, stringNumberUnion)
+      const result = fake(intersectionSchema)
+
+      // Should return a string (the compatible union option)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle prefault with lazy types', () => {
+      // Prefault should work with lazy schemas
+      const prefaultString = z.string().prefault('fallback')
+      const lazyString = z.lazy(() => z.string())
+
+      const intersectionSchema = z.intersection(prefaultString, lazyString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle prefault with pipe types', () => {
+      // Prefault should work with pipe schemas
+      const prefaultString = z.string().prefault('fallback')
+      const pipeString = z.string().pipe(z.string())
+
+      const intersectionSchema = z.intersection(prefaultString, pipeString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+    })
+
+    it('should handle prefault with other wrapper types', () => {
+      // Prefault should work with optional, nullable, default, readonly, catch
+      const prefaultString = z.string().prefault('fallback')
+      const optionalString = z.string().optional()
+      const nullableString = z.string().nullable()
+      const defaultString = z.string().default('default')
+      const readonlyString = z.string().readonly()
+      const catchString = z.string().catch('catch-fallback')
+
+      const prefaultOptionalIntersection = z.intersection(prefaultString, optionalString)
+      const prefaultNullableIntersection = z.intersection(prefaultString, nullableString)
+      const prefaultDefaultIntersection = z.intersection(prefaultString, defaultString)
+      const prefaultReadonlyIntersection = z.intersection(prefaultString, readonlyString)
+      const prefaultCatchIntersection = z.intersection(prefaultString, catchString)
+
+      const optionalResult = fake(prefaultOptionalIntersection)
+      const nullableResult = fake(prefaultNullableIntersection)
+      const defaultResult = fake(prefaultDefaultIntersection)
+      const readonlyResult = fake(prefaultReadonlyIntersection)
+      const catchResult = fake(prefaultCatchIntersection)
+
+      // Results should be strings or the wrapper values (undefined, null, default)
+      expect(optionalResult === undefined || typeof optionalResult === 'string').toBe(true)
+      expect(nullableResult === null || typeof nullableResult === 'string').toBe(true)
+      expect(defaultResult === 'default' || typeof defaultResult === 'string').toBe(true)
+      expect(typeof readonlyResult).toBe('string')
+      expect(typeof catchResult).toBe('string')
+    })
+
+    it('should handle complex prefault intersections', () => {
+      // Test prefault with constrained types
+      const prefaultConstrainedString = z.string().min(5).max(10).prefault('fallback')
+      const anotherConstrainedString = z.string().min(3).max(8)
+
+      const intersectionSchema = z.intersection(prefaultConstrainedString, anotherConstrainedString)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThanOrEqual(5) // max of mins
+      expect(result.length).toBeLessThanOrEqual(8) // min of maxes
+    })
+
+    it('should handle prefault with function default value', () => {
+      // Test prefault with function default value
+      const prefaultWithFunction = z.number().prefault(() => 42)
+      const numberSchema = z.number()
+
+      const intersectionSchema = z.intersection(prefaultWithFunction, numberSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('number')
+    })
+
+    it('should handle nested prefault intersections', () => {
+      // Test prefault with nested schemas
+      const prefaultObject = z.object({ name: z.string() }).prefault({ name: 'fallback' })
+      const objectSchema = z.object({ name: z.string(), age: z.number() })
+
+      const intersectionSchema = z.intersection(prefaultObject, objectSchema)
+      const result = fake(intersectionSchema)
+
+      expect(typeof result).toBe('object')
+      expect(result).toHaveProperty('name')
+      expect(result).toHaveProperty('age')
+      expect(typeof result.name).toBe('string')
+      expect(typeof result.age).toBe('number')
+    })
+  })
+})
+
+describe('function intersection handler', () => {
+  it('should handle identical function schemas by returning a valid function', () => {
+    // Same function schema should intersect to a valid function
+    const functionSchema1 = z.function()
+    const functionSchema2 = z.function()
+
+    const intersectionSchema = z.intersection(functionSchema1, functionSchema2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('function')
+  })
+
+  it('should handle function with any/unknown types', () => {
+    // Function should work with any/unknown
+    const functionSchema = z.function()
+    const anySchema = z.any()
+    const unknownSchema = z.unknown()
+
+    const functionAnyIntersection = z.intersection(functionSchema, anySchema)
+    const functionUnknownIntersection = z.intersection(functionSchema, unknownSchema)
+
+    const anyResult = fake(functionAnyIntersection)
+    const unknownResult = fake(functionUnknownIntersection)
+
+    expect(typeof anyResult).toBe('function')
+    expect(typeof unknownResult).toBe('function')
+  })
+
+  it('should throw error for function with incompatible type', () => {
+    // Function with non-function should be impossible
+    const functionSchema = z.function()
+    const stringSchema = z.string()
+
+    const intersectionSchema = z.intersection(functionSchema, stringSchema)
+
+    expect(() => fake(intersectionSchema)).toThrow('Cannot intersect string with function')
+  })
+
+  it('should handle function with no args/returns specified', () => {
+    // Functions without specific args/returns should work
+    const func1 = z.function()
+    const func2 = z.function()
+
+    const intersectionSchema = z.intersection(func1, func2)
+    const result = fake(intersectionSchema)
+
+    expect(typeof result).toBe('function')
   })
 })

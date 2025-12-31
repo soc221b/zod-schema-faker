@@ -93,6 +93,12 @@ export function fakeIntersection<T extends core.$ZodIntersection>(
       return handleNonoptionalIntersection(left, right, context, rootFake)
     case 'catch':
       return handleCatchIntersection(left, right, context, rootFake)
+    case 'prefault':
+      return handlePrefaultIntersection(left, right, context, rootFake)
+
+    // Advanced types
+    case 'function':
+      return handleFunctionIntersection(left, right, context, rootFake)
 
     // Most general types
     case 'any':
@@ -114,12 +120,17 @@ function shouldSwap(left: any, right: any): boolean {
   const specificity: Record<string, number> = {
     any: 0,
     unknown: 1,
+    function: 2, // Advanced types are less specific than primitives but more than any/unknown
+    promise: 2, // Advanced types are less specific than primitives but more than any/unknown
+    file: 2, // Advanced types are less specific than primitives but more than any/unknown
+    custom: 2, // Advanced types are less specific than primitives but more than any/unknown
     optional: 1, // Wrappers are less specific than concrete types
     nullable: 1, // Wrappers are less specific than concrete types
     default: 1, // Wrappers are less specific than concrete types
     readonly: 1, // Wrappers are less specific than concrete types
     nonoptional: 1, // Wrappers are less specific than concrete types
     catch: 1, // Catch wrapper is less specific than concrete types
+    prefault: 1, // Prefault wrapper is less specific than concrete types
     lazy: 2, // Lazy needs to be resolved first, but is less specific than concrete types
     pipe: 2, // Pipe needs to use input schema, same level as lazy
     union: 2, // Combinators are less specific than primitives but more than any/unknown
@@ -232,6 +243,10 @@ function handleStringIntersection(left: any, right: any, context: Context, rootF
     case 'catch':
       // String intersected with catch should use catch's underlying schema
       return handleCatchWithSpecificType(right, left, context, rootFake)
+
+    case 'prefault':
+      // String intersected with prefault should use prefault's underlying schema
+      return handlePrefaultWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect string with ${rightType}`)
@@ -801,6 +816,10 @@ function handleNumberIntersection(left: any, right: any, context: Context, rootF
     case 'catch':
       // Number intersected with catch should use catch's underlying schema
       return handleCatchWithSpecificType(right, left, context, rootFake)
+
+    case 'prefault':
+      // Number intersected with prefault should use prefault's underlying schema
+      return handlePrefaultWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect number with ${rightType}`)
@@ -1438,6 +1457,10 @@ function handleObjectIntersection(left: any, right: any, context: Context, rootF
     case 'catch':
       // Object intersected with catch should use catch's underlying schema
       return handleCatchWithSpecificType(right, left, context, rootFake)
+
+    case 'prefault':
+      // Object intersected with prefault should use prefault's underlying schema
+      return handlePrefaultWithSpecificType(right, left, context, rootFake)
 
     default:
       throw new TypeError(`Cannot intersect object with ${rightType}`)
@@ -2625,4 +2648,90 @@ function handleCatchWithSpecificType(catchSchema: any, specificSchema: any, cont
   } as any
 
   return fakeIntersection(underlyingIntersection, context, rootFake)
+}
+function handlePrefaultIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For prefault schemas, we intersect the underlying schema with the right schema
+  // The prefault wrapper provides a probabilistic default value if the underlying schema fails validation
+  // For fake data generation, we focus on the underlying schema intersection
+
+  const underlyingSchema = left._zod.def.innerType
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'prefault':
+      // Both are prefault schemas - intersect their inner types
+      const rightInnerType = right._zod.def.innerType
+      const innerIntersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: underlyingSchema,
+            right: rightInnerType,
+          },
+          '"~standard"': {} as any, // Required by Zod v4 type system
+        },
+      } as any
+      return fakeIntersection(innerIntersection, context, rootFake)
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept any prefault value - generate from underlying schema
+      return rootFake(underlyingSchema, context)
+
+    default:
+      // For other types, intersect the underlying schema with the right schema
+      const intersection = {
+        _zod: {
+          def: {
+            type: 'intersection' as const,
+            left: underlyingSchema,
+            right: right,
+          },
+          '"~standard"': {} as any, // Required by Zod v4 type system
+        },
+      } as any
+      return fakeIntersection(intersection, context, rootFake)
+  }
+}
+function handlePrefaultWithSpecificType(prefaultSchema: any, specificSchema: any, context: Context, rootFake: any): any {
+  // This is the reverse case where a specific type is intersected with a prefault
+  // We need to use the prefault's underlying schema for intersection
+
+  const underlyingSchema = prefaultSchema._zod.def.innerType
+
+  // Create intersection between the underlying schema and the specific schema
+  const underlyingIntersection = {
+    _zod: {
+      def: {
+        type: 'intersection' as const,
+        left: underlyingSchema,
+        right: specificSchema,
+      },
+      '"~standard"': {} as any, // Required by Zod v4 type system
+    },
+  } as any
+
+  return fakeIntersection(underlyingIntersection, context, rootFake)
+}
+
+function handleFunctionIntersection(left: any, right: any, context: Context, rootFake: any): any {
+  // For function schemas, we handle basic intersection logic
+  // In Zod v4, function schemas are simpler and don't have complex args/returns constraints
+
+  const rightType = right._zod.def.type
+
+  switch (rightType) {
+    case 'function':
+      // Both are function schemas - return a simple function
+      return () => 'function-result'
+
+    case 'any':
+    case 'unknown':
+      // Any and unknown accept functions - generate a function
+      return () => 'function-result'
+
+    default:
+      // Function cannot be intersected with non-function types
+      throw new TypeError(`Cannot intersect function with ${rightType}`)
+  }
 }

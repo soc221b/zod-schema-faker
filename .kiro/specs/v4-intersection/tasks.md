@@ -296,25 +296,25 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 31. Implement prefault intersection handler (TDD) - Error Wrapper
-  - [ ] 31.1 Write failing test for prefault intersection
+- [x] 31. Implement prefault intersection handler (TDD) - Error Wrapper
+  - [x] 31.1 Write failing test for prefault intersection
     - Test prefault wrapper semantics preservation
     - _Requirements: 2.3_
 
-  - [ ] 31.2 Implement prefault intersection logic
+  - [x] 31.2 Implement prefault intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.3_
 
-- [ ] 32. Write property test for cross-type intersection handling
+- [x] 32. Write property test for cross-type intersection handling
   - **Property 3: Cross-type intersection handling**
   - **Validates: Requirements 2.2, 2.3**
 
-- [ ] 33. Implement function intersection handler (TDD) - Advanced
-  - [ ] 33.1 Write failing test for function intersection
+- [x] 33. Implement function intersection handler (TDD) - Advanced
+  - [x] 33.1 Write failing test for function intersection
     - Test function schema intersection behavior
     - _Requirements: 2.2_
 
-  - [ ] 33.2 Implement function intersection logic
+  - [x] 33.2 Implement function intersection logic
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
