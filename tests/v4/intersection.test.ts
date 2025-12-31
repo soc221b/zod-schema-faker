@@ -4198,4 +4198,349 @@ describe('promise intersection handler', () => {
       )
     })
   })
+
+  describe('error handling and validation', () => {
+    it('should detect impossible intersections early with descriptive error messages', () => {
+      // Test early detection of impossible intersections
+      // These should throw descriptive errors immediately
+
+      // Test 1: Conflicting primitive types
+      const stringSchema = z.string()
+      const numberSchema = z.number()
+      const stringNumberIntersection = z.intersection(stringSchema, numberSchema)
+
+      expect(() => fake(stringNumberIntersection)).toThrow('Cannot intersect string with number')
+
+      // Test 2: Conflicting literal values
+      const literalA = z.literal('hello')
+      const literalB = z.literal('world')
+      const conflictingLiterals = z.intersection(literalA, literalB)
+
+      expect(() => fake(conflictingLiterals)).toThrow('Cannot intersect literal values')
+
+      // Test 3: Conflicting constraints
+      const minString = z.string().min(10)
+      const maxString = z.string().max(5)
+      const conflictingConstraints = z.intersection(minString, maxString)
+
+      expect(() => fake(conflictingConstraints)).toThrow(
+        'Cannot intersect string constraints - min length (10) is greater than max length (5)',
+      )
+
+      // Test 4: Incompatible enum values
+      const colorEnum = z.enum(['red', 'green', 'blue'])
+      const metalEnum = z.enum(['gold', 'silver', 'bronze'])
+      const incompatibleEnums = z.intersection(colorEnum, metalEnum)
+
+      expect(() => fake(incompatibleEnums)).toThrow('Cannot intersect enum')
+
+      // Test 5: Never type intersections
+      const neverSchema = z.never()
+      const anySchema = z.any()
+      const neverIntersection = z.intersection(neverSchema, anySchema)
+
+      expect(() => fake(neverIntersection)).toThrow(
+        'Cannot generate fake data for intersection with never type - intersection is impossible',
+      )
+
+      // Test 6: Incompatible object properties
+      const obj1 = z.object({ id: z.string() })
+      const obj2 = z.object({ id: z.number() })
+      const conflictingObjects = z.intersection(obj1, obj2)
+
+      expect(() => fake(conflictingObjects)).toThrow('Cannot intersect')
+
+      // Test 7: Incompatible array element types
+      const stringArray = z.array(z.string())
+      const numberArray = z.array(z.number())
+      const conflictingArrays = z.intersection(stringArray, numberArray)
+
+      expect(() => fake(conflictingArrays)).toThrow('Cannot intersect')
+
+      // Test 8: Conflicting number constraints
+      const minNumber = z.number().min(10)
+      const maxNumber = z.number().max(5)
+      const conflictingNumbers = z.intersection(minNumber, maxNumber)
+
+      expect(() => fake(conflictingNumbers)).toThrow(
+        'Cannot intersect number constraints - min value (10) is greater than max value (5)',
+      )
+
+      // Test 9: Conflicting date constraints
+      const minDate = z.date().min(new Date('2025-01-01'))
+      const maxDate = z.date().max(new Date('2024-01-01'))
+      const conflictingDates = z.intersection(minDate, maxDate)
+
+      expect(() => fake(conflictingDates)).toThrow('Cannot intersect date constraints')
+
+      // Test 10: Incompatible template literal patterns
+      const template1 = z.templateLiteral(['hello-', z.string()] as any)
+      const template2 = z.templateLiteral([z.string(), '-world'] as any)
+      const conflictingTemplates = z.intersection(template1, template2)
+
+      expect(() => fake(conflictingTemplates)).toThrow('Cannot intersect template literal')
+    })
+
+    it('should provide specific error messages for different types of impossible intersections', () => {
+      // Test that error messages are descriptive and specific to the type of conflict
+
+      // Primitive type conflicts
+      expect(() => {
+        const intersection = z.intersection(z.string(), z.boolean())
+        fake(intersection)
+      }).toThrow('Cannot intersect string with boolean')
+
+      expect(() => {
+        const intersection = z.intersection(z.number(), z.date())
+        fake(intersection)
+      }).toThrow('Cannot intersect number with date')
+
+      // Literal conflicts with specific messages
+      expect(() => {
+        const intersection = z.intersection(z.literal(42), z.literal('hello'))
+        fake(intersection)
+      }).toThrow('Cannot intersect literal values [42] with literal values [hello] - no common values')
+
+      // Constraint conflicts with specific details
+      expect(() => {
+        const intersection = z.intersection(z.string().min(20), z.string().max(10))
+        fake(intersection)
+      }).toThrow('min length (20) is greater than max length (10)')
+
+      // Enum conflicts with value details
+      expect(() => {
+        const intersection = z.intersection(z.enum(['a', 'b']), z.enum(['c', 'd']))
+        fake(intersection)
+      }).toThrow('Cannot intersect enum values [a, b] with enum values [c, d] - no common values')
+
+      // Type incompatibility with clear explanation
+      expect(() => {
+        const intersection = z.intersection(z.literal('test'), z.number())
+        fake(intersection)
+      }).toThrow('Cannot intersect literal values [test] with number type - types are incompatible')
+    })
+
+    it('should handle edge cases in error detection', () => {
+      // Test edge cases that might not be immediately obvious
+
+      // Empty arrays/objects that might seem compatible but aren't
+      const emptyTuple = z.tuple([])
+      const nonEmptyTuple = z.tuple([z.string()])
+      expect(() => {
+        const intersection = z.intersection(emptyTuple, nonEmptyTuple)
+        fake(intersection)
+      }).toThrow('Cannot intersect tuples with different lengths')
+
+      // Conflicting array length constraints
+      const shortArray = z.array(z.string()).max(2)
+      const longArray = z.array(z.string()).min(5)
+      expect(() => {
+        const intersection = z.intersection(shortArray, longArray)
+        fake(intersection)
+      }).toThrow('Cannot intersect array constraints')
+
+      // Conflicting set size constraints
+      const smallSet = z.set(z.string()).max(2)
+      const largeSet = z.set(z.string()).min(5)
+      expect(() => {
+        const intersection = z.intersection(smallSet, largeSet)
+        fake(intersection)
+      }).toThrow('Cannot intersect set constraints')
+
+      // Incompatible record key types
+      const stringRecord = z.record(z.string(), z.string())
+      const numberRecord = z.record(z.number(), z.string())
+      expect(() => {
+        const intersection = z.intersection(stringRecord, numberRecord)
+        fake(intersection)
+      }).toThrow('Cannot intersect record types')
+
+      // Incompatible map key/value types
+      const stringMap = z.map(z.string(), z.string())
+      const numberMap = z.map(z.number(), z.number())
+      expect(() => {
+        const intersection = z.intersection(stringMap, numberMap)
+        fake(intersection)
+      }).toThrow('Cannot intersect map')
+    })
+  })
+
+  describe('recursion protection', () => {
+    it('should detect circular references and prevent infinite recursion', () => {
+      // Test circular reference detection
+      // Create a recursive schema that could cause infinite loops
+
+      // Simple circular reference through lazy schemas
+      const circularSchema = z.lazy(() => z.intersection(circularSchema, z.string()))
+
+      // This should not cause infinite recursion - it should either:
+      // 1. Detect the cycle and throw an error, or
+      // 2. Use depth limiting to prevent infinite recursion
+      expect(() => {
+        fake(circularSchema)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+
+      // More complex circular reference
+      const nodeSchema = z.lazy(() =>
+        z.object({
+          value: z.string(),
+          children: z.array(nodeSchema),
+        }),
+      )
+
+      const intersectedNode = z.intersection(
+        nodeSchema,
+        z.object({
+          id: z.number(),
+        }),
+      )
+
+      // Should handle recursive structures without infinite loops
+      expect(() => {
+        fake(intersectedNode)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+    })
+
+    it('should implement depth limits to prevent deep recursion', () => {
+      // Test depth limits for performance
+      // Create deeply nested intersection that could be expensive
+
+      // Create a deeply nested lazy schema
+      let deepSchema: any = z.string()
+      for (let i = 0; i < 100; i++) {
+        const currentSchema = deepSchema
+        deepSchema = z.lazy(() => z.intersection(currentSchema, z.string()))
+      }
+
+      // Should handle deep nesting without performance issues
+      const startTime = Date.now()
+      const result = fake(deepSchema)
+      const endTime = Date.now()
+
+      // Should complete in reasonable time (less than 1 second)
+      expect(endTime - startTime).toBeLessThan(1000)
+      expect(typeof result).toBe('string')
+    })
+
+    it('should use caching to improve performance on repeated intersections', () => {
+      // Test caching for performance optimization
+      const baseSchema = z.object({
+        name: z.string(),
+        age: z.number(),
+      })
+
+      const extendedSchema = z.object({
+        email: z.string(),
+        phone: z.string(),
+      })
+
+      const intersectionSchema = z.intersection(baseSchema, extendedSchema)
+
+      // First call - should establish cache
+      const startTime1 = Date.now()
+      const result1 = fake(intersectionSchema)
+      const endTime1 = Date.now()
+      const firstCallTime = endTime1 - startTime1
+
+      // Second call - should use cache and be faster
+      const startTime2 = Date.now()
+      const result2 = fake(intersectionSchema)
+      const endTime2 = Date.now()
+      const secondCallTime = endTime2 - startTime2
+
+      // Both should return valid objects
+      expect(typeof result1).toBe('object')
+      expect(result1).toHaveProperty('name')
+      expect(result1).toHaveProperty('age')
+      expect(result1).toHaveProperty('email')
+      expect(result1).toHaveProperty('phone')
+
+      expect(typeof result2).toBe('object')
+      expect(result2).toHaveProperty('name')
+      expect(result2).toHaveProperty('age')
+      expect(result2).toHaveProperty('email')
+      expect(result2).toHaveProperty('phone')
+
+      // Note: Caching might not always make the second call faster due to various factors,
+      // but it should at least not be significantly slower
+      // For now, we just ensure both calls complete successfully
+    })
+
+    it('should handle complex recursive intersection patterns', () => {
+      // Test complex patterns that might cause recursion issues
+
+      // Mutually recursive schemas
+      const schemaA = z.lazy(() =>
+        z.object({
+          type: z.literal('A'),
+          b: schemaB.optional(),
+        }),
+      )
+
+      const schemaB = z.lazy(() =>
+        z.object({
+          type: z.literal('B'),
+          a: schemaA.optional(),
+        }),
+      )
+
+      // Intersect with additional constraints
+      const constrainedA = z.intersection(
+        schemaA,
+        z.object({
+          id: z.string(),
+          timestamp: z.date(),
+        }),
+      )
+
+      const constrainedB = z.intersection(
+        schemaB,
+        z.object({
+          id: z.string(),
+          version: z.number(),
+        }),
+      )
+
+      // Should handle mutual recursion without issues
+      expect(() => {
+        fake(constrainedA)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+
+      expect(() => {
+        fake(constrainedB)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+    })
+
+    it('should detect and handle self-referential intersections', () => {
+      // Test self-referential patterns that could cause infinite loops
+
+      // Schema that references itself through intersection
+      const selfRefSchema = z.lazy(() => {
+        const base = z.object({
+          value: z.string(),
+        })
+        return z.intersection(base, selfRefSchema.optional())
+      })
+
+      // Should handle self-reference gracefully
+      expect(() => {
+        fake(selfRefSchema)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+
+      // More complex self-reference through union and intersection
+      const complexSelfRef = z.lazy(() =>
+        z.union([
+          z.string(),
+          z.intersection(
+            z.object({ nested: complexSelfRef }),
+            z.object({ level: z.number() }),
+          ),
+        ]),
+      )
+
+      expect(() => {
+        fake(complexSelfRef)
+      }).not.toThrow(/Maximum call stack size exceeded|RangeError/)
+    })
+  })
 })

@@ -318,7 +318,7 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [-] 34. Implement promise intersection handler (TDD) - Advanced
+- [x] 34. Implement promise intersection handler (TDD) - Advanced
   - [x] 34.1 Write failing test for promise intersection
     - Test promise schema intersection behavior
     - _Requirements: 2.2_
@@ -363,23 +363,23 @@ The implementation follows this specificity hierarchy (most specific first):
     - Make the test pass with minimal implementation
     - _Requirements: 2.2_
 
-- [ ] 39. Implement error handling and validation (TDD)
-  - [ ] 39.1 Write failing test for impossible intersection detection
+- [x] 39. Implement error handling and validation (TDD)
+  - [x] 39.1 Write failing test for impossible intersection detection
     - Test early detection of impossible intersections
     - Test descriptive error message generation
     - _Requirements: 1.3, 3.1_
 
-  - [ ] 39.2 Implement comprehensive error detection
+  - [x] 39.2 Implement comprehensive error detection
     - Make the test pass with minimal implementation
     - _Requirements: 1.3, 3.1_
 
-- [ ] 40. Implement recursion protection (TDD)
-  - [ ] 40.1 Write failing test for recursion protection
+- [-] 40. Implement recursion protection (TDD)
+  - [x] 40.1 Write failing test for recursion protection
     - Test circular reference detection
     - Test depth limits and caching for performance
     - _Requirements: 3.2_
 
-  - [ ] 40.2 Implement recursion protection logic
+  - [x] 40.2 Implement recursion protection logic
     - Make the test pass with minimal implementation
     - _Requirements: 3.2_
 
