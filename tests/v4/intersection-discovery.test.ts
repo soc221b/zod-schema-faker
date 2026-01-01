@@ -116,7 +116,7 @@ describe('v4 intersection discovery system', () => {
         if (shallowResult === undefined && !shallowError) {
           // This might be a schema that legitimately returns undefined (like z.literal(undefined))
           // or an optional schema nested inside another schema
-          console.log(`Warning: Schema type ${shallowType} returned undefined without error`)
+          // This is expected behavior for certain schema types
         }
         // Don't fail the test for this case, as it might be legitimate
       }
@@ -128,7 +128,7 @@ describe('v4 intersection discovery system', () => {
         if (deepResult === undefined && !deepError) {
           // This might be a schema that legitimately returns undefined (like z.literal(undefined))
           // or an optional schema nested inside another schema
-          console.log(`Warning: Schema type ${deepType} returned undefined without error`)
+          // This is expected behavior for certain schema types
         }
         // Don't fail the test for this case, as it might be legitimate
       }
