@@ -9,7 +9,9 @@ function-based architecture and integrates seamlessly with the current schema re
 The key challenge is determining when two schemas can be meaningfully intersected and generating data that satisfies
 both constraints. This requires sophisticated schema analysis and constraint merging logic.
 
-Additionally, this design includes a discovery system that uses Property-Based Testing (PBT) to systematically find gaps in intersection support by generating random Zod v4 built-in intersection schemas with all their checks and identifying cases where Zod accepts the schema but the faker fails to generate valid data.
+Additionally, this design includes a discovery system that uses Property-Based Testing (PBT) to systematically find gaps
+in intersection support by generating random Zod v4 built-in intersection schemas with all their checks and identifying
+cases where Zod accepts the schema but the faker fails to generate valid data.
 
 ## Architecture
 
@@ -200,12 +202,42 @@ The discovery system uses property-based testing to systematically explore the i
 // Schema generator that creates valid Zod v4 built-in schemas with all their checks
 function generateRandomZodSchema(depth: number = 0): z.ZodType {
   const schemaTypes = [
-    'string', 'number', 'boolean', 'date', 'bigint', 'symbol',
-    'literal', 'enum', 'object', 'array', 'tuple', 'record',
-    'map', 'set', 'union', 'optional', 'nullable', 'default',
-    'readonly', 'nonoptional', 'lazy', 'pipe', 'catch', 'prefault',
-    'function', 'promise', 'file', 'custom', 'any', 'unknown', 'never',
-    'template_literal', 'nan', 'null', 'undefined', 'void'
+    'string',
+    'number',
+    'boolean',
+    'date',
+    'bigint',
+    'symbol',
+    'literal',
+    'enum',
+    'object',
+    'array',
+    'tuple',
+    'record',
+    'map',
+    'set',
+    'union',
+    'optional',
+    'nullable',
+    'default',
+    'readonly',
+    'nonoptional',
+    'lazy',
+    'pipe',
+    'catch',
+    'prefault',
+    'function',
+    'promise',
+    'file',
+    'custom',
+    'any',
+    'unknown',
+    'never',
+    'template_literal',
+    'nan',
+    'null',
+    'undefined',
+    'void',
   ]
 
   // Generate based on weighted distribution
@@ -228,7 +260,6 @@ function discoverIntersectionGaps() {
 
       // Verify the fake data validates against the intersection
       intersectionSchema.parse(fakeData)
-
     } catch (error) {
       // Capture gap: Zod accepts but faker fails
       captureGap(leftSchema, rightSchema, error)
@@ -386,11 +417,17 @@ the system should throw a TypeError with a descriptive message explaining why th
 Property 6: Recursion safety _For any_ self-referential schema in an intersection, the resolution process should
 terminate without infinite recursion while still producing valid results **Validates: Requirements 3.2**
 
-Property 7: Discovery system schema generation _For any_ generated random Zod v4 built-in intersection schema with all their checks, the schema should be valid according to Zod's parser and represent a meaningful intersection test case **Validates: Requirements 4.1, 4.5**
+Property 7: Discovery system schema generation _For any_ generated random Zod v4 built-in intersection schema with all
+their checks, the schema should be valid according to Zod's parser and represent a meaningful intersection test case
+**Validates: Requirements 4.1, 4.5**
 
-Property 8: Gap detection accuracy _For any_ intersection schema that Zod accepts but the faker fails to handle, the discovery system should capture the schema structure and error details with complete information for analysis **Validates: Requirements 4.2**
+Property 8: Gap detection accuracy _For any_ intersection schema that Zod accepts but the faker fails to handle, the
+discovery system should capture the schema structure and error details with complete information for analysis
+**Validates: Requirements 4.2**
 
-Property 9: Gap categorization correctness _For any_ set of discovered gaps, the analysis system should categorize them by schema type combinations and error patterns in a way that enables prioritized fixing **Validates: Requirements 4.3, 4.4**
+Property 9: Gap categorization correctness _For any_ set of discovered gaps, the analysis system should categorize them
+by schema type combinations and error patterns in a way that enables prioritized fixing **Validates: Requirements 4.3,
+4.4**
 
 ## Error Handling
 
@@ -460,12 +497,14 @@ The implementation requires both unit tests and property-based tests for compreh
 The discovery system uses an extended property-based testing approach:
 
 **Schema Generation Strategy:**
+
 - Weighted random generation favoring common schema types
 - Depth-limited recursive generation for complex schemas
 - Comprehensive constraint variation to test all Zod v4 built-in checks and validations
 - Bias toward known problematic combinations
 
 **Gap Detection Process:**
+
 1. Generate random left and right schemas
 2. Create intersection schema using Zod
 3. Attempt to generate fake data using our faker
@@ -473,6 +512,7 @@ The discovery system uses an extended property-based testing approach:
 5. Capture any failures with full context
 
 **Analysis and Reporting:**
+
 - Categorize gaps by schema type patterns
 - Identify high-priority gaps based on frequency
 - Generate actionable recommendations for implementation
