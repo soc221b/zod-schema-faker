@@ -9,16 +9,19 @@ function-based architecture and integrates seamlessly with the current schema re
 The key challenge is determining when two schemas can be meaningfully intersected and generating data that satisfies
 both constraints. This requires sophisticated schema analysis and constraint merging logic.
 
+Additionally, this design includes a discovery system that uses Property-Based Testing (PBT) to systematically find gaps in intersection support by generating random Zod v4 built-in intersection schemas with all their checks and identifying cases where Zod accepts the schema but the faker fails to generate valid data.
+
 ## Architecture
 
 ### Core Components
 
-The intersection implementation consists of three main components:
+The intersection implementation consists of four main components:
 
 1. **Intersection Faker Function** (`fakeIntersection`): The main entry point that handles intersection schema
    processing
 2. **Schema Resolver**: Logic for determining how to combine different schema types
 3. **Constraint Merger**: Utilities for merging compatible constraints from both schemas
+4. **Discovery System**: Property-based testing system for finding unsupported intersection combinations
 
 ### Integration Points
 
@@ -187,6 +190,83 @@ function fakeIntersection(schema, context, rootFake) {
 
 This approach reduces code duplication by ensuring each type combination is handled in only one direction.
 
+## Discovery System Architecture
+
+### Property-Based Schema Generation
+
+The discovery system uses property-based testing to systematically explore the intersection space:
+
+```typescript
+// Schema generator that creates valid Zod v4 built-in schemas with all their checks
+function generateRandomZodSchema(depth: number = 0): z.ZodType {
+  const schemaTypes = [
+    'string', 'number', 'boolean', 'date', 'bigint', 'symbol',
+    'literal', 'enum', 'object', 'array', 'tuple', 'record',
+    'map', 'set', 'union', 'optional', 'nullable', 'default',
+    'readonly', 'nonoptional', 'lazy', 'pipe', 'catch', 'prefault',
+    'function', 'promise', 'file', 'custom', 'any', 'unknown', 'never',
+    'template_literal', 'nan', 'null', 'undefined', 'void'
+  ]
+
+  // Generate based on weighted distribution
+  const type = weightedChoice(schemaTypes, depth)
+  return createSchemaOfTypeWithAllChecks(type, depth)
+}
+
+// Intersection discovery test
+function discoverIntersectionGaps() {
+  for (let i = 0; i < 1000; i++) {
+    const leftSchema = generateRandomZodSchema()
+    const rightSchema = generateRandomZodSchema()
+
+    try {
+      // Test if Zod accepts this intersection
+      const intersectionSchema = z.intersection(leftSchema, rightSchema)
+
+      // Test if our faker can handle it
+      const fakeData = fake(intersectionSchema)
+
+      // Verify the fake data validates against the intersection
+      intersectionSchema.parse(fakeData)
+
+    } catch (error) {
+      // Capture gap: Zod accepts but faker fails
+      captureGap(leftSchema, rightSchema, error)
+    }
+  }
+}
+```
+
+### Gap Analysis Categories
+
+The discovery system categorizes gaps into actionable categories:
+
+1. **Unimplemented Schema Types**: New Zod types not yet supported
+2. **Missing Constraint Handlers**: Specific constraint combinations not handled
+3. **Edge Case Failures**: Rare combinations that cause unexpected errors
+4. **Performance Issues**: Valid intersections that are too slow to generate
+
+### Discovery Test Structure
+
+```typescript
+describe('Intersection Discovery Tests', () => {
+  it('should discover unsupported primitive combinations', () => {
+    // Generate random primitive schema pairs
+    // Test intersection support systematically
+  })
+
+  it('should discover unsupported collection combinations', () => {
+    // Generate random collection schema pairs
+    // Test nested intersection support
+  })
+
+  it('should discover constraint merging gaps', () => {
+    // Generate schemas with various constraints
+    // Test constraint compatibility detection
+  })
+})
+```
+
 ## Data Models
 
 ### Schema Type Classification
@@ -238,6 +318,34 @@ interface ObjectConstraints {
 }
 ```
 
+### Discovery System Data Models
+
+```typescript
+interface DiscoveryGap {
+  leftSchema: SerializedSchema
+  rightSchema: SerializedSchema
+  errorType: 'unimplemented' | 'constraint_conflict' | 'edge_case' | 'performance'
+  errorMessage: string
+  zodAccepts: boolean
+  fakerFails: boolean
+  timestamp: Date
+}
+
+interface SerializedSchema {
+  type: string
+  constraints?: Record<string, any>
+  nested?: SerializedSchema[]
+}
+
+interface GapAnalysisReport {
+  totalTests: number
+  gapsFound: number
+  gapsByCategory: Record<string, DiscoveryGap[]>
+  priorityGaps: DiscoveryGap[]
+  recommendations: string[]
+}
+```
+
 ## Correctness Properties
 
 _A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a
@@ -277,6 +385,12 @@ the system should throw a TypeError with a descriptive message explaining why th
 
 Property 6: Recursion safety _For any_ self-referential schema in an intersection, the resolution process should
 terminate without infinite recursion while still producing valid results **Validates: Requirements 3.2**
+
+Property 7: Discovery system schema generation _For any_ generated random Zod v4 built-in intersection schema with all their checks, the schema should be valid according to Zod's parser and represent a meaningful intersection test case **Validates: Requirements 4.1, 4.5**
+
+Property 8: Gap detection accuracy _For any_ intersection schema that Zod accepts but the faker fails to handle, the discovery system should capture the schema structure and error details with complete information for analysis **Validates: Requirements 4.2**
+
+Property 9: Gap categorization correctness _For any_ set of discovered gaps, the analysis system should categorize them by schema type combinations and error patterns in a way that enables prioritized fixing **Validates: Requirements 4.3, 4.4**
 
 ## Error Handling
 
@@ -336,9 +450,33 @@ The implementation requires both unit tests and property-based tests for compreh
 ### Property-Based Testing Configuration
 
 - **Framework**: Vitest with custom property test utilities
-- **Iterations**: Minimum 100 iterations per property test
+- **Iterations**: Minimum 100 iterations per property test, 1000+ for discovery tests
 - **Test Tags**: Each property test references its design document property
 - **Coverage**: 100% code coverage requirement maintained
+- **Discovery Mode**: Separate test suite for gap discovery with extended iteration counts
+
+### Discovery Testing Strategy
+
+The discovery system uses an extended property-based testing approach:
+
+**Schema Generation Strategy:**
+- Weighted random generation favoring common schema types
+- Depth-limited recursive generation for complex schemas
+- Comprehensive constraint variation to test all Zod v4 built-in checks and validations
+- Bias toward known problematic combinations
+
+**Gap Detection Process:**
+1. Generate random left and right schemas
+2. Create intersection schema using Zod
+3. Attempt to generate fake data using our faker
+4. Validate generated data against intersection schema
+5. Capture any failures with full context
+
+**Analysis and Reporting:**
+- Categorize gaps by schema type patterns
+- Identify high-priority gaps based on frequency
+- Generate actionable recommendations for implementation
+- Track gap resolution over time
 
 ### Test Organization
 
@@ -353,6 +491,24 @@ describe('Intersection Faker Properties', () => {
   it('Property 2: Constraint merging correctness', () => {
     // **Feature: v4-intersection, Property 2: Constraint merging correctness**
     // Test constraint merging across same-type schema pairs
+  })
+})
+
+// Discovery test structure
+describe('Intersection Discovery System', () => {
+  it('Property 7: Discovery system schema generation', () => {
+    // **Feature: v4-intersection, Property 7: Discovery system schema generation**
+    // Test that generated schemas are valid and diverse
+  })
+
+  it('Property 8: Gap detection accuracy', () => {
+    // **Feature: v4-intersection, Property 8: Gap detection accuracy**
+    // Test gap capture and analysis functionality
+  })
+
+  it('Property 9: Gap categorization correctness', () => {
+    // **Feature: v4-intersection, Property 9: Gap categorization correctness**
+    // Test gap analysis and reporting
   })
 })
 ```

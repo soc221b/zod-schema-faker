@@ -13,7 +13,9 @@ simultaneously.
 - **Right_Schema**: The second schema in an intersection operation
 - **Fake_Generator**: The v4 function-based system that generates fake data from schemas
 - **Schema_Resolver**: The algorithm that determines how to combine intersected schemas
-- **Context**: The execution context passed through the v4 faker system
+- **Discovery_System**: The property-based testing system that generates random Zod schemas and tests intersection support
+- **Gap_Analysis**: The process of identifying unsupported intersection combinations by comparing Zod validation with faker generation
+- **Schema_Generator**: A property-based test generator that creates valid Zod v4 built-in schemas with all their checks for intersection testing
 
 ## Requirements
 
@@ -58,3 +60,15 @@ reliable and efficient.
 2. THE Schema_Resolver SHALL avoid infinite recursion when processing self-referential schemas
 3. THE Fake_Generator SHALL reuse the existing v4 context system for configuration and random generation
 4. THE intersection implementation SHALL follow the same patterns as other v4 schema handlers
+
+### Requirement 4: Intersection Discovery and Gap Analysis
+
+**User Story:** As a library maintainer, I want to systematically discover what Zod intersection combinations are accepted by Zod but not supported by the faker, so that I can identify and prioritize implementation gaps.
+
+#### Acceptance Criteria
+
+1. WHEN running property-based discovery tests, THE Discovery_System SHALL generate random Zod v4 built-in intersection schemas with all their checks that are valid according to Zod's parser
+2. WHEN a generated intersection schema is valid in Zod but fails in the faker, THE Discovery_System SHALL capture the schema structure and error details for analysis
+3. WHEN analyzing discovered gaps, THE Discovery_System SHALL categorize failures by schema type combinations and error patterns
+4. WHEN reporting discovery results, THE Discovery_System SHALL provide actionable information about which intersection types need implementation or fixes
+5. THE Discovery_System SHALL use property-based testing to systematically explore the intersection space of all Zod v4 built-in schema types and their checks rather than relying on manual test cases
