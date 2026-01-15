@@ -58,7 +58,7 @@
     "randexp": "0.5.3"
   },
   "devDependencies": {
-    "@types/node": "24.10.8",
+    "@types/node": "24.10.9",
     "@vitest/coverage-v8": "4.0.17",
     "prettier": "3.8.0",
     "prettier-plugin-organize-imports": "4.3.0",
