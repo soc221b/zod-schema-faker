@@ -62,7 +62,7 @@
     "@vitest/coverage-v8": "4.0.17",
     "prettier": "3.8.0",
     "prettier-plugin-organize-imports": "4.3.0",
-    "prettier-plugin-packagejson": "2.5.21",
+    "prettier-plugin-packagejson": "2.5.22",
     "prettier-plugin-sort-json": "4.2.0",
     "rimraf": "6.1.2",
     "ts-expect": "1.3.0",
