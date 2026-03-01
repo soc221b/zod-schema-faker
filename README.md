@@ -16,6 +16,9 @@ Features
 ## Installation
 
 ```sh
+# Ensure peer dependencies are installed:
+npm install --save-dev @faker-js/faker zod
+# Install zod-schema-faker
 npm install --save-dev zod-schema-faker
 ```
 
