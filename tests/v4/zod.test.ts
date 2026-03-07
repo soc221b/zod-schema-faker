@@ -457,6 +457,10 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     //
     //
   },
+  {
+    description: 'nullable transform',
+    schema: z.string().nullable().transform(value => (value === '' ? null : value)),
+  },
 
   // prefault
   {
