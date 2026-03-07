@@ -457,11 +457,6 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     //
     //
   },
-  {
-    description: 'nullable transform',
-    schema: z.string().nullable().transform(value => (value === '' ? null : value)),
-  },
-
   // prefault
   {
     schema: z
@@ -817,6 +812,15 @@ describe('valid', () => {
 
     const data = fn('')
     expect(data).toBeTypeOf('number')
+  })
+
+  test('pipe nullable transform - null branch is reliably exercised', () => {
+    const schema = z.string().nullable().transform(value => (value === '' ? null : value))
+    // Run enough iterations so the nullable faker's null branch is virtually
+    // certain to be hit, deterministically catching any null-access regression.
+    for (let i = 0; i < 100; i++) {
+      expect(() => fake(schema)).not.toThrow()
+    }
   })
 })
 
