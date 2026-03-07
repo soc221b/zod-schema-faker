@@ -457,6 +457,10 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     //
     //
   },
+  {
+    description: 'null transform',
+    schema: z.null().transform(value => value),
+  },
   // prefault
   {
     schema: z
@@ -821,6 +825,13 @@ describe('valid', () => {
     for (let i = 0; i < 100; i++) {
       expect(() => fake(schema)).not.toThrow()
     }
+  })
+
+  test('pipe null transform - always null input, fully deterministic', () => {
+    // z.null() always produces null, so this deterministically exercises the
+    // null-input path in fakePipe on every single run.
+    const schema = z.null().transform(value => value)
+    expect(() => fake(schema)).not.toThrow()
   })
 })
 
