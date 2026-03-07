@@ -817,7 +817,6 @@ describe('valid', () => {
     const data = fn('')
     expect(data).toBeTypeOf('number')
   })
-
 })
 
 describe('invalid', () => {
