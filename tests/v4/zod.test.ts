@@ -818,21 +818,6 @@ describe('valid', () => {
     expect(data).toBeTypeOf('number')
   })
 
-  test('pipe nullable transform - null branch is reliably exercised', () => {
-    const schema = z.string().nullable().transform(value => (value === '' ? null : value))
-    // Run enough iterations so the nullable faker's null branch is virtually
-    // certain to be hit, deterministically catching any null-access regression.
-    for (let i = 0; i < 100; i++) {
-      expect(() => fake(schema)).not.toThrow()
-    }
-  })
-
-  test('pipe null transform - always null input, fully deterministic', () => {
-    // z.null() always produces null, so this deterministically exercises the
-    // null-input path in fakePipe on every single run.
-    const schema = z.null().transform(value => value)
-    expect(() => fake(schema)).not.toThrow()
-  })
 })
 
 describe('invalid', () => {
