@@ -53,17 +53,15 @@
     "pack": "rm -f *.tgz && npm pack && mv zod-schema-faker* zod-schema-faker.tgz",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@faker-js/faker": "10.1.0",
-    "randexp": "0.5.3"
-  },
   "devDependencies": {
+    "@faker-js/faker": "10.0.0",
     "@types/node": "24.12.0",
     "@vitest/coverage-v8": "4.0.18",
     "prettier": "3.8.1",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
     "prettier-plugin-sort-json": "4.2.0",
+    "randexp": "0.5.3",
     "rimraf": "6.1.3",
     "ts-expect": "1.3.0",
     "ts-node": "10.9.2",
@@ -74,6 +72,11 @@
     "zod": "4.1.12"
   },
   "peerDependencies": {
+    "@faker-js/faker": "^10.0.0",
+    "randexp": "^0.5.3",
     "zod": "^3.25.0 || ^4.0.0"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

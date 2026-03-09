@@ -16,7 +16,7 @@ Features
 ## Installation
 
 ```sh
-npm install --save-dev zod-schema-faker
+npm install --save-dev zod-schema-faker @faker-js/faker randexp
 ```
 
 ## Usage

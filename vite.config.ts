@@ -15,12 +15,10 @@ export default defineConfig({
         v3: resolve(__dirname, 'src/v3/index.ts'),
         v4: resolve(__dirname, 'src/v4/index.ts'),
       },
-      name: 'ZodSchemaFaker',
       fileName: 'zod-schema-faker',
-      formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['zod/v3', 'zod/v4/core'],
+      external: ['zod/v3', 'zod/v4/core', '@faker-js/faker', 'randexp'],
       output: [
         {
           format: 'es',
