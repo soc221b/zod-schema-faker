@@ -21,6 +21,5 @@ export function fakePipe<T extends core.$ZodPipe>(
   const payload = { value: left, issues: left?.issues }
   const _context = {}
   const right = schema._zod.def.out._zod.run(payload, _context)
-  payload.value = right
-  return left
+  return right.value
 }
