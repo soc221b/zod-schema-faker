@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version-file: '.nvmrc'
 
@@ -25,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version-file: '.nvmrc'
 
@@ -50,9 +50,9 @@ jobs:
       - test
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v6.3.0
         with:
           node-version-file: '.nvmrc'
 
@@ -60,7 +60,7 @@ jobs:
 
       - run: npm run build
 
-      - uses: JS-DevTools/npm-publish@v4
+      - uses: JS-DevTools/npm-publish@v4.1.5
         id: publish
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
