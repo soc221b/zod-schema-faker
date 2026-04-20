@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version-file: '.nvmrc'
 
@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version-file: '.nvmrc'
 
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6.0.2
 
-      - uses: actions/setup-node@v6.3.0
+      - uses: actions/setup-node@v6.4.0
         with:
           node-version-file: '.nvmrc'
 
