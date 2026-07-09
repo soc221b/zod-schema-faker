@@ -57,7 +57,7 @@
     "@faker-js/faker": "10.5.0",
     "@types/node": "24.13.3",
     "@vitest/coverage-v8": "4.1.10",
-    "prettier": "3.9.4",
+    "prettier": "3.9.5",
     "prettier-plugin-organize-imports": "4.3.0",
     "prettier-plugin-packagejson": "3.0.2",
     "prettier-plugin-sort-json": "4.2.0",
