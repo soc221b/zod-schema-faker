@@ -434,25 +434,6 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // optional
   { schema: z.optional(z.literal('optional')) },
 
-  // pipe
-  {
-    schema: z.pipe(
-      z.string(),
-      z.transform(val => val.length),
-    ),
-  },
-
-  // prefault
-  {
-    schema: z.prefault(
-      z.pipe(
-        z.string(),
-        z.transform(val => val.length),
-      ),
-      'tuna',
-    ),
-  },
-
   // partialRecord
   {
     description: 'partial',
@@ -660,15 +641,6 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
     schema: z.templateLiteral([z.nullable(z.literal('grassy'))]),
   },
 
-  // transform
-  {
-    description: 'transform',
-    schema: z.pipe(
-      z.string(),
-      z.transform(val => val.length),
-    ),
-  },
-
   // tuple
   {
     description: 'rest',
@@ -751,6 +723,43 @@ const invalidSuits: { description?: string; schema: z.ZodMiniType; only?: boolea
   { schema: z.never() },
 ]
 
+const transformSuits: {
+  description?: string
+  schema: z.ZodMiniType
+  only?: boolean
+  assert?: (result: unknown) => void
+}[] = [
+  // pipe / transform
+  {
+    description: 'transform',
+    schema: z.pipe(
+      z.string(),
+      z.transform(val => val.length),
+    ),
+  },
+
+  // prefault
+  {
+    schema: z.prefault(
+      z.pipe(
+        z.string(),
+        z.transform(val => val.length),
+      ),
+      'tuna',
+    ),
+  },
+
+  // null transform
+  {
+    description: 'null transform',
+    schema: z.pipe(
+      z.null(),
+      z.transform(value => value),
+    ),
+    assert: result => expect(result).toBeNull(),
+  },
+]
+
 beforeAll(() => {
   setFaker(faker)
 })
@@ -784,6 +793,22 @@ describe('valid', () => {
 
     const data = fn('')
     expect(data).toBeTypeOf('number')
+  })
+})
+
+describe('transform-like', () => {
+  transformSuits.forEach(({ description, schema, only, assert }) => {
+    let name = schema._zod.def.type
+    if (description) {
+      name += ` ${description}`
+    }
+
+    const t = only ? test.only : test
+    t(name, () => {
+      expect(() => fake(schema)).not.toThrow()
+      const result = fake(schema)
+      assert?.(result)
+    })
   })
 })
 
