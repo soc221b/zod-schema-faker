@@ -814,6 +814,12 @@ describe('valid', () => {
     const data = fn('')
     expect(data).toBeTypeOf('number')
   })
+
+  test('nonoptional chain', { repeats: 5 }, () => {
+    const schema = z.string().optional().nonoptional()
+    const data = fake(schema)
+    expect(data).toBeTypeOf('string')
+  })
 })
 
 describe('invalid', () => {
