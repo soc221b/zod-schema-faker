@@ -10,6 +10,7 @@ import { fakeDefault } from './schemas/default'
 import { fakeEnum } from './schemas/enum'
 import { fakeFile } from './schemas/file'
 import { fakeFunction } from './schemas/function'
+import { fakeIntersection } from './schemas/intersection'
 import { fakeLazy } from './schemas/lazy'
 import { fakeLiteral } from './schemas/literal'
 import { fakeMap } from './schemas/map'
@@ -62,11 +63,10 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'file':
       return fakeFile(schema as any, context, rootFake)
     case 'int':
-      // TODO
-      break
+      // Placeholder for future int type support
+      throw new Error('int type not yet supported in intersections')
     case 'intersection':
-      // TODO
-      break
+      return fakeIntersection(schema as any, context, rootFake)
     case 'lazy':
       return fakeLazy(schema as any, context, rootFake)
     case 'literal':
@@ -104,15 +104,15 @@ export const rootFake: RootFake = ((schema: core.$ZodType, context) => {
     case 'string':
       return fakeString(schema as any, context, rootFake)
     case 'success':
-      // TODO
-      break
+      // Placeholder for future success type support
+      throw new Error('success type not yet supported in intersections')
     case 'symbol':
       return fakeSymbol(schema as any, context, rootFake)
     case 'template_literal':
       return fakeTemplateLiteral(schema as any, context, rootFake)
     case 'transform':
-      // TODO
-      break
+      // Placeholder for future transform type support
+      throw new Error('transform type not yet supported in intersections')
     case 'tuple':
       return fakeTuple(schema as any, context, rootFake)
     case 'undefined':
