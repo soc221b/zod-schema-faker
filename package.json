@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",
-    "@types/node": "24.13.4",
+    "@types/node": "24.13.5",
     "@vitest/coverage-v8": "5.0.0",
     "prettier": "3.9.6",
     "prettier-plugin-organize-imports": "4.3.0",
