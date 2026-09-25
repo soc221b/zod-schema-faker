@@ -6,7 +6,7 @@
     "test": "npx tsc -p tsconfig.json"
   },
   "dependencies": {
-    "zod": "3.25.76"
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@faker-js/faker": "10.6.0",
