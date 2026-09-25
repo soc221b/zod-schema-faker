@@ -171,7 +171,7 @@ describe('file faker', () => {
       ]
 
       unknownMimeTypes.forEach(mimeType => {
-        const schema = z.file().check(z.mime([mimeType]))
+        const schema = z.file().check(z.mime([mimeType]), z.minSize(1))
         const result = fake(schema)
 
         expect(result).toBeInstanceOf(File)
@@ -870,7 +870,7 @@ describe('file faker', () => {
       ]
 
       unknownMimeTypes.forEach(mimeType => {
-        const schema = z.file().check(z.mime([mimeType]))
+        const schema = z.file().check(z.mime([mimeType]), z.minSize(1))
         const result = fake(schema)
 
         expect(result).toBeInstanceOf(File)
@@ -910,7 +910,7 @@ describe('file faker', () => {
       ]
 
       fallbackMimeTypes.forEach(mimeType => {
-        const schema = z.file().check(z.mime([mimeType]))
+        const schema = z.file().check(z.mime([mimeType]), z.minSize(1))
         const result = fake(schema)
 
         expect(result).toBeInstanceOf(File)
