@@ -83,6 +83,8 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { schema: z.date() },
   { description: 'min', schema: z.date().check(z.minimum(new Date('3000-01-01'))) },
   { description: 'max', schema: z.date().check(z.maximum(new Date('1000-01-01'))) },
+  { description: 'gt', schema: z.date().check(z.gt(new Date('3000-01-01'))) },
+  { description: 'lt', schema: z.date().check(z.lt(new Date('1000-01-01'))) },
   {
     description: 'multiple min',
     schema: z
@@ -523,6 +525,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { description: 'email', schema: z.string().check(z.email()) },
   { description: 'emoji', schema: z.string().check(z.emoji()) },
   { description: 'guid', schema: z.string().check(z.guid()) },
+  ...('iban' in z ? [{ description: 'iban', schema: z.string().check(z.iban()) }] : []),
   { description: 'ipv4', schema: z.string().check(z.ipv4()) },
   { description: 'ipv6', schema: z.string().check(z.ipv6()) },
   { description: 'jwt', schema: z.string().check(z.jwt()) },
@@ -550,6 +553,7 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { description: 'email unicode', schema: z.email({ pattern: z.regexes.unicodeEmail }) },
   { description: 'emoji', schema: z.emoji() },
   { description: 'guid', schema: z.guid() },
+  ...('iban' in z ? [{ description: 'iban', schema: z.iban() }] : []),
   { description: 'hash md5', schema: z.hash('md5') },
   { description: 'hash md5 hex', schema: z.hash('md5', { enc: 'hex' }) },
   { description: 'hash md5 base64', schema: z.hash('md5', { enc: 'base64' }) },
