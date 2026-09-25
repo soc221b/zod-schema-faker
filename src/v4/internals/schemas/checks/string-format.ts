@@ -109,6 +109,10 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
       data = randexp(core.regexes.guid)
       break
     }
+    case 'iban': {
+      data = getFaker().finance.iban()
+      break
+    }
     case 'ipv4': {
       data = randexp(core.regexes.ipv4)
       break

@@ -80,6 +80,7 @@ export function fakeString<T extends core.$ZodString>(
               | 'email'
               | 'emoji'
               | 'guid'
+              | 'iban'
               | 'ipv4'
               | 'ipv6'
               | 'json_string'

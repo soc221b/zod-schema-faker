@@ -9,7 +9,19 @@ export function fakeDate<T extends core.$ZodDate>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  const minDate: Date = schema._zod.bag.minimum ?? new Date(-8640000000000000)
-  const maxDate: Date = schema._zod.bag.maximum ?? new Date(8640000000000000)
-  return getFaker().date.between({ from: minDate, to: maxDate })
+  let min = -8640000000000000
+  let max = 8640000000000000
+  for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
+    switch (check._zod.def.check) {
+      case 'greater_than': {
+        min = Math.max(min, Number(check._zod.def.value) + (check._zod.def.inclusive ? 0 : 1))
+        break
+      }
+      case 'less_than': {
+        max = Math.min(max, Number(check._zod.def.value) - (check._zod.def.inclusive ? 0 : 1))
+        break
+      }
+    }
+  }
+  return getFaker().date.between({ from: new Date(min), to: new Date(max) })
 }
