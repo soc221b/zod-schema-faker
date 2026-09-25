@@ -12,6 +12,10 @@
     {
       "matchDepTypes": ["engines", "peerDependencies"],
       "rangeStrategy": "auto"
+    },
+    {
+      "matchFileNames": ["e2e/**"],
+      "enabled": false
     }
   ]
 }
