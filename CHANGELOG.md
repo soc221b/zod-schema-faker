@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.2](https://github.com/soc221b/zod-schema-faker/compare/2.1.1...2.1.2) (2026-09-25)
+
+
+### Bug Fixes
+
+* [#760](https://github.com/soc221b/zod-schema-faker/issues/760) ([680d27b](https://github.com/soc221b/zod-schema-faker/commit/680d27b42f34dda8d9b93a7607bfd22d6b4b71ff))
+* date min and max not respected with Zod 4.6 ([680d27b](https://github.com/soc221b/zod-schema-faker/commit/680d27b42f34dda8d9b93a7607bfd22d6b4b71ff))
+
 ## [2.1.1](https://github.com/soc221b/zod-schema-faker/compare/2.1.0...2.1.1) (2026-03-09)
 
 
