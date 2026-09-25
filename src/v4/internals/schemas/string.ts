@@ -70,6 +70,7 @@ export function fakeString<T extends core.$ZodString>(
               | 'base64url'
               | 'cidrv4'
               | 'cidrv6'
+              | 'credit_card'
               | 'cuid'
               | 'cuid2'
               | 'date'

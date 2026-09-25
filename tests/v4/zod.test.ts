@@ -552,6 +552,7 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
   { description: 'base64url', schema: z.base64url() },
   { description: 'cidrv4', schema: z.cidrv4() },
   { description: 'cidrv6', schema: z.cidrv6() },
+  ...('creditCard' in z ? [{ description: 'credit card', schema: z.creditCard() }] : []),
   { description: 'cuid', schema: z.cuid() },
   { description: 'cuid2', schema: z.cuid2() },
   { description: 'e164', schema: z.e164() },
