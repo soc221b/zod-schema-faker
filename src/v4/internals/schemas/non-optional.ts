@@ -8,5 +8,11 @@ export function fakeNonOptional<T extends core.$ZodNonOptional>(
   context: Context,
   rootFake: typeof internalFake,
 ): Infer<T> {
-  return rootFake(schema._zod.def.innerType, context)
+  // Unwrap multiple inner optional layers if they exist
+  // A known issue is that this cannot handle `z.string().optional().nullable().nonoptional()`, But this should still solve most common cases
+  let innerType = schema._zod.def.innerType
+  while (innerType instanceof core.$ZodOptional) {
+    innerType = innerType._zod.def.innerType
+  }
+  return rootFake(innerType, context)
 }
