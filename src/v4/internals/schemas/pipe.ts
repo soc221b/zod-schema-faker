@@ -17,10 +17,9 @@ export function fakePipe<T extends core.$ZodPipe>(
     return getFaker().helpers.arrayElement(stringBoolValues)
   }
 
-  const left = rootFake(schema._zod.def.in, context) as any
-  const payload = { value: left, issues: left.issues }
-  const _context = {}
-  const right = schema._zod.def.out._zod.run(payload, _context)
-  payload.value = right
-  return left
+  if (schema._zod.def.in._zod.def.type === 'transform') {
+    return rootFake(schema._zod.def.out, context) as any
+  }
+
+  return rootFake(schema._zod.def.in, context) as any
 }

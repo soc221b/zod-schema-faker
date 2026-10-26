@@ -54,6 +54,29 @@ const data = fake(Player)
 console.log(data) // { username: "billie", xp: 100 }
 ```
 
+### Input vs. Output
+
+v4 or mini: `fake()` returns the schema input (`z.input<T>`), which is what `parse()` accepts. To get the output
+(`z.output<T>`), decode or parse the fake data.
+
+```mermaid
+sequenceDiagram
+  participant unknown
+  participant input as z.input#lt;T#gt;
+  participant output as z.output#lt;T#gt;
+  unknown->>output: z.parse()
+  unknown->>input: fake()
+  input->>output: z.decode()
+  output->>input: z.encode()
+```
+
+```ts
+const schema = z.string().transform(val => val.length)
+
+const input = fake(schema) // 'billie'
+const output = z.decode(schema, input) // 6
+```
+
 ### Fake Custom types
 
 v3:
@@ -130,7 +153,7 @@ const data = fake(pxSchema) // '100px'
 
 #### Core APIs
 
-- `function fake<T extends core.$ZodType>(schema: T): core.infer<T>`: Generate fake data based on schema.
+- `function fake<T extends core.$ZodType>(schema: T): core.input<T>`: Generate fake input data based on schema.
 
 #### Random Utility APIs
 
@@ -144,7 +167,7 @@ const data = fake(pxSchema) // '100px'
 #### Customization APIs
 
 - `function custom<T extends core.$ZodType>(schema: T, fake: Fake<T>): void`: Generate fake data based on schema.
-- `type Fake<T extends core.$ZodType> = (schema: T, context: Context, rootFake: RootFake) => core.infer<T>`: Custom fake
+- `type Fake<T extends core.$ZodType> = (schema: T, context: Context, rootFake: RootFake) => core.input<T>`: Custom fake
   function.
 
 ## Unsupported
@@ -158,7 +181,6 @@ const data = fake(pxSchema) // '100px'
 
 - .codec 🚧
 - .intersection 🚧
-- .preprocess 🚧
 - .refine ❌
 - .stringbool custom 🚧
 - .stringFormat custom 🚧

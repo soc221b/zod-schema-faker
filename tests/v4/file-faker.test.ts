@@ -546,7 +546,9 @@ describe('file faker', () => {
           expect(complexResult.optionalFile.type).toBe('image/png')
         }
 
-        expect(complexResult.defaultFile).toBeInstanceOf(File)
+        if (complexResult.defaultFile !== undefined) {
+          expect(complexResult.defaultFile).toBeInstanceOf(File)
+        }
       }
     })
   })
