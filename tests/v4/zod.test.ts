@@ -111,6 +111,13 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
   // default
   { schema: z.string().default('tuna') },
   { description: 'function', schema: z.number().default(Math.random) },
+  {
+    description: 'output differs from input',
+    schema: z
+      .string()
+      .transform(val => val.length)
+      .default(5),
+  },
 
   // discriminatedUnion
   {
@@ -459,6 +466,7 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     //
     //
   },
+  { description: 'null input with transform', schema: z.null().transform(val => val) },
 
   // prefault
   {
@@ -470,6 +478,9 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     //
     //
   },
+
+  // preprocess
+  { schema: z.preprocess(val => val, z.string()) },
 
   // partialRecord
   {

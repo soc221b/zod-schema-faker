@@ -111,6 +111,16 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   // default
   { schema: z._default(z.string(), 'tuna') },
   { description: 'function', schema: z._default(z.number(), Math.random) },
+  {
+    description: 'output differs from input',
+    schema: z._default(
+      z.pipe(
+        z.string(),
+        z.transform(val => val.length),
+      ),
+      5,
+    ),
+  },
 
   // discriminatedUnion
   {
@@ -441,6 +451,13 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
     schema: z.pipe(
       z.string(),
       z.transform(val => val.length),
+    ),
+  },
+  {
+    description: 'null input with transform',
+    schema: z.pipe(
+      z.null(),
+      z.transform(val => val),
     ),
   },
 
