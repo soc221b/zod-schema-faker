@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/soc221b/zod-schema-faker/compare/2.1.2...3.0.0) (2026-10-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* v4 `fake()` now returns the schema input (`z.input<T>`) instead of the output, and custom fakers (`Fake<T>`) must return it too. Use `z.decode(schema, fake(schema))` to get output data.
+
+### Bug Fixes
+
+* [#674](https://github.com/soc221b/zod-schema-faker/issues/674) ([dfe7eb4](https://github.com/soc221b/zod-schema-faker/commit/dfe7eb452114d08b4ee851f591394d887762b5b9))
+* fake schema input instead of output ([#785](https://github.com/soc221b/zod-schema-faker/issues/785)) ([dfe7eb4](https://github.com/soc221b/zod-schema-faker/commit/dfe7eb452114d08b4ee851f591394d887762b5b9)), closes [#674](https://github.com/soc221b/zod-schema-faker/issues/674)
+
 ## [2.1.2](https://github.com/soc221b/zod-schema-faker/compare/2.1.1...2.1.2) (2026-09-25)
 
 
