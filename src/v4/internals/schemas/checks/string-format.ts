@@ -83,9 +83,12 @@ export function fakeStringFormat<T extends core.$ZodStringFormat>(
     }
     case 'email': {
       const regex = schema._zod.def.pattern ? schema._zod.def.pattern : core.regexes.email
-      data = randexp(regex)
-      if (practicalEmailRegex.source === regex.source) {
-        data = data.replace(/\.\./g, '.').replace(/^\./, 'a')
+      if (regex.source === practicalEmailRegex.source || regex.source === core.regexes.email.source) {
+        data = randexp(practicalEmailRegex)
+          .replace(/\.{2,}/g, '.')
+          .replace(/^\./, 'a')
+      } else {
+        data = randexp(regex)
       }
       break
     }
