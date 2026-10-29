@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.1](https://github.com/soc221b/zod-schema-faker/compare/3.0.0...3.0.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* restore email generation speed with Zod 4.6 ([#790](https://github.com/soc221b/zod-schema-faker/issues/790)) ([5315726](https://github.com/soc221b/zod-schema-faker/commit/53157268bebd3f7f97835fd948d0a736730c71f3)), closes [#788](https://github.com/soc221b/zod-schema-faker/issues/788)
+
 ## [3.0.0](https://github.com/soc221b/zod-schema-faker/compare/2.1.2...3.0.0) (2026-10-26)
 
 
