@@ -829,6 +829,14 @@ describe('valid', () => {
     const data = fn('')
     expect(data).toBeTypeOf('number')
   })
+
+  test('email local part stays short', () => {
+    const schema = z.email()
+    for (let i = 0; i < 100; i++) {
+      const [local] = fake(schema).split('@')
+      expect(local.length).toBeLessThanOrEqual(101)
+    }
+  })
 })
 
 describe('invalid', () => {
