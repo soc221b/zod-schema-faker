@@ -252,6 +252,13 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
 
   // map
   { schema: z.map(z.string(), z.number()) },
+  { description: 'min', schema: z.map(z.string(), z.number()).min(1) },
+  { description: 'max', schema: z.map(z.string(), z.number()).max(10) },
+  { description: 'size', schema: z.map(z.string(), z.number()).size(5) },
+  { description: 'nonempty', schema: z.map(z.string(), z.number()).nonempty() },
+  { description: 'min (multiple)', schema: z.map(z.string(), z.number()).min(3).min(1).min(2) },
+  { description: 'max (multiple)', schema: z.map(z.string(), z.number()).max(1).max(3).max(2) },
+  { description: 'size (enum keys)', schema: z.map(z.enum(['a', 'b', 'c']), z.number()).size(3) },
 
   // nan
   { schema: z.nan() },
@@ -791,6 +798,12 @@ const invalidSuits: { description?: string; schema: z.ZodType; only?: boolean; a
       .check(z.mime(['application/json'])),
   },
 
+  // map
+  { description: 'min > max', schema: z.map(z.string(), z.number()).min(6).max(4) },
+  { description: 'min > size', schema: z.map(z.string(), z.number()).min(6).size(5) },
+  { description: 'max < size', schema: z.map(z.string(), z.number()).max(4).size(5) },
+  { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).size(3) },
+
   // never
   { schema: z.never() },
 ]
@@ -828,6 +841,20 @@ describe('valid', () => {
 
     const data = fn('')
     expect(data).toBeTypeOf('number')
+  })
+
+  test('map size checks are respected', () => {
+    const schemas = [
+      z.map(z.string(), z.number()).size(3),
+      z.map(z.string(), z.number()).min(2).max(4),
+      z.map(z.string(), z.number()).nonempty(),
+      z.map(z.enum(['a', 'b', 'c']), z.number()).min(3),
+    ]
+    for (const schema of schemas) {
+      for (let i = 0; i < 100; i++) {
+        schema.parse(fake(schema))
+      }
+    }
   })
 
   test('email local part stays short', () => {

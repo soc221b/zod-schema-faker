@@ -239,6 +239,18 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
 
   // map
   { schema: z.map(z.string(), z.number()) },
+  { description: 'min', schema: z.map(z.string(), z.number()).check(z.minSize(1)) },
+  { description: 'max', schema: z.map(z.string(), z.number()).check(z.maxSize(10)) },
+  { description: 'size', schema: z.map(z.string(), z.number()).check(z.size(5)) },
+  {
+    description: 'min (multiple)',
+    schema: z.map(z.string(), z.number()).check(z.minSize(3), z.minSize(1), z.minSize(2)),
+  },
+  {
+    description: 'max (multiple)',
+    schema: z.map(z.string(), z.number()).check(z.maxSize(1), z.maxSize(3), z.maxSize(2)),
+  },
+  { description: 'size (enum keys)', schema: z.map(z.enum(['a', 'b', 'c']), z.number()).check(z.size(3)) },
 
   // nan
   { schema: z.nan() },
@@ -769,6 +781,12 @@ const invalidSuits: { description?: string; schema: z.ZodMiniType; only?: boolea
         z.minimum(new Date('2222-01-01T00:00:00.000Z')),
       ),
   },
+
+  // map
+  { description: 'min > max', schema: z.map(z.string(), z.number()).check(z.minSize(6), z.maxSize(4)) },
+  { description: 'min > size', schema: z.map(z.string(), z.number()).check(z.minSize(6), z.size(5)) },
+  { description: 'max < size', schema: z.map(z.string(), z.number()).check(z.maxSize(4), z.size(5)) },
+  { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).check(z.size(3)) },
 
   // never
   { schema: z.never() },
