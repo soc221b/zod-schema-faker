@@ -252,13 +252,18 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
 
   // map
   { schema: z.map(z.string(), z.number()) },
-  { description: 'min', schema: z.map(z.string(), z.number()).min(1) },
-  { description: 'max', schema: z.map(z.string(), z.number()).max(10) },
-  { description: 'size', schema: z.map(z.string(), z.number()).size(5) },
-  { description: 'nonempty', schema: z.map(z.string(), z.number()).nonempty() },
-  { description: 'min (multiple)', schema: z.map(z.string(), z.number()).min(3).min(1).min(2) },
-  { description: 'max (multiple)', schema: z.map(z.string(), z.number()).max(1).max(3).max(2) },
-  { description: 'size (enum keys)', schema: z.map(z.enum(['a', 'b', 'c']), z.number()).size(3) },
+  { description: 'min', schema: z.map(z.string(), z.number()).check(z.minSize(1)) },
+  { description: 'max', schema: z.map(z.string(), z.number()).check(z.maxSize(10)) },
+  { description: 'size', schema: z.map(z.string(), z.number()).check(z.size(5)) },
+  {
+    description: 'min (multiple)',
+    schema: z.map(z.string(), z.number()).check(z.minSize(3), z.minSize(1), z.minSize(2)),
+  },
+  {
+    description: 'max (multiple)',
+    schema: z.map(z.string(), z.number()).check(z.maxSize(1), z.maxSize(3), z.maxSize(2)),
+  },
+  { description: 'size (enum keys)', schema: z.map(z.enum(['a', 'b', 'c']), z.number()).check(z.size(3)) },
 
   // nan
   { schema: z.nan() },
@@ -802,10 +807,10 @@ const invalidSuits: { description?: string; schema: z.ZodType; only?: boolean; a
   },
 
   // map
-  { description: 'min > max', schema: z.map(z.string(), z.number()).min(6).max(4) },
-  { description: 'min > size', schema: z.map(z.string(), z.number()).min(6).size(5) },
-  { description: 'max < size', schema: z.map(z.string(), z.number()).max(4).size(5) },
-  { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).size(3) },
+  { description: 'min > max', schema: z.map(z.string(), z.number()).check(z.minSize(6), z.maxSize(4)) },
+  { description: 'min > size', schema: z.map(z.string(), z.number()).check(z.minSize(6), z.size(5)) },
+  { description: 'max < size', schema: z.map(z.string(), z.number()).check(z.maxSize(4), z.size(5)) },
+  { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).check(z.size(3)) },
 
   // set
   { description: 'min > max', schema: z.set(z.number()).min(6).max(4) },
@@ -854,10 +859,9 @@ describe('valid', () => {
 
   test('map and set size checks are respected', () => {
     const schemas: z.ZodType[] = [
-      z.map(z.string(), z.number()).size(3),
-      z.map(z.string(), z.number()).min(2).max(4),
-      z.map(z.string(), z.number()).nonempty(),
-      z.map(z.enum(['a', 'b', 'c']), z.number()).min(3),
+      z.map(z.string(), z.number()).check(z.size(3)),
+      z.map(z.string(), z.number()).check(z.minSize(2), z.maxSize(4)),
+      z.map(z.enum(['a', 'b', 'c']), z.number()).check(z.minSize(3)),
       z.set(z.string()).size(3),
       z.set(z.string()).min(2).max(4),
       z.set(z.string()).nonempty(),
@@ -879,12 +883,12 @@ describe('valid', () => {
 
     expect(fake(z.set(Letter).size(2))).toEqual(new Set(['a', 'b']))
     calls = 0
-    expect([...fake(z.map(Letter, z.number()).size(2)).keys()].sort()).toEqual(['a', 'b'])
+    expect([...fake(z.map(Letter, z.number()).check(z.size(2))).keys()].sort()).toEqual(['a', 'b'])
   })
 
   test('map and set fill every possible value', () => {
     const values = Array.from({ length: 100 }, (_, i) => `v${i}`) as [string, ...string[]]
-    const schemas: z.ZodType[] = [z.set(z.enum(values)).size(100), z.map(z.enum(values), z.number()).size(100)]
+    const schemas: z.ZodType[] = [z.set(z.enum(values)).size(100), z.map(z.enum(values), z.number()).check(z.size(100))]
     for (const schema of schemas) {
       for (let i = 0; i < 100; i++) {
         schema.parse(fake(schema))
