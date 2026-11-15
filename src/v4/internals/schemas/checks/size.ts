@@ -52,9 +52,26 @@ export function fakeSize(checks: core.$ZodCheck<never>[] | undefined, context: C
 }
 
 /**
- * Generated keys or values may collide (e.g. `z.boolean()` or `z.enum()`), so callers keep drawing until the collection
- * reaches the target size, giving up after this many attempts.
+ * Generated keys or values may collide (e.g. `z.boolean()` or `z.enum()`), so keep calling `add` until `collection`
+ * reaches `size`, giving up after too many duplicates in a row.
+ *
+ * Below `min` the result would be invalid, so allow enough duplicates to collect every possible value even when there
+ * are exactly `min` of them. At or above `min` the result is already valid, so stop early rather than spin on a small
+ * domain (e.g. `z.set(z.boolean())` aiming for 7 values).
  */
-export function maxAttempts(size: number): number {
-  return size * 10 + 10
+export function fillUnique(collection: { readonly size: number }, min: number, size: number, add: () => void): void {
+  let duplicates = 0
+  while (collection.size < size) {
+    const before = collection.size
+    add()
+    if (collection.size > before) {
+      duplicates = 0
+      continue
+    }
+    duplicates++
+    const maxDuplicates = collection.size < min ? 100 + 30 * min : 10
+    if (duplicates >= maxDuplicates) {
+      break
+    }
+  }
 }

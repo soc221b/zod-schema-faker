@@ -871,6 +871,45 @@ describe('valid', () => {
     }
   })
 
+  test('map and set keep drawing past long runs of duplicates', () => {
+    // fakes 'a' 50 times in a row before the first 'b'
+    const Letter = z.custom<'a' | 'b'>(val => val === 'a' || val === 'b')
+    let calls = 0
+    custom(Letter, () => (calls++ < 50 ? 'a' : 'b'))
+
+    expect(fake(z.set(Letter).size(2))).toEqual(new Set(['a', 'b']))
+    calls = 0
+    expect([...fake(z.map(Letter, z.number()).size(2)).keys()].sort()).toEqual(['a', 'b'])
+  })
+
+  test('map and set fill every possible value', () => {
+    const values = Array.from({ length: 100 }, (_, i) => `v${i}`) as [string, ...string[]]
+    const schemas: z.ZodType[] = [z.set(z.enum(values)).size(100), z.map(z.enum(values), z.number()).size(100)]
+    for (const schema of schemas) {
+      for (let i = 0; i < 100; i++) {
+        schema.parse(fake(schema))
+      }
+    }
+  })
+
+  test('map and set stop early on duplicates once the minimum is met', () => {
+    const Constant = z.custom<'a'>(val => val === 'a')
+    let calls = 0
+    custom(Constant, () => {
+      calls++
+      return 'a' as const
+    })
+
+    for (let i = 0; i < 20; i++) {
+      calls = 0
+      fake(z.set(Constant))
+      expect(calls).toBeLessThanOrEqual(11)
+      calls = 0
+      fake(z.map(Constant, z.number()))
+      expect(calls).toBeLessThanOrEqual(11)
+    }
+  })
+
   test('email local part stays short', () => {
     const schema = z.email()
     for (let i = 0; i < 100; i++) {
