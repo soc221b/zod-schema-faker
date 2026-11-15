@@ -1,53 +1,17 @@
 import * as core from 'zod/v4/core'
-import { MAX_DEPTH } from '../config'
 import { Context } from '../context'
 import { rootFake as internalFake } from '../fake'
-import { getFaker } from '../random'
 import { Infer } from '../type'
+import { fakeSize, maxAttempts } from './checks/size'
 
 export function fakeSet<T extends core.$ZodSet>(schema: T, context: Context, rootFake: typeof internalFake): Infer<T> {
-  let min = 0
-  let max = Infinity
-  for (const check of (schema._zod.def.checks ?? []) as core.$ZodChecks[]) {
-    switch (check._zod.def.check) {
-      case 'max_size': {
-        max = Math.min(max, check._zod.def.maximum)
-        break
-      }
-      case 'min_size': {
-        min = Math.max(min, check._zod.def.minimum)
-        break
-      }
-      case 'size_equals': {
-        min = check._zod.def.size
-        max = check._zod.def.size
-        break
-      }
-      default: {
-        const _:
-          | 'bigint_format'
-          | 'greater_than'
-          | 'length_equals'
-          | 'less_than'
-          | 'max_length'
-          | 'mime_type'
-          | 'min_length'
-          | 'multiple_of'
-          | 'number_format'
-          | 'overwrite'
-          | 'property'
-          | 'string_format'
-          | never = check._zod.def.check
-        break
-      }
-    }
+  const { min, size } = fakeSize(schema._zod.def.checks, context)
+  const set = new Set()
+  for (let attempt = 0; set.size < size && attempt < maxAttempts(size); attempt++) {
+    set.add(rootFake(schema._zod.def.valueType, context))
   }
-
-  max = max === Infinity ? min + getFaker().number.int({ min: 0, max: 10 }) : max
-  if (context.depth > MAX_DEPTH) {
-    max = min
+  if (set.size < min) {
+    throw new RangeError(`Unable to generate ${min} unique values for set`)
   }
-  return new Set(
-    getFaker().helpers.multiple(() => rootFake(schema._zod.def.valueType, context), { count: { min, max } }),
-  )
+  return set as Infer<T>
 }

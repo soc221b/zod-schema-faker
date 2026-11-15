@@ -525,6 +525,8 @@ const validSuits: { description?: string; schema: z.ZodMiniType; only?: boolean;
   { description: 'size', schema: z.set(z.number()).check(z.size(5)) },
   { description: 'min (multiple)', schema: z.set(z.number()).check(z.minSize(3), z.minSize(1), z.minSize(2)) },
   { description: 'max (multiple)', schema: z.set(z.number()).check(z.maxSize(1), z.maxSize(3), z.maxSize(2)) },
+  { description: 'size (enum values)', schema: z.set(z.enum(['a', 'b', 'c'])).check(z.size(3)) },
+  { description: 'size (boolean values)', schema: z.set(z.boolean()).check(z.size(2)) },
 
   // string
   { schema: z.string() },
@@ -787,6 +789,12 @@ const invalidSuits: { description?: string; schema: z.ZodMiniType; only?: boolea
   { description: 'min > size', schema: z.map(z.string(), z.number()).check(z.minSize(6), z.size(5)) },
   { description: 'max < size', schema: z.map(z.string(), z.number()).check(z.maxSize(4), z.size(5)) },
   { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).check(z.size(3)) },
+
+  // set
+  { description: 'min > max', schema: z.set(z.number()).check(z.minSize(6), z.maxSize(4)) },
+  { description: 'min > size', schema: z.set(z.number()).check(z.minSize(6), z.size(5)) },
+  { description: 'max < size', schema: z.set(z.number()).check(z.maxSize(4), z.size(5)) },
+  { description: 'not enough unique values', schema: z.set(z.boolean()).check(z.size(3)) },
 
   // never
   { schema: z.never() },

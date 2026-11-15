@@ -530,6 +530,9 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
   { description: 'size', schema: z.set(z.number()).size(5) },
   { description: 'min (multiple)', schema: z.set(z.number()).min(3).min(1).min(2) },
   { description: 'max (multiple)', schema: z.set(z.number()).max(1).max(3).max(2) },
+  { description: 'nonempty', schema: z.set(z.number()).nonempty() },
+  { description: 'size (enum values)', schema: z.set(z.enum(['a', 'b', 'c'])).size(3) },
+  { description: 'size (boolean values)', schema: z.set(z.boolean()).size(2) },
 
   // string
   { schema: z.string() },
@@ -804,6 +807,12 @@ const invalidSuits: { description?: string; schema: z.ZodType; only?: boolean; a
   { description: 'max < size', schema: z.map(z.string(), z.number()).max(4).size(5) },
   { description: 'not enough unique keys', schema: z.map(z.boolean(), z.number()).size(3) },
 
+  // set
+  { description: 'min > max', schema: z.set(z.number()).min(6).max(4) },
+  { description: 'min > size', schema: z.set(z.number()).min(6).size(5) },
+  { description: 'max < size', schema: z.set(z.number()).max(4).size(5) },
+  { description: 'not enough unique values', schema: z.set(z.boolean()).size(3) },
+
   // never
   { schema: z.never() },
 ]
@@ -843,12 +852,17 @@ describe('valid', () => {
     expect(data).toBeTypeOf('number')
   })
 
-  test('map size checks are respected', () => {
-    const schemas = [
+  test('map and set size checks are respected', () => {
+    const schemas: z.ZodType[] = [
       z.map(z.string(), z.number()).size(3),
       z.map(z.string(), z.number()).min(2).max(4),
       z.map(z.string(), z.number()).nonempty(),
       z.map(z.enum(['a', 'b', 'c']), z.number()).min(3),
+      z.set(z.string()).size(3),
+      z.set(z.string()).min(2).max(4),
+      z.set(z.string()).nonempty(),
+      z.set(z.enum(['a', 'b', 'c'])).min(3),
+      z.set(z.boolean()).size(2),
     ]
     for (const schema of schemas) {
       for (let i = 0; i < 100; i++) {
