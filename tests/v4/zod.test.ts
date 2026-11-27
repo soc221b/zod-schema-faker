@@ -225,6 +225,29 @@ const validSuits: { description?: string; schema: z.ZodType; only?: boolean; asy
     })(),
   },
 
+  {
+    description: 'custom faker on a non-custom schema',
+    schema: (() => {
+      const TestSchema = z
+        .string()
+        .check(z.refine(value => /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value))))
+        .brand<'date-string'>()
+      const fakeTest: Fake<typeof TestSchema> = () => {
+        return getFaker().date.anytime().toISOString().slice(0, 10) as z.output<typeof TestSchema>
+      }
+      custom(TestSchema, fakeTest)
+      return TestSchema
+    })(),
+  },
+  {
+    description: 'custom faker on a nested non-custom schema',
+    schema: (() => {
+      const TestSchema = z.string().check(z.refine(value => value === 'registered'))
+      custom(TestSchema, () => 'registered')
+      return z.object({ value: TestSchema, list: z.array(TestSchema) })
+    })(),
+  },
+
   // TODO: intersection
   // { schema: z.intersection(z.union([z.number(), z.string()]), z.union([z.number(), z.boolean()])) },
   // {
